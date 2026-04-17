@@ -60,10 +60,20 @@ export default function WaitlistPage() {
     if (!email) return;
 
     setLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setSubmitted(true);
-    setLoading(false);
+    try {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbz7I9bwR6WbiBMqPUKDQw7WDMNMgmcPGmWwilKN5knRIbj7njNTH3ESSxsb8CdIz05t/exec",
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
+    } finally {
+      setSubmitted(true);
+      setLoading(false);
+    }
   };
 
   return (
