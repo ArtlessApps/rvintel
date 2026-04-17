@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build / Next.js
+.next
+out
+build
+dist
+
+# Debug / env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.env
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE / OS
+.DS_Store
+.idea
+*.swp
+*.swo
+
+# Testing
+coverage
