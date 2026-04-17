@@ -129,8 +129,7 @@ export default function WaitlistPage() {
 
                 <p className="text-base sm:text-lg text-muted-foreground leading-relaxed text-pretty max-w-xl mx-auto lg:mx-0 mb-8">
                   RV rental owners fly blind on pricing. RVIntel gives you the
-                  market intelligence to know exactly what your rig should earn —
-                  before you leave a single dollar behind.
+                  market intelligence to know exactly what your rig should earn.
                 </p>
 
                 <div id="waitlist" className="max-w-md mx-auto lg:mx-0 w-full">
@@ -172,7 +171,7 @@ export default function WaitlistPage() {
                     </div>
                   )}
                   <p className="text-sm text-muted-foreground mt-4">
-                    Join 500+ RV owners waiting for launch. No spam, ever.
+                    Be among the first to get access. No spam, ever.
                   </p>
                 </div>
               </div>
