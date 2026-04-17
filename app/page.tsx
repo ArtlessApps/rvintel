@@ -115,17 +115,17 @@ export default function WaitlistPage() {
           <div className="max-w-7xl mx-auto w-full">
             <div className="grid gap-12 lg:gap-14 lg:grid-cols-2 lg:items-center">
               <div className="flex flex-col justify-center text-center lg:text-left order-2 lg:order-1">
+                <h1
+                  id="hero-heading"
+                  className="text-3xl sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1] font-bold text-foreground tracking-tight text-balance mb-6"
+                >
+                  Stop Leaving Money on the Table
+                </h1>
+
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 mx-auto lg:mx-0 w-fit">
                   <Sparkles className="w-4 h-4 shrink-0" aria-hidden />
                   <span>Early Access Opening Soon</span>
                 </div>
-
-                <h1
-                  id="hero-heading"
-                  className="text-3xl sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1] font-bold text-foreground tracking-tight text-balance mb-4"
-                >
-                  Stop Leaving Money on the Table
-                </h1>
 
                 <p className="text-base sm:text-lg text-muted-foreground leading-relaxed text-pretty max-w-xl mx-auto lg:mx-0 mb-8">
                   RV rental owners fly blind on pricing. RVIntel gives you the
