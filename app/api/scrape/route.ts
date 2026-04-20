@@ -56,9 +56,18 @@ const ListingExtractSchema = z.object({
         "Not an RV = a bare pickup truck, SUV, car, sedan, or any tow vehicle with no camper body. If you only see a pickup truck with no camper mounted, return 'Not an RV'. " +
         "Other = anything that truly does not fit. Prefer a specific class over Other whenever possible."
       ),
+      rv_title: z.string().optional().describe(
+        "The full raw title/headline shown on the listing card, verbatim. " +
+        "Example: '2019 Four Winds 26B' or 'FRANCES 2019 Thor Four Winds 26B'. " +
+        "Include the complete text exactly as it appears — do not abbreviate or reword."
+      ),
       rv_year: z.number().int().optional().describe("Model year of the RV"),
-      rv_make: z.string().optional().describe("Manufacturer, e.g. Winnebago, Airstream"),
-      rv_model: z.string().optional().describe("Model name, e.g. Travato 59K"),
+      rv_make: z.string().optional().describe(
+        "Brand/series name as shown, e.g. 'Four Winds', 'Travato', 'Minnie Winnie'. " +
+        "Prefer the RV series over the underlying chassis manufacturer. " +
+        "If the listing says 'Thor Four Winds', rv_make is 'Four Winds' (not 'Thor')."
+      ),
+      rv_model: z.string().optional().describe("Model/floorplan code, e.g. '26B', '59K', '22A'"),
       nightly_rate: z.number().describe("Nightly rental rate in USD (number only)"),
       weekly_rate: z.number().optional().describe("Weekly rental rate in USD if shown"),
       review_count: z.number().int().optional().describe("Total number of reviews"),
@@ -105,12 +114,7 @@ const MAKE_MODEL_CLASS_RULES: { match: RegExp; class: RvClass }[] = [
   { match: /\b(pop[-\s]*up|tent\s*trailer|a[-\s]*frame|aliner|clipper\s*classic|rockwood\s*(freedom|hw)|jay\s*sport)\b/i, class: "Pop Up" },
 ];
 
-function classifyFromMakeModel(
-  make: string | undefined | null,
-  model: string | undefined | null,
-  urlSlug: string
-): RvClass | null {
-  const haystack = [make ?? "", model ?? "", urlSlug].join(" ");
+function classifyFromText(haystack: string): RvClass | null {
   for (const rule of MAKE_MODEL_CLASS_RULES) {
     if (rule.match.test(haystack)) return rule.class;
   }
@@ -119,6 +123,7 @@ function classifyFromMakeModel(
 
 function finalClass(
   llmClass: RvClass | undefined,
+  title: string | undefined | null,
   make: string | undefined | null,
   model: string | undefined | null,
   listingUrl: string
@@ -131,8 +136,12 @@ function finalClass(
     }
   })();
 
+  // Combine every text signal the LLM gave us so a brand name lands a match
+  // even if it gets swapped between make/model/title fields.
+  const haystack = [title ?? "", make ?? "", model ?? "", slug].join(" ");
+
   // Deterministic lookup wins over the LLM for known make/models.
-  const fromTable = classifyFromMakeModel(make, model, slug);
+  const fromTable = classifyFromText(haystack);
   if (fromTable) return fromTable;
 
   // Otherwise trust the LLM's classification if it's one of the enum values.
@@ -174,11 +183,14 @@ async function scrapeMarket(
             type: "json",
             schema: ListingExtractSchema,
             prompt:
-              "Extract every RV rental listing visible on the page. For each listing return: listing_url, host_name, rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, amenities, and rv_class.\n\n" +
-              "CLASSIFICATION RULES — be precise. Decide rv_class from the photo and the make/model, not from the page category:\n" +
+              "Extract every RV rental listing visible on the page. For each listing return: listing_url, host_name, rv_title (verbatim), rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, amenities, and rv_class.\n\n" +
+              "ALWAYS include rv_title copied word-for-word from the listing card headline (e.g. '2019 Four Winds 26B'). This is required — do not skip it.\n\n" +
+              "CRITICAL — model/floorplan codes are NOT class designators:\n" +
+              "A trailing letter like A, B, C, E, F, G, J, K, M after a number is a FLOORPLAN code, not an RV class. '26B', '22E', '30A', '24F', '59K' say nothing about class. IGNORE those letters when classifying. Classify only from the body style (photo) and the brand/series name.\n\n" +
+              "CLASSIFICATION RULES — be precise. Decide rv_class from the photo and the brand/series:\n" +
               "- Class A: large bus-style coach with flat front and huge windshield. Examples: Tiffin Allegro, Newmar Dutch Star, Fleetwood Bounder, Winnebago Vista/Adventurer, Thor Hurricane.\n" +
               "- Class B: van-sized campervan with a CONTINUOUS van roofline and NO bed hanging over the cab. Examples: Winnebago Travato/Solis/Revel/Ekko 22, Airstream Interstate, Coachmen Galleria, Storyteller Overland, Thor Sequence/Tellaro, any Mercedes Sprinter / Ford Transit / Ram Promaster conversion.\n" +
-              "- Class C: motorhome on a cut-away van/truck chassis with a VERY DISTINCTIVE bed or storage bump that juts out OVER the driver cab. Examples: Winnebago Minnie Winnie/View/Navion, Thor Four Winds/Chateau, Jayco Redhawk/Greyhawk, Coachmen Leprechaun, Forest River Sunseeker/Forester.\n" +
+              "- Class C: motorhome on a cut-away van/truck chassis with a VERY DISTINCTIVE bed or storage bump that juts out OVER the driver cab. Examples: Winnebago Minnie Winnie/View/Navion, Thor Four Winds/Chateau/Quantum/Freedom Elite, Jayco Redhawk/Greyhawk/Melbourne, Coachmen Leprechaun/Freelander, Forest River Sunseeker/Forester.\n" +
               "- Travel Trailer: towable, no motor, bumper-pull hitch. Examples: Airstream Bambi/Flying Cloud, Jayco Jay Flight, Grand Design Imagine, R-Pod, Happier Camper, Taxa.\n" +
               "- Fifth Wheel: towable with a raised kingpin/gooseneck that sits in a pickup bed.\n" +
               "- Toy Hauler: trailer or motorhome with a rear ramp door garage.\n" +
@@ -186,11 +198,18 @@ async function scrapeMarket(
               "- Truck Camper: a slide-in camper unit that sits INSIDE a pickup truck bed; you can see the pickup's cab in front of and below the camper. Examples: Lance, Northern Lite, Four Wheel Campers, Palomino Backpack.\n" +
               "- Not an RV: a bare pickup truck, SUV, car, sedan, van with no camper interior, or any tow vehicle by itself. If the photo just shows a pickup truck with no camper mounted, you MUST return 'Not an RV'. Do NOT label pickup trucks as Class C.\n" +
               "- Other: only if nothing above fits.\n\n" +
+              "Brand-name cheat sheet (use these as authoritative — any listing whose title contains these words is that class regardless of model code):\n" +
+              "Class B: Travato, Solis, Revel, Ekko, Boldt, Airstream Interstate, Galleria, Beyond, Storyteller, Sequence, Tellaro, Rize, Scope, Sanctuary.\n" +
+              "Class C: Four Winds, Chateau, Freedom Elite, Quantum, Axis, Vegas, Minnie Winnie, View, Navion, Spirit, Outlook, Porto, Redhawk, Greyhawk, Melbourne, Seneca, Leprechaun, Freelander, Prism, Sunseeker, Forester, Isata.\n" +
+              "Class A: Tiffin, Allegro, Phaeton, Newmar, Dutch Star, Mountain Aire, Ventana, Bay Star, Bounder, Pace Arrow, Hurricane, Palazzo, Georgetown, Discovery, Vista, Adventurer, Journey, Tour, Forza.\n\n" +
+              "For rv_make, prefer the RV series/brand name (e.g. 'Four Winds', 'Travato') over the chassis manufacturer (e.g. 'Thor', 'Mercedes'). If the title is 'Thor Four Winds 26B', rv_make = 'Four Winds', rv_model = '26B'.\n\n" +
               "Common mistakes to AVOID:\n" +
-              "1. Do NOT put Class C motorhomes (with an over-cab bed) into Class B. Class B NEVER has an over-cab bump.\n" +
-              "2. Do NOT put a pickup truck into Class C. A Class C always has a large motorhome body behind the cab; a bare pickup truck has just a cargo bed.\n" +
-              "3. A Sprinter/Transit/Promaster is Class B ONLY if it has the van's original roofline. If it has a boxy motorhome body bolted on with a cab-over, it's Class C.\n" +
-              "4. A 'Lance', 'Northern Lite', 'Four Wheel Camper' is a Truck Camper, not Class C.",
+              "1. NEVER let a trailing letter in a model code (22B, 26B, 30A) drive the class. The letter is a floorplan designator.\n" +
+              "2. A 'Four Winds' is ALWAYS Class C — it has a cab-over bed. Never Class B.\n" +
+              "3. Do NOT put Class C motorhomes (with an over-cab bed) into Class B. Class B NEVER has an over-cab bump.\n" +
+              "4. Do NOT put a pickup truck into Class C. A Class C always has a large motorhome body behind the cab; a bare pickup truck has just a cargo bed.\n" +
+              "5. A Sprinter/Transit/Promaster is Class B ONLY if it has the van's original roofline. If it has a boxy motorhome body bolted on with a cab-over, it's Class C.\n" +
+              "6. 'Lance', 'Northern Lite', 'Four Wheel Camper' is a Truck Camper, not Class C.",
           },
         ],
         waitFor: 4000,
@@ -222,6 +241,7 @@ async function scrapeMarket(
         .map((l) => {
           const resolvedClass = finalClass(
             l.rv_class as RvClass | undefined,
+            l.rv_title,
             l.rv_make,
             l.rv_model,
             l.listing_url
