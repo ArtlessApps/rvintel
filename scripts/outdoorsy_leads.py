@@ -14,7 +14,8 @@ from urllib.parse import urlparse
 from firecrawl import FirecrawlApp
 
 # ── Config ────────────────────────────────────────────────────────────────────
-FIRECRAWL_API_KEY = "fc-acf10e247039443bac9153ddd35df068"
+import os
+FIRECRAWL_API_KEY = os.environ["FIRECRAWL_API_KEY"]
 SEARCH_BASE = "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental"
 OUTPUT_FILE = "san_diego_rv_leads.csv"
 MIN_LISTINGS = 2
