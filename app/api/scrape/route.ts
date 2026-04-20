@@ -28,6 +28,9 @@ const ListingExtractSchema = z.object({
     z.object({
       listing_url: z.string().describe("Full URL to the individual listing page"),
       host_name: z.string().optional().describe("Name of the host or rental company"),
+      rv_class: z.enum(["Class A", "Class B", "Class C", "Travel Trailer", "Fifth Wheel", "Other"]).describe(
+        "RV class. Class B = campervans/van conversions (Winnebago Travato, Airstream Interstate, Mercedes Sprinter conversions, etc). Class A = large bus-style motorhomes. Class C = mid-size motorhomes with over-cab bed. Travel Trailer = towable. Fifth Wheel = towable with kingpin hitch."
+      ),
       rv_year: z.number().int().optional().describe("Model year of the RV"),
       rv_make: z.string().optional().describe("Manufacturer, e.g. Winnebago, Airstream"),
       rv_model: z.string().optional().describe("Model name, e.g. Travato 59K"),
@@ -104,7 +107,7 @@ async function scrapeMarket(
         .map((l) => ({
           platform,
           market,
-          rv_class: rvClass,
+          rv_class: l.rv_class ?? rvClass,
           listing_url: l.listing_url,
           host_name: l.host_name ?? null,
           rv_year: l.rv_year ?? null,
