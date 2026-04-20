@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   BarChart,
@@ -10,7 +10,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
 } from "recharts";
 import {
   TrendingUp,
@@ -20,9 +19,11 @@ import {
   RefreshCw,
   Star,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -30,222 +31,63 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getSupabase } from "@/lib/supabase";
 
-// ─── Dummy data ───────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-const COMP_LISTINGS = [
-  {
-    id: "1",
-    host: "SoCal Vans",
-    rv_year: 2022,
-    rv_make: "Winnebago",
-    rv_model: "Travato 59K",
-    nightly_rate: 249,
-    weekly_rate: 1449,
-    review_count: 87,
-    avg_rating: 4.9,
-    occupancy_est: 78,
-    platform: "outdoorsy",
-    listing_url: "#",
-  },
-  {
-    id: "2",
-    host: "Pacific Coast Rentals",
-    rv_year: 2023,
-    rv_make: "Mercedes-Benz",
-    rv_model: "Sprinter 2500",
-    nightly_rate: 279,
-    weekly_rate: 1649,
-    review_count: 44,
-    avg_rating: 4.8,
-    occupancy_est: 71,
-    platform: "outdoorsy",
-    listing_url: "#",
-  },
-  {
-    id: "3",
-    host: "Sun & Road",
-    rv_year: 2021,
-    rv_make: "Airstream",
-    rv_model: "Interstate 24GT",
-    nightly_rate: 269,
-    weekly_rate: 1549,
-    review_count: 112,
-    avg_rating: 4.9,
-    occupancy_est: 84,
-    platform: "rvshare",
-    listing_url: "#",
-  },
-  {
-    id: "4",
-    host: "Beach Break RV",
-    rv_year: 2020,
-    rv_make: "Winnebago",
-    rv_model: "Revel 44E",
-    nightly_rate: 199,
-    weekly_rate: 1149,
-    review_count: 63,
-    avg_rating: 4.7,
-    occupancy_est: 65,
-    platform: "rvshare",
-    listing_url: "#",
-  },
-  {
-    id: "5",
-    host: "Nomad Life Rentals",
-    rv_year: 2022,
-    rv_make: "Storyteller",
-    rv_model: "Overland MODE",
-    nightly_rate: 289,
-    weekly_rate: 1749,
-    review_count: 29,
-    avg_rating: 4.8,
-    occupancy_est: 59,
-    platform: "outdoorsy",
-    listing_url: "#",
-  },
-  {
-    id: "6",
-    host: "Coastal Campers",
-    rv_year: 2019,
-    rv_make: "Ford",
-    rv_model: "Transit 350 Conversion",
-    nightly_rate: 175,
-    weekly_rate: 999,
-    review_count: 156,
-    avg_rating: 4.6,
-    occupancy_est: 76,
-    platform: "rvshare",
-    listing_url: "#",
-  },
-  {
-    id: "7",
-    host: "Wild West Vans",
-    rv_year: 2023,
-    rv_make: "Winnebago",
-    rv_model: "Travato 59GL",
-    nightly_rate: 259,
-    weekly_rate: 1499,
-    review_count: 18,
-    avg_rating: 5.0,
-    occupancy_est: 62,
-    platform: "outdoorsy",
-    listing_url: "#",
-  },
-  {
-    id: "8",
-    host: "Sunset Expeditions",
-    rv_year: 2021,
-    rv_make: "Ram",
-    rv_model: "ProMaster 3500 High Roof",
-    nightly_rate: 159,
-    weekly_rate: 899,
-    review_count: 74,
-    avg_rating: 4.5,
-    occupancy_est: 69,
-    platform: "rvshare",
-    listing_url: "#",
-  },
-  {
-    id: "9",
-    host: "Baja Bound Rentals",
-    rv_year: 2022,
-    rv_make: "Airstream",
-    rv_model: "Interstate 19",
-    nightly_rate: 229,
-    weekly_rate: 1299,
-    review_count: 51,
-    avg_rating: 4.7,
-    occupancy_est: 73,
-    platform: "outdoorsy",
-    listing_url: "#",
-  },
-  {
-    id: "10",
-    host: "Freedom Wheels SD",
-    rv_year: 2020,
-    rv_make: "Mercedes-Benz",
-    rv_model: "Metris Weekender",
-    nightly_rate: 149,
-    weekly_rate: 849,
-    review_count: 93,
-    avg_rating: 4.6,
-    occupancy_est: 81,
-    platform: "rvshare",
-    listing_url: "#",
-  },
-  {
-    id: "11",
-    host: "California Vans Co",
-    rv_year: 2023,
-    rv_make: "Winnebago",
-    rv_model: "Solis Pocket 36A",
-    nightly_rate: 219,
-    weekly_rate: 1249,
-    review_count: 37,
-    avg_rating: 4.9,
-    occupancy_est: 67,
-    platform: "outdoorsy",
-    listing_url: "#",
-  },
-  {
-    id: "12",
-    host: "Torrey Pines Rentals",
-    rv_year: 2021,
-    rv_make: "Hymer",
-    rv_model: "Aktiv 2.0",
-    nightly_rate: 239,
-    weekly_rate: 1399,
-    review_count: 22,
-    avg_rating: 4.8,
-    occupancy_est: 55,
-    platform: "rvshare",
-    listing_url: "#",
-  },
-];
+type Listing = {
+  id: string;
+  platform: string;
+  host_name: string | null;
+  rv_year: number | null;
+  rv_make: string | null;
+  rv_model: string | null;
+  nightly_rate: number;
+  weekly_rate: number | null;
+  review_count: number | null;
+  avg_rating: number | null;
+  listing_url: string;
+  scraped_at: string;
+};
 
-const RATE_DISTRIBUTION = [
-  { range: "$100–149", count: 1 },
-  { range: "$150–199", count: 3 },
-  { range: "$200–249", count: 4 },
-  { range: "$250–299", count: 4 },
-];
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const YOUR_RATE = 225;
-const AVG_MARKET_RATE = Math.round(
-  COMP_LISTINGS.reduce((sum, l) => sum + l.nightly_rate, 0) / COMP_LISTINGS.length
-);
+function buildRateDistribution(listings: Listing[]) {
+  const buckets: Record<string, number> = {};
+  for (const l of listings) {
+    const base = Math.floor(l.nightly_rate / 50) * 50;
+    const key = `$${base}–${base + 49}`;
+    buckets[key] = (buckets[key] ?? 0) + 1;
+  }
+  return Object.entries(buckets)
+    .sort((a, b) => parseInt(a[0].slice(1)) - parseInt(b[0].slice(1)))
+    .map(([range, count]) => ({ range, count }));
+}
+
+function formatLastUpdated(listings: Listing[]) {
+  if (!listings.length) return "—";
+  const latest = listings.reduce((a, b) =>
+    a.scraped_at > b.scraped_at ? a : b
+  ).scraped_at;
+  return new Date(latest).toLocaleString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+    hour: "numeric", minute: "2-digit", timeZoneName: "short",
+  });
+}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function MetricCard({
-  label,
-  value,
-  sub,
-  trend,
+  label, value, sub, trend,
 }: {
-  label: string;
-  value: string;
-  sub: string;
-  trend: "up" | "down" | "neutral";
+  label: string; value: string; sub: string; trend: "up" | "down" | "neutral";
 }) {
-  const TrendIcon =
-    trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
-  const trendColor =
-    trend === "up"
-      ? "text-emerald-600"
-      : trend === "down"
-      ? "text-rose-500"
-      : "text-muted-foreground";
-
+  const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
+  const trendColor = trend === "up" ? "text-emerald-600" : trend === "down" ? "text-rose-500" : "text-muted-foreground";
   return (
     <div className="bg-card rounded-xl p-6 shadow-[0_1px_4px_rgba(25,28,30,0.06)]">
-      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-        {label}
-      </p>
-      <p className="text-3xl font-bold text-foreground tracking-tight mb-1">
-        {value}
-      </p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">{label}</p>
+      <p className="text-3xl font-bold text-foreground tracking-tight mb-1">{value}</p>
       <div className={`flex items-center gap-1 text-xs font-medium ${trendColor}`}>
         <TrendIcon className="w-3.5 h-3.5" />
         <span>{sub}</span>
@@ -254,39 +96,22 @@ function MetricCard({
   );
 }
 
-function OccupancyBar({ pct }: { pct: number }) {
-  const color =
-    pct >= 75
-      ? "bg-emerald-500"
-      : pct >= 55
-      ? "bg-amber-400"
-      : "bg-rose-400";
+function MetricCardSkeleton() {
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-        <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
-      </div>
-      <span className="text-xs text-muted-foreground w-8 text-right">{pct}%</span>
+    <div className="bg-card rounded-xl p-6 shadow-[0_1px_4px_rgba(25,28,30,0.06)]">
+      <Skeleton className="h-3 w-24 mb-3" />
+      <Skeleton className="h-8 w-32 mb-2" />
+      <Skeleton className="h-3 w-40" />
     </div>
   );
 }
 
-const CustomTooltip = ({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  payload?: { value: number }[];
-  label?: string;
-}) => {
-  if (active && payload && payload.length) {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
+  if (active && payload?.length) {
     return (
       <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-md text-sm">
         <p className="font-semibold text-foreground">{label}</p>
-        <p className="text-muted-foreground">
-          {payload[0].value} listing{payload[0].value !== 1 ? "s" : ""}
-        </p>
+        <p className="text-muted-foreground">{payload[0].value} listing{payload[0].value !== 1 ? "s" : ""}</p>
       </div>
     );
   }
@@ -299,11 +124,38 @@ export default function DashboardPage() {
   const [market, setMarket] = useState("san-diego-ca");
   const [rvClass, setRvClass] = useState("Class B");
   const [dateWindow, setDateWindow] = useState("30d");
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const avgMarketRate = AVG_MARKET_RATE;
-  const yourRate = YOUR_RATE;
-  const positionPct = Math.round(((yourRate - avgMarketRate) / avgMarketRate) * 100);
-  const positionSign = positionPct >= 0 ? "+" : "";
+  const fetchListings = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    try {
+      const { data } = await getSupabase()
+        .from("listings")
+        .select("id, platform, host_name, rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, listing_url, scraped_at")
+        .eq("market", market)
+        .eq("rv_class", rvClass)
+        .order("nightly_rate", { ascending: false });
+
+      setListings(data ?? []);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [market, rvClass]);
+
+  useEffect(() => { fetchListings(); }, [fetchListings]);
+
+  const avgRate = listings.length
+    ? Math.round(listings.reduce((s, l) => s + l.nightly_rate, 0) / listings.length)
+    : 0;
+
+  const rateDistribution = buildRateDistribution(listings);
+  const lastUpdated = formatLastUpdated(listings);
+  const marketLabel = market === "san-diego-ca" ? "San Diego" : market;
 
   return (
     <div className="min-h-screen bg-background">
@@ -311,7 +163,7 @@ export default function DashboardPage() {
       <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-[20px] border-b border-border">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link href="/" className="flex items-center gap-2">
               <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-primary-foreground" />
               </div>
@@ -321,12 +173,19 @@ export default function DashboardPage() {
             <span className="text-sm text-muted-foreground">Market Dashboard</span>
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-xs text-muted-foreground hidden sm:block">
-              Data last updated:{" "}
-              <span className="text-foreground font-medium">Apr 19, 2026 · 6:00 AM PDT</span>
-            </p>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <RefreshCw className="w-3.5 h-3.5" />
+            {!loading && listings.length > 0 && (
+              <p className="text-xs text-muted-foreground hidden sm:block">
+                Updated: <span className="text-foreground font-medium">{lastUpdated}</span>
+              </p>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={refreshing}
+              onClick={() => fetchListings(true)}
+            >
+              {refreshing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
               Refresh
             </Button>
           </div>
@@ -334,11 +193,7 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Back link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to home
         </Link>
@@ -346,13 +201,9 @@ export default function DashboardPage() {
         {/* Filter bar */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-              Market
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">Market</label>
             <Select value={market} onValueChange={setMarket}>
-              <SelectTrigger className="w-44 h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="w-44 h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="san-diego-ca">San Diego, CA</SelectItem>
                 <SelectItem value="los-angeles-ca">Los Angeles, CA</SelectItem>
@@ -362,15 +213,10 @@ export default function DashboardPage() {
               </SelectContent>
             </Select>
           </div>
-
           <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-              RV Class
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">RV Class</label>
             <Select value={rvClass} onValueChange={setRvClass}>
-              <SelectTrigger className="w-36 h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="w-36 h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Class B">Class B</SelectItem>
                 <SelectItem value="Class A">Class A</SelectItem>
@@ -380,15 +226,10 @@ export default function DashboardPage() {
               </SelectContent>
             </Select>
           </div>
-
           <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-              Window
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">Window</label>
             <Select value={dateWindow} onValueChange={setDateWindow}>
-              <SelectTrigger className="w-32 h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="w-32 h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="7d">Last 7 days</SelectItem>
                 <SelectItem value="30d">Last 30 days</SelectItem>
@@ -396,117 +237,105 @@ export default function DashboardPage() {
               </SelectContent>
             </Select>
           </div>
-
           <Badge variant="secondary" className="ml-auto text-xs">
-            {COMP_LISTINGS.length} listings · {rvClass} · San Diego
+            {loading ? "Loading…" : `${listings.length} listings · ${rvClass} · ${marketLabel}`}
           </Badge>
         </div>
 
         {/* Metric cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard
-            label="Avg Market Rate"
-            value={`$${avgMarketRate}/night`}
-            sub="vs. $198 last month"
-            trend="up"
-          />
-          <MetricCard
-            label="Your Position"
-            value={`${positionSign}${positionPct}%`}
-            sub={
-              positionPct < 0
-                ? `$${Math.abs(yourRate - avgMarketRate)} below market avg`
-                : `$${yourRate - avgMarketRate} above market avg`
-            }
-            trend={positionPct < -10 ? "down" : positionPct > 10 ? "up" : "neutral"}
-          />
-          <MetricCard
-            label="Market Occupancy"
-            value="71%"
-            sub="+4 pts vs. last month"
-            trend="up"
-          />
-          <MetricCard
-            label="Active Inventory"
-            value={`${COMP_LISTINGS.length}`}
-            sub="listings tracked"
-            trend="neutral"
-          />
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => <MetricCardSkeleton key={i} />)
+          ) : (
+            <>
+              <MetricCard
+                label="Avg Market Rate"
+                value={avgRate ? `$${avgRate}/night` : "—"}
+                sub={`across ${listings.length} listings`}
+                trend="neutral"
+              />
+              <MetricCard
+                label="Rate Range"
+                value={listings.length ? `$${Math.min(...listings.map(l => l.nightly_rate))}–$${Math.max(...listings.map(l => l.nightly_rate))}` : "—"}
+                sub="min to max nightly"
+                trend="neutral"
+              />
+              <MetricCard
+                label="Avg Rating"
+                value={listings.filter(l => l.avg_rating).length
+                  ? `${(listings.reduce((s, l) => s + (l.avg_rating ?? 0), 0) / listings.filter(l => l.avg_rating).length).toFixed(2)} ★`
+                  : "—"}
+                sub="across all listings"
+                trend="up"
+              />
+              <MetricCard
+                label="Active Inventory"
+                value={`${listings.length}`}
+                sub="listings tracked"
+                trend="neutral"
+              />
+            </>
+          )}
         </div>
 
         {/* Charts row */}
         <div className="grid lg:grid-cols-5 gap-4">
-          {/* Rate distribution chart */}
+          {/* Rate distribution */}
           <div className="lg:col-span-3 bg-card rounded-xl p-6 shadow-[0_1px_4px_rgba(25,28,30,0.06)]">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h2 className="text-sm font-semibold text-foreground">
-                  Rate Distribution
-                </h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Nightly rate spread · {rvClass} · San Diego
-                </p>
+                <h2 className="text-sm font-semibold text-foreground">Rate Distribution</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Nightly rate spread · {rvClass} · {marketLabel}</p>
               </div>
-              <Badge variant="outline" className="text-xs font-medium">
-                Your rate: ${yourRate}
-              </Badge>
+              {avgRate > 0 && (
+                <Badge variant="outline" className="text-xs font-medium">Avg: ${avgRate}/night</Badge>
+              )}
             </div>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={RATE_DISTRIBUTION}
-                margin={{ top: 4, right: 4, left: -16, bottom: 0 }}
-                barSize={40}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0.005 240)" vertical={false} />
-                <XAxis
-                  dataKey="range"
-                  tick={{ fontSize: 11, fill: "oklch(0.5 0.01 240)" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: "oklch(0.5 0.01 240)" }}
-                  axisLine={false}
-                  tickLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: "oklch(0.96 0.005 240)" }} />
-                <ReferenceLine
-                  x="$200–249"
-                  stroke="#2dd4bf"
-                  strokeDasharray="4 3"
-                  label={{ value: "You", position: "top", fontSize: 11, fill: "#2dd4bf" }}
-                />
-                <Bar dataKey="count" fill="#2dd4bf" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <Skeleton className="h-[220px] w-full rounded-lg" />
+            ) : rateDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={rateDistribution} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barSize={40}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0.005 240)" vertical={false} />
+                  <XAxis dataKey="range" tick={{ fontSize: 11, fill: "oklch(0.5 0.01 240)" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "oklch(0.5 0.01 240)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: "oklch(0.96 0.005 240)" }} />
+                  <Bar dataKey="count" fill="#2dd4bf" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[220px] flex items-center justify-center text-sm text-muted-foreground">
+                No data for this market + class combination yet.
+              </div>
+            )}
           </div>
 
-          {/* Occupancy snapshot */}
+          {/* Top by review count */}
           <div className="lg:col-span-2 bg-card rounded-xl p-6 shadow-[0_1px_4px_rgba(25,28,30,0.06)]">
-            <h2 className="text-sm font-semibold text-foreground mb-1">
-              Top Performers by Occupancy
-            </h2>
-            <p className="text-xs text-muted-foreground mb-5">
-              Est. occupancy · last 30 days
-            </p>
-            <div className="space-y-4">
-              {COMP_LISTINGS.sort((a, b) => b.occupancy_est - a.occupancy_est)
-                .slice(0, 6)
-                .map((l) => (
-                  <div key={l.id}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-foreground truncate max-w-[70%]">
+            <h2 className="text-sm font-semibold text-foreground mb-1">Most Reviewed</h2>
+            <p className="text-xs text-muted-foreground mb-5">By review count · last scrape</p>
+            {loading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-8 w-full rounded" />)}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {[...listings]
+                  .sort((a, b) => (b.review_count ?? 0) - (a.review_count ?? 0))
+                  .slice(0, 6)
+                  .map((l) => (
+                    <div key={l.id} className="flex items-center justify-between gap-2">
+                      <span className="text-xs text-foreground truncate max-w-[65%]">
                         {l.rv_year} {l.rv_make} {l.rv_model}
                       </span>
-                      <span className="text-xs font-semibold text-foreground">
-                        ${l.nightly_rate}/night
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-muted-foreground">{l.review_count ?? 0} reviews</span>
+                        <span className="text-xs font-semibold text-foreground">${l.nightly_rate}</span>
+                      </div>
                     </div>
-                    <OccupancyBar pct={l.occupancy_est} />
-                  </div>
-                ))}
-            </div>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -514,94 +343,85 @@ export default function DashboardPage() {
         <div className="bg-card rounded-xl shadow-[0_1px_4px_rgba(25,28,30,0.06)] overflow-hidden">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-foreground">
-                Comp Listings
-              </h2>
+              <h2 className="text-sm font-semibold text-foreground">Comp Listings</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                All {rvClass} rentals tracked in San Diego
+                All {rvClass} rentals tracked in {marketLabel}
               </p>
             </div>
-            <p className="text-xs text-muted-foreground hidden sm:block">
-              Data last updated: Apr 19, 2026 · 6:00 AM PDT
-            </p>
+            {!loading && listings.length > 0 && (
+              <p className="text-xs text-muted-foreground hidden sm:block">
+                Updated: {lastUpdated}
+              </p>
+            )}
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/40">
-                  <th className="text-left text-xs font-semibold uppercase tracking-widest text-muted-foreground px-6 py-3">
-                    RV
-                  </th>
-                  <th className="text-left text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3">
-                    Platform
-                  </th>
-                  <th className="text-right text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3">
-                    Nightly
-                  </th>
-                  <th className="text-right text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3">
-                    Weekly
-                  </th>
-                  <th className="text-right text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3">
-                    Reviews
-                  </th>
-                  <th className="text-right text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3">
-                    Rating
-                  </th>
-                  <th className="text-right text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3 hidden md:table-cell">
-                    Occ. Est.
-                  </th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {COMP_LISTINGS.sort((a, b) => b.nightly_rate - a.nightly_rate).map((l) => (
-                  <tr key={l.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-3.5">
-                      <div className="font-medium text-foreground">
-                        {l.rv_year} {l.rv_make} {l.rv_model}
-                      </div>
-                      <div className="text-xs text-muted-foreground">{l.host}</div>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <Badge
-                        variant={l.platform === "outdoorsy" ? "default" : "secondary"}
-                        className="text-xs capitalize"
-                      >
-                        {l.platform}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3.5 text-right font-semibold text-foreground">
-                      ${l.nightly_rate}
-                    </td>
-                    <td className="px-4 py-3.5 text-right text-muted-foreground">
-                      {l.weekly_rate ? `$${l.weekly_rate}` : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 text-right text-muted-foreground">
-                      {l.review_count}
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <span className="inline-flex items-center gap-1 text-foreground font-medium">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        {l.avg_rating.toFixed(1)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3.5 hidden md:table-cell">
-                      <OccupancyBar pct={l.occupancy_est} />
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <a
-                        href={l.listing_url}
-                        className="text-primary hover:text-primary/80 transition-colors"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </td>
-                  </tr>
+            {loading ? (
+              <div className="p-6 space-y-3">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full rounded" />
                 ))}
-              </tbody>
-            </table>
+              </div>
+            ) : listings.length === 0 ? (
+              <div className="p-12 text-center text-sm text-muted-foreground">
+                No listings scraped for this market yet.{" "}
+                <button
+                  onClick={() => fetchListings(true)}
+                  className="text-primary hover:underline"
+                >
+                  Trigger a scrape
+                </button>{" "}
+                to populate data.
+              </div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/40">
+                    {["RV", "Platform", "Nightly", "Weekly", "Reviews", "Rating", ""].map((h) => (
+                      <th key={h} className={`text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3 ${h === "RV" ? "text-left pl-6" : h === "" ? "" : "text-right"}`}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {listings.map((l) => (
+                    <tr key={l.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-6 py-3.5">
+                        <div className="font-medium text-foreground">
+                          {[l.rv_year, l.rv_make, l.rv_model].filter(Boolean).join(" ") || "Unknown RV"}
+                        </div>
+                        {l.host_name && (
+                          <div className="text-xs text-muted-foreground">{l.host_name}</div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <Badge variant={l.platform === "outdoorsy" ? "default" : "secondary"} className="text-xs capitalize">
+                          {l.platform}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3.5 text-right font-semibold text-foreground">${l.nightly_rate}</td>
+                      <td className="px-4 py-3.5 text-right text-muted-foreground">
+                        {l.weekly_rate ? `$${l.weekly_rate}` : "—"}
+                      </td>
+                      <td className="px-4 py-3.5 text-right text-muted-foreground">{l.review_count ?? "—"}</td>
+                      <td className="px-4 py-3.5 text-right">
+                        {l.avg_rating ? (
+                          <span className="inline-flex items-center gap-1 text-foreground font-medium">
+                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            {l.avg_rating.toFixed(1)}
+                          </span>
+                        ) : "—"}
+                      </td>
+                      <td className="px-4 py-3.5 text-right">
+                        <a href={l.listing_url} className="text-primary hover:text-primary/80 transition-colors" target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </main>
