@@ -9,7 +9,7 @@ const MARKET_URLS: Record<string, { outdoorsy: string; rvshare: string; label: s
   "san-diego-ca": {
     label: "san-diego-ca",
     outdoorsy:
-      "https://www.outdoorsy.com/rv-rental/san-diego--ca?type=b-van",
+      "https://www.outdoorsy.com/rv-rental/san-diego-ca?type=b-van",
     rvshare:
       "https://rvshare.com/rv-rental?location=san+diego+ca&type%5B%5D=class-b",
   },
@@ -74,20 +74,19 @@ async function scrapeMarket(
       } as Parameters<typeof firecrawl.scrape>[1]);
 
       const raw = result as Record<string, unknown>;
+      const statusCode = (raw.metadata as Record<string, unknown>)?.statusCode as number | undefined;
 
-      if (!result.success) {
-        errors.push(`${platform}: scrape failed — ${JSON.stringify(raw)}`);
+      // Use json data if present, regardless of success flag (Firecrawl can return
+      // success:false on 403/bot-blocked pages while still having extracted content)
+      const jsonData = raw.json as z.infer<typeof ListingExtractSchema> | undefined;
+
+      if (!jsonData?.listings?.length) {
+        const md = (raw.markdown as string | undefined)?.slice(0, 400) ?? "(no markdown)";
+        errors.push(`${platform}: no listings extracted (status ${statusCode ?? "?"}). Preview: ${md}`);
         continue;
       }
 
-      if (!raw.json) {
-        // Return markdown snippet so we can see what was scraped
-        const md = (raw.markdown as string | undefined)?.slice(0, 500) ?? "(no markdown)";
-        errors.push(`${platform}: extraction returned no data. Page preview: ${md}`);
-        continue;
-      }
-
-      const { listings } = (result as Record<string, unknown>).json as z.infer<typeof ListingExtractSchema>;
+      const { listings } = jsonData;
 
       if (!listings?.length) {
         errors.push(`${platform}: 0 listings extracted`);
