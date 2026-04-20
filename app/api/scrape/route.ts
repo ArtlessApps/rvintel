@@ -191,10 +191,14 @@ async function scrapeMarket(
   let inserted = 0;
   let skipped = 0;
 
-  for (const { platform, url } of targets) {
+  const scrapeOne = async ({ platform, url }: ScrapeTarget): Promise<{ inserted: number; skipped: number; errors: string[] }> => {
     const label = `${platform} ${new URL(url).searchParams.get("filter[vehicle_type]") ?? new URL(url).searchParams.get("type") ?? "all"}`;
+    const localErrors: string[] = [];
+    let localInserted = 0;
+    let localSkipped = 0;
+
     try {
-      const result = await firecrawl.scrape(url, {
+    const result = await firecrawl.scrape(url, {
         formats: [
           "markdown",
           {
@@ -243,16 +247,11 @@ async function scrapeMarket(
 
       if (!jsonData?.listings?.length) {
         const md = (raw.markdown as string | undefined)?.slice(0, 400) ?? "(no markdown)";
-        errors.push(`${label}: no listings extracted (status ${statusCode ?? "?"}). Preview: ${md}`);
-        continue;
+        localErrors.push(`${label}: no listings extracted (status ${statusCode ?? "?"}). Preview: ${md}`);
+        return { inserted: 0, skipped: 0, errors: localErrors };
       }
 
       const { listings } = jsonData;
-
-      if (!listings?.length) {
-        errors.push(`${label}: 0 listings extracted`);
-        continue;
-      }
 
       const rows = listings
         .filter((l) => l.nightly_rate > 0)
@@ -282,25 +281,36 @@ async function scrapeMarket(
           };
         })
         .filter((row) => {
-          if (row.rv_class === "Not an RV") {
-            skipped += 1;
-            return false;
-          }
+          if (row.rv_class === "Not an RV") { localSkipped++; return false; }
           return true;
         });
 
-      // Upsert on listing_url — requires unique constraint (see SQL setup notes)
       const { error } = await supabase
         .from("listings")
         .upsert(rows, { onConflict: "listing_url", ignoreDuplicates: false });
 
       if (error) {
-        errors.push(`${label} upsert: ${error.message}`);
+        localErrors.push(`${label} upsert: ${error.message}`);
       } else {
-        inserted += rows.length;
+        localInserted = rows.length;
       }
     } catch (err) {
-      errors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
+      localErrors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    return { inserted: localInserted, skipped: localSkipped, errors: localErrors };
+  };
+
+  // Run all 16 targets in parallel — cuts total time from ~160s to ~15s
+  const results = await Promise.allSettled(targets.map(scrapeOne));
+
+  for (const r of results) {
+    if (r.status === "fulfilled") {
+      inserted += r.value.inserted;
+      skipped += r.value.skipped;
+      errors.push(...r.value.errors);
+    } else {
+      errors.push(`target failed: ${r.reason}`);
     }
   }
 
