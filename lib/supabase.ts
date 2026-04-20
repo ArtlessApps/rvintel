@@ -85,6 +85,26 @@ export type Database = {
         };
         Insert: Omit<Database["public"]["Tables"]["availability_snapshots"]["Row"], "id" | "created_at">;
       };
+      cron_runs: {
+        Row: {
+          id: string;
+          started_at: string;
+          finished_at: string | null;
+          duration_ms: number | null;
+          market: string;
+          platform: string | null;
+          status: "success" | "partial" | "failure";
+          listings_upserted: number;
+          snapshots_inserted: number;
+          skipped_not_rv: number;
+          error_count: number;
+          errors: string[] | null;
+          error_message: string | null;
+        };
+        Insert: Omit<Database["public"]["Tables"]["cron_runs"]["Row"], "id" | "started_at"> & {
+          started_at?: string;
+        };
+      };
       waitlist: {
         Row: {
           id: string;

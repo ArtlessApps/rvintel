@@ -185,7 +185,7 @@ async function scrapeMarket(
   firecrawl: FirecrawlApp,
   market: string,
   platformFilter?: "outdoorsy" | "rvshare"
-): Promise<{ inserted: number; skipped: number; errors: string[] }> {
+): Promise<{ inserted: number; snapshotsInserted: number; skipped: number; errors: string[] }> {
   const allTargets = MARKET_TARGETS[market];
   if (!allTargets) throw new Error(`Unknown market: ${market}`);
 
@@ -203,6 +203,7 @@ async function scrapeMarket(
   const supabase = getServiceSupabase();
   const errors: string[] = [];
   let inserted = 0;
+  let snapshotsInserted = 0;
   let skipped = 0;
 
   // How many pages to fetch per class per run. Intentionally low — coverage is
@@ -257,10 +258,11 @@ async function scrapeMarket(
     "5. A Sprinter/Transit/Promaster is Class B ONLY if it has the van's original roofline. If it has a boxy motorhome body bolted on with a cab-over, it's Class C.\n" +
     "6. 'Lance', 'Northern Lite', 'Four Wheel Camper' is a Truck Camper, not Class C.";
 
-  const scrapeOne = async ({ platform, url }: ScrapeTarget): Promise<{ inserted: number; skipped: number; errors: string[] }> => {
+  const scrapeOne = async ({ platform, url }: ScrapeTarget): Promise<{ inserted: number; snapshotsInserted: number; skipped: number; errors: string[] }> => {
     const label = `${platform} ${new URL(url).searchParams.get("filter[type]") ?? new URL(url).searchParams.get("type") ?? "all"}`;
     const localErrors: string[] = [];
     let localInserted = 0;
+    let localSnapshotsInserted = 0;
     let localSkipped = 0;
 
     const allRows: ReturnType<typeof buildRows>[number][] = [];
@@ -379,6 +381,8 @@ async function scrapeMarket(
               .insert(snapshots);
             if (snapErr) {
               localErrors.push(`${label} snapshot: ${snapErr.message}`);
+            } else {
+              localSnapshotsInserted = snapshots.length;
             }
           }
         }
@@ -387,12 +391,17 @@ async function scrapeMarket(
       localErrors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
     }
 
-    return { inserted: localInserted, skipped: localSkipped, errors: localErrors };
+    return {
+      inserted: localInserted,
+      snapshotsInserted: localSnapshotsInserted,
+      skipped: localSkipped,
+      errors: localErrors,
+    };
   };
 
   // Run in batches of 2 — fits Firecrawl concurrency and keeps each batch ~12s
   const BATCH_SIZE = 2;
-  const allResults: PromiseSettledResult<{ inserted: number; skipped: number; errors: string[] }>[] = [];
+  const allResults: PromiseSettledResult<{ inserted: number; snapshotsInserted: number; skipped: number; errors: string[] }>[] = [];
   for (let i = 0; i < targets.length; i += BATCH_SIZE) {
     const batch = targets.slice(i, i + BATCH_SIZE);
     const batchResults = await Promise.allSettled(batch.map(scrapeOne));
@@ -403,6 +412,7 @@ async function scrapeMarket(
   for (const r of results) {
     if (r.status === "fulfilled") {
       inserted += r.value.inserted;
+      snapshotsInserted += r.value.snapshotsInserted;
       skipped += r.value.skipped;
       errors.push(...r.value.errors);
     } else {
@@ -410,7 +420,48 @@ async function scrapeMarket(
     }
   }
 
-  return { inserted, skipped, errors };
+  return { inserted, snapshotsInserted, skipped, errors };
+}
+
+// ─── Cron run log ─────────────────────────────────────────────────────────────
+// Writes one row per /api/scrape invocation to public.cron_runs so we can see
+// at a glance what ran, when, and what it wrote. Must never throw — a log
+// failure must not promote a successful scrape into a 500.
+
+type CronRunLog = {
+  startedAt: Date;
+  finishedAt: Date;
+  market: string;
+  platform: string | null;
+  status: "success" | "partial" | "failure";
+  listingsUpserted: number;
+  snapshotsInserted: number;
+  skippedNotRv: number;
+  errors: string[];
+  errorMessage: string | null;
+};
+
+async function logCronRun(entry: CronRunLog): Promise<void> {
+  try {
+    const supabase = getServiceSupabase();
+    const { error } = await supabase.from("cron_runs").insert({
+      started_at: entry.startedAt.toISOString(),
+      finished_at: entry.finishedAt.toISOString(),
+      duration_ms: entry.finishedAt.getTime() - entry.startedAt.getTime(),
+      market: entry.market,
+      platform: entry.platform,
+      status: entry.status,
+      listings_upserted: entry.listingsUpserted,
+      snapshots_inserted: entry.snapshotsInserted,
+      skipped_not_rv: entry.skippedNotRv,
+      error_count: entry.errors.length,
+      errors: entry.errors.length ? entry.errors : null,
+      error_message: entry.errorMessage,
+    });
+    if (error) console.error("cron_runs insert failed:", error.message);
+  } catch (err) {
+    console.error("cron_runs insert threw:", err instanceof Error ? err.message : String(err));
+  }
 }
 
 // ─── Route handlers ───────────────────────────────────────────────────────────
@@ -430,21 +481,55 @@ export async function POST(req: NextRequest) {
   const platformFilter = body.platform as "outdoorsy" | "rvshare" | undefined;
 
   const firecrawl = new FirecrawlApp({ apiKey });
+  const startedAt = new Date();
 
   try {
-    const { inserted, skipped, errors } = await scrapeMarket(firecrawl, market, platformFilter);
+    const { inserted, snapshotsInserted, skipped, errors } = await scrapeMarket(firecrawl, market, platformFilter);
+
+    // success = scrapeMarket returned cleanly AND every target succeeded.
+    // partial = some targets wrote rows but others errored.
+    // failure = no rows written AND at least one error (e.g. every target timed out).
+    const status: CronRunLog["status"] =
+      errors.length === 0 ? "success" : inserted > 0 ? "partial" : "failure";
+
+    await logCronRun({
+      startedAt,
+      finishedAt: new Date(),
+      market,
+      platform: platformFilter ?? null,
+      status,
+      listingsUpserted: inserted,
+      snapshotsInserted,
+      skippedNotRv: skipped,
+      errors,
+      errorMessage: null,
+    });
 
     return NextResponse.json({
       success: true,
       market,
       inserted,
+      snapshotsInserted,
       skipped,
       errors: errors.length ? errors : undefined,
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    await logCronRun({
+      startedAt,
+      finishedAt: new Date(),
+      market,
+      platform: platformFilter ?? null,
+      status: "failure",
+      listingsUpserted: 0,
+      snapshotsInserted: 0,
+      skippedNotRv: 0,
+      errors: [],
+      errorMessage: message,
+    });
     return NextResponse.json(
-      { success: false, error: err instanceof Error ? err.message : String(err) },
+      { success: false, error: message },
       { status: 500 }
     );
   }

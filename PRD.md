@@ -178,19 +178,38 @@ When `freshCount / totalActive < 0.6`, show a "Calibrating — coverage building
 - [x] Three staggered daily crons (`rvshare-1`, `rvshare-2`, `outdoorsy-1`)
 - [x] Firecrawl client timeout raised to 120s to match JSON extraction latency
 
-### Phase 2 — Diversified Discovery (Week 2)
+### Phase 2 — Diversified Discovery (Week 1, back half — accelerated)
+
+Rationale for acceleration: every day of relevance-sorted capture bakes biased snapshots into the time-series moat (see §4.3). Bias is not fixable retroactively, so Phase 2 is pulled forward from Week 2 to days 4–7 of Week 1 — but the sort-param verification dependency is preserved so we don't burn credits on a non-functional rotation.
+
+**Days 1–3 (in parallel with Phase 1 stabilization):** establish a default-relevance baseline
+- [ ] Capture ≥3 days of default-sort snapshots across all active targets
+- [ ] Record the per-target URL set each day to measure variant-rotation lift later
+
+**Day 3 — Sort-param verification (hard dependency, ~20 credits)**
+- [ ] One-off Firecrawl test: fetch one Outdoorsy and one RVshare search URL with `sort=price_asc` vs. default
+- [ ] Diff the returned listing URL sets
+- [ ] If the URL sets differ → platforms honor server-side sort → proceed to day 4 rollout
+- [ ] If identical → sorting is client-side JS; fall back to price-band stratification (`price<150`, `150-300`, `300+`) and re-test
+
+**Days 4–5 — Single-target pilot**
 - [ ] Add `sort` and `price_band` dimensions to `MARKET_TARGETS`
+- [ ] Ship variant rotation behind a per-target flag on **one** target first (lowest-risk: RVshare, no stealth)
 - [ ] Cron picks a variant per run based on day-of-week
-- [ ] Verify platforms honor server-side sort params (test against Firecrawl first)
+- [ ] Measure URL-set diversification vs. the days 1–3 baseline
+
+**Days 6–7 — Fan-out**
+- [ ] Enable variant rotation on all targets once pilot shows ≥15% new-URL lift vs. baseline
+- [ ] Monitor credit consumption daily against the 3,000/mo Hobby ceiling
 - [ ] Success metric: 7-day coverage reaches ≥90% of estimated market size
 
-### Phase 3 — Detail Enrichment (Weeks 3-4)
+### Phase 3 — Detail Enrichment (Weeks 2-3)
 - [ ] New route: `/api/enrich`
 - [ ] Schema additions: `length_ft`, `sleeps`, `slides`, `fuel_type`, `delivery_radius_mi`, `delivery_per_mile_fee`, `cleaning_fee`, `min_nights`, `included_miles`, `generator`, `solar`, `pet_policy`, `photo_count`, `host_response_rate`, `host_response_time`
 - [ ] Nightly cron drains oldest `enriched_at IS NULL` queue
 - [ ] Banner on dashboard: "X of Y listings enriched"
 
-### Phase 4 — Occupancy & Comp-Sets (Weeks 5-8)
+### Phase 4 — Occupancy & Comp-Sets (Weeks 4-7)
 - [ ] Weekly calendar scrape → `availability_snapshots`
 - [ ] Materialized view: rolling 30-day occupancy inference per listing
 - [ ] Comp-set UI: kNN query on attributes + time-series aggregate over the set
@@ -201,8 +220,9 @@ When `freshCount / totalActive < 0.6`, show a "Calibrating — coverage building
 - [ ] Env var hygiene: re-set Supabase URL/anon key cleanly (currently has literal `\n` inside stored values)
 - [ ] Move to Firecrawl Growth tier once expanding beyond San Diego
 
-### Phase 6 — Multi-Market Expansion (Weeks 8+)
+### Phase 6 — Multi-Market Expansion (Weeks 7+)
 - [ ] Add LA, Phoenix, Denver, Austin, Seattle, Miami, Nashville, Portland, Vegas
+- [ ] Add **RVezy** and **RVnGO** as P2P scrape targets (deferred from Phases 1–5)
 - [ ] Upgrade Firecrawl to Growth (20k credits/mo) — needed once scraping ≥3 markets
 
 ---
@@ -247,3 +267,5 @@ When `freshCount / totalActive < 0.6`, show a "Calibrating — coverage building
 - **2026-04-20:** Chose **search-page pricing refresh** over detail-page refresh. Search returns 12 prices per fetch at 5 credits; detail returns 1 price per fetch at 5 credits. 12× cost difference for identical data.
 - **2026-04-20:** Chose **single 120s Firecrawl timeout** over per-platform timeouts. LLM extraction is the slow step on both platforms; a too-tight timeout wastes successful Firecrawl responses and credits.
 - **2026-04-20:** Deferred **Firecrawl Growth upgrade** until multi-market expansion. Hobby 3k credits/mo fits single-market daily cadence with ~600 headroom.
+- **2026-04-20:** **RVezy** and **RVnGO** deferred to Phase 6; **Motorhome Republic** and **Campanda** excluded permanently (fleet/dealer pricing, not P2P).
+- **2026-04-20:** **Pulled Phase 2 (Diversified Discovery) from Week 2 into the back half of Week 1.** Relevance-sorted capture produces biased snapshots, and principle 4.3 makes that bias permanent — every day of delay corrupts the time-series moat we cannot backfill. Acceleration preserves the sort-param verification dependency (day 3) and adds a days 1–3 default-sort baseline so variant lift is measurable rather than assumed.
