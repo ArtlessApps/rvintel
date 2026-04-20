@@ -234,7 +234,7 @@ async function scrapeMarket(
               "6. 'Lance', 'Northern Lite', 'Four Wheel Camper' is a Truck Camper, not Class C.",
           },
         ],
-        waitFor: 4000,
+        waitFor: 1500,
         proxy: "stealth",
       } as Parameters<typeof firecrawl.scrape>[1]);
 

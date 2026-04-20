@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "app/api/scrape/route.ts": {
+      "maxDuration": 300
+    }
+  },
   "crons": [
     {
       "path": "/api/scrape",
