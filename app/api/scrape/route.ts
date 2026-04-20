@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { z } from "zod";
-import { getSupabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
+function getServiceSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  return createClient(url, key);
+}
 
 // ─── Market / class config ────────────────────────────────────────────────────
 
@@ -9,7 +15,7 @@ const MARKET_URLS: Record<string, { outdoorsy: string; rvshare: string; label: s
   "san-diego-ca": {
     label: "san-diego-ca",
     outdoorsy:
-      "https://www.outdoorsy.com/rv-rental/san-diego-ca?type=b-van",
+      "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental&filter[vehicle_type]=b-van",
     rvshare:
       "https://rvshare.com/rv-rental?location=san+diego+ca&type%5B%5D=class-b",
   },
@@ -51,7 +57,7 @@ async function scrapeMarket(
   const urls = MARKET_URLS[market];
   if (!urls) throw new Error(`Unknown market: ${market}`);
 
-  const supabase = getSupabase();
+  const supabase = getServiceSupabase();
   const errors: string[] = [];
   let inserted = 0;
 
