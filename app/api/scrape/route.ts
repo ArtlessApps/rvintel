@@ -207,8 +207,9 @@ async function scrapeMarket(
 
   // How many pages to fetch per class per run. Intentionally low — coverage is
   // achieved across many daily cron runs, not by exhausting pagination in one shot.
-  // Firecrawl Hobby = 2 concurrent, ~20/min; bigger per-run scopes hit rate limits.
-  const MAX_PAGES: Record<string, number> = { outdoorsy: 2, rvshare: 2 };
+  // JSON extraction takes 60–90s per page, so we budget conservatively to fit
+  // within the 300s Vercel function cap even when LLM latency spikes.
+  const MAX_PAGES: Record<string, number> = { outdoorsy: 2, rvshare: 1 };
   // Outdoorsy shows 12 listings/page; stop paginating if a page returns fewer than this.
   const MIN_PAGE_RESULTS = 5;
 
@@ -299,10 +300,10 @@ async function scrapeMarket(
         });
     }
 
-    // Outdoorsy stealth proxy legitimately takes 40–60s per page; RVshare is fast.
-    // Per-platform timeouts avoid killing good Outdoorsy calls prematurely while
-    // still bounding RVshare if something goes wrong.
-    const CALL_TIMEOUT_MS = platform === "outdoorsy" ? 90_000 : 45_000;
+    // JSON extraction mode runs an LLM over each scraped page; that step dominates
+    // latency and routinely takes 60–90s. A too-tight client timeout throws away
+    // successful Firecrawl responses (and their credits) for no reason.
+    const CALL_TIMEOUT_MS = 120_000;
     function withTimeout<T>(promise: Promise<T>): Promise<T> {
       return Promise.race([
         promise,
