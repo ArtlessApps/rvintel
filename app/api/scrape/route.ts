@@ -369,12 +369,17 @@ async function scrapeMarket(
           // Append a time-series snapshot for every row we just upserted.
           // Append-only — time depth is the moat and cannot be backfilled.
           if (upserted && upserted.length > 0) {
+            // Stamp the base target URL as source_url so Phase 2 can measure
+            // variant-rotation lift: "distinct listings surfaced by this URL
+            // on day N". The base URL encodes platform + class + (future)
+            // sort/price_band params, so it IS the variant identity.
             const snapshots = upserted.map((r) => ({
               listing_id: r.id as string,
               nightly_rate: r.nightly_rate as number,
               weekly_rate: (r.weekly_rate ?? null) as number | null,
               review_count: (r.review_count ?? null) as number | null,
               avg_rating: (r.avg_rating ?? null) as number | null,
+              source_url: url,
             }));
             const { error: snapErr } = await supabase
               .from("listing_snapshots")

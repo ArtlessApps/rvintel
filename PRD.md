@@ -184,7 +184,7 @@ Rationale for acceleration: every day of relevance-sorted capture bakes biased s
 
 **Days 1–3 (in parallel with Phase 1 stabilization):** establish a default-relevance baseline
 - [ ] Capture ≥3 days of default-sort snapshots across all active targets
-- [ ] Record the per-target URL set each day to measure variant-rotation lift later
+- [x] Record the per-target URL set each day to measure variant-rotation lift later — `listing_snapshots.source_url` column added in migration `003_snapshot_source_url.sql`; every snapshot now attributes the base `MARKET_TARGETS` URL that surfaced it
 
 **Day 3 — Sort-param verification (hard dependency, ~20 credits)**
 - [ ] One-off Firecrawl test: fetch one Outdoorsy and one RVshare search URL with `sort=price_asc` vs. default
@@ -193,10 +193,11 @@ Rationale for acceleration: every day of relevance-sorted capture bakes biased s
 - [ ] If identical → sorting is client-side JS; fall back to price-band stratification (`price<150`, `150-300`, `300+`) and re-test
 
 **Days 4–5 — Single-target pilot**
-- [ ] Add `sort` and `price_band` dimensions to `MARKET_TARGETS`
+- [ ] Refactor `MARKET_TARGETS` from hardcoded URL strings to a structured shape — `{ platform, class, sort?, price_band?, url }` — so variants compose cleanly and cron runs can log structured dimensions alongside the raw URL. `listing_snapshots.source_url` remains the ground truth of what was fetched; the structured config is for readability, iteration, and future analytics joins.
+- [ ] Add `sort` and `price_band` dimensions to `MARKET_TARGETS` using the new shape
 - [ ] Ship variant rotation behind a per-target flag on **one** target first (lowest-risk: RVshare, no stealth)
 - [ ] Cron picks a variant per run based on day-of-week
-- [ ] Measure URL-set diversification vs. the days 1–3 baseline
+- [ ] Measure URL-set diversification vs. the days 1–3 baseline via `listing_snapshots.source_url`
 
 **Days 6–7 — Fan-out**
 - [ ] Enable variant rotation on all targets once pilot shows ≥15% new-URL lift vs. baseline
@@ -219,6 +220,44 @@ Rationale for acceleration: every day of relevance-sorted capture bakes biased s
 - [ ] Daily sweeper cron flips `is_active = false` when `last_seen_at < now() - 14d`
 - [ ] Env var hygiene: re-set Supabase URL/anon key cleanly (currently has literal `\n` inside stored values)
 - [ ] Move to Firecrawl Growth tier once expanding beyond San Diego
+
+### Access gating (progressive, cross-phase)
+
+Three tiers of protection for `/dashboard`. We ship only the tier the current phase actually needs — each tier has different cost, different blast-radius, and different user-experience commitments. **The cost of auth is ongoing, not one-time** (sessions, password resets, email deliverability, provider migrations), so we hold at the lowest tier that clears the current threat model.
+
+**Tier 1 — Passcode splash (SHIPPED 2026-04-20)**
+- [x] `middleware.ts` intercepts `/dashboard/*`, redirects to `/early-access` when the `rvintel_access` cookie is missing or stale
+- [x] `/early-access` page with a shared-passcode form + server action that validates against `DASHBOARD_ACCESS_CODE` and sets a signed cookie containing `DASHBOARD_ACCESS_SIGNATURE`
+- [x] Env vars documented in `.env.local.example`; both unset = gate disabled (dev-friendly, mirrors `CRON_SECRET` pattern)
+- [x] Migration `004_listings_rls.sql` makes the anon-readable posture on `public.listings` explicit (RLS ON with a named SELECT policy, not implicit RLS-OFF)
+
+What Tier 1 protects: link-preview crawlers, casual visitors, anyone who hasn't been handed the passcode.
+What it does **not** protect: the Supabase `listings` table itself — the anon key is still shipped in the client bundle and `listings` has an `anon` SELECT policy. A determined visitor who opens devtools can still hit the Supabase REST endpoint directly. That is acceptable while there is nothing behind the login that is not also visible in the marketing site.
+
+**Tier 2 — Server-rendered dashboard + session-gated data (TRIGGER: start of Phase 4)**
+
+Move the dashboard from a client component that queries Supabase with the anon key to a React Server Component that queries with the service role key. At that point the anon key can no longer read `listings` and Tier 1's cosmetic gate becomes a real data gate.
+
+- [ ] Rotate `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the current one is already exposed in every deploy's client bundle
+- [ ] Refactor `app/dashboard/page.tsx` to an RSC that loads listings server-side via the service role
+- [ ] Drop the `listings_anon_read` policy introduced in `004_listings_rls.sql`; anon now sees zero rows
+- [ ] Replace shared-passcode auth with a waitlist-scoped magic-link flow (email token → signed session cookie), keeping the `waitlist` table as the source of truth for who gets in
+- [ ] Middleware validates the session cookie's HMAC + expiry instead of comparing against `DASHBOARD_ACCESS_SIGNATURE`
+- [ ] Interactive dashboard controls (market/class selects, refresh) become server actions or narrow client islands that call server functions — never Supabase directly
+
+Why Phase 4 is the trigger: comp-sets are the first feature where logged-in state matters (each user's set is different, and comp-sets are paid-tier gated). Shipping Tier 2 earlier means owning the session infrastructure before any feature needs it — auth maintenance without auth payoff.
+
+**Tier 3 — Full auth provider + per-user RLS (TRIGGER: paid-tier launch)**
+
+Only when we're charging money or when a feature needs user-scoped data (saved filters, host-claimed listings, B2B orgs for the fleet tier).
+
+- [ ] Pick a provider — default recommendation is **Clerk via Vercel Marketplace** (native integration, rich UX, webhook to Supabase for user mirroring). Supabase Auth is the alternative if consolidating on one vendor matters more than the Clerk UX.
+- [ ] Stripe integration for paid tiers, mirroring subscription status into the users table
+- [ ] RLS rewrite on `listings`, `listing_snapshots`, and any future user-scoped tables — policies gate on `auth.uid()` and subscription tier claims
+- [ ] Migrate Tier 2 magic-link users into the provider (or invalidate and ask them to re-register — acceptable pre-scale)
+- [ ] Organization/team model deferred until the fleet tier has signal (per §3, ≥90 days of time-series)
+
+Why not earlier: Tier 3's RLS model depends on knowing what users actually do. Designing user-scoped policies before the product has user-scoped features produces speculative RLS that gets rewritten when real features ship — with production user data in the middle of the migration.
 
 ### Phase 6 — Multi-Market Expansion (Weeks 7+)
 - [ ] Add LA, Phoenix, Denver, Austin, Seattle, Miami, Nashville, Portland, Vegas
@@ -269,3 +308,4 @@ Rationale for acceleration: every day of relevance-sorted capture bakes biased s
 - **2026-04-20:** Deferred **Firecrawl Growth upgrade** until multi-market expansion. Hobby 3k credits/mo fits single-market daily cadence with ~600 headroom.
 - **2026-04-20:** **RVezy** and **RVnGO** deferred to Phase 6; **Motorhome Republic** and **Campanda** excluded permanently (fleet/dealer pricing, not P2P).
 - **2026-04-20:** **Pulled Phase 2 (Diversified Discovery) from Week 2 into the back half of Week 1.** Relevance-sorted capture produces biased snapshots, and principle 4.3 makes that bias permanent — every day of delay corrupts the time-series moat we cannot backfill. Acceleration preserves the sort-param verification dependency (day 3) and adds a days 1–3 default-sort baseline so variant lift is measurable rather than assumed.
+- **2026-04-20:** **Shipped Tier 1 dashboard gate (passcode splash) instead of full auth.** The dashboard had no access control — a public URL serving what will eventually be a paid product. Tier 1 (middleware + shared passcode) closes the visibility gap in an hour without committing to a provider, session model, or RLS rewrite before there is a logged-in feature to justify them. Tiers 2 and 3 are staged to trigger at Phase 4 (comp-sets) and paid-tier launch respectively, so each layer of auth cost buys a concrete user-facing capability rather than speculative infrastructure.

@@ -64,6 +64,7 @@ export type Database = {
           weekly_rate: number | null;
           review_count: number | null;
           avg_rating: number | null;
+          source_url: string | null;
         };
         Insert: {
           listing_id: string;
@@ -72,6 +73,7 @@ export type Database = {
           weekly_rate?: number | null;
           review_count?: number | null;
           avg_rating?: number | null;
+          source_url?: string | null;
         };
       };
       availability_snapshots: {
