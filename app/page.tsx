@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardPreview } from "@/components/dashboard-preview";
+import { supabase } from "@/lib/supabase";
 import {
   TrendingUp,
   DollarSign,
@@ -61,15 +62,7 @@ export default function WaitlistPage() {
 
     setLoading(true);
     try {
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbz7I9bwR6WbiBMqPUKDQw7WDMNMgmcPGmWwilKN5knRIbj7njNTH3ESSxsb8CdIz05t/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify({ email }),
-        }
-      );
+      await supabase.from("waitlist").insert({ email });
     } finally {
       setSubmitted(true);
       setLoading(false);
@@ -102,6 +95,12 @@ export default function WaitlistPage() {
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Preview
+              </a>
+              <a
+                href="/dashboard"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Dashboard
               </a>
             </nav>
             <Button
@@ -138,8 +137,7 @@ export default function WaitlistPage() {
                 </div>
 
                 <p className="text-base sm:text-lg text-muted-foreground leading-relaxed text-pretty max-w-xl mx-auto lg:mx-0 mb-8">
-                  RV rental owners fly blind on pricing. RVIntel gives you the
-                  market intelligence to know exactly what your rig should earn.
+                  The average RV owner underprices by 18% on peak weekends. RVIntel tracks local supply, demand, and competitor rates so you never guess again.
                 </p>
 
                 <div id="waitlist" className="max-w-md mx-auto lg:mx-0 w-full">
@@ -209,21 +207,21 @@ export default function WaitlistPage() {
               {[
                 {
                   icon: DollarSign,
-                  title: "Dynamic Pricing Insights",
+                  title: "Market Comps",
                   description:
-                    "See real-time market rates for your RV class and location. Know exactly when to raise or lower your prices.",
+                    "See exactly what comparable RVs are charging in your market. Filter by class, make, and amenities to find your true competitors.",
                 },
                 {
                   icon: BarChart3,
-                  title: "Demand Forecasting",
+                  title: "Occupancy Signals",
                   description:
-                    "Predict booking windows, peak demand periods, and local events that drive rental prices up.",
+                    "Track blocked calendars and booking velocity across your local market to understand real demand before you price.",
                 },
                 {
                   icon: Zap,
-                  title: "Smart Recommendations",
+                  title: "Event Alerts",
                   description:
-                    "Get AI-powered suggestions to optimize your pricing strategy and maximize your annual revenue.",
+                    "Get notified when high-demand events hit your area so you can raise rates at exactly the right moment.",
                 },
               ].map((feature) => (
                 <div
