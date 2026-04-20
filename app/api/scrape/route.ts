@@ -181,10 +181,12 @@ function isAuthorized(req: NextRequest): boolean {
 
 async function scrapeMarket(
   firecrawl: FirecrawlApp,
-  market: string
+  market: string,
+  platformFilter?: "outdoorsy" | "rvshare"
 ): Promise<{ inserted: number; skipped: number; errors: string[] }> {
-  const targets = MARKET_TARGETS[market];
-  if (!targets) throw new Error(`Unknown market: ${market}`);
+  const allTargets = MARKET_TARGETS[market];
+  if (!allTargets) throw new Error(`Unknown market: ${market}`);
+  const targets = platformFilter ? allTargets.filter(t => t.platform === platformFilter) : allTargets;
 
   const supabase = getServiceSupabase();
   const errors: string[] = [];
@@ -338,11 +340,12 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const market = body.market ?? "san-diego-ca";
+  const platformFilter = body.platform as "outdoorsy" | "rvshare" | undefined;
 
   const firecrawl = new FirecrawlApp({ apiKey });
 
   try {
-    const { inserted, skipped, errors } = await scrapeMarket(firecrawl, market);
+    const { inserted, skipped, errors } = await scrapeMarket(firecrawl, market, platformFilter);
 
     return NextResponse.json({
       success: true,
@@ -364,6 +367,8 @@ export async function GET(req: NextRequest) {
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  // Vercel Cron calls GET — forward to POST logic
-  return POST(new Request(req.url, { method: "POST", headers: req.headers, body: "{}" }) as NextRequest);
+  // Vercel Cron calls GET — pass platform from query param if present
+  const platform = new URL(req.url).searchParams.get("platform") ?? undefined;
+  const body = JSON.stringify({ market: "san-diego-ca", ...(platform ? { platform } : {}) });
+  return POST(new Request(req.url, { method: "POST", headers: req.headers, body }) as NextRequest);
 }
