@@ -60,7 +60,7 @@ async function scrapeMarket(
     ["rvshare", urls.rvshare],
   ] as const) {
     try {
-      const result = await firecrawl.scrapeUrl(url, {
+      const result = await firecrawl.scrape(url, {
         formats: ["extract"],
         extract: { schema: ListingExtractSchema },
       });
