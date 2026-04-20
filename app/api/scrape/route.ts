@@ -15,9 +15,9 @@ const MARKET_URLS: Record<string, { outdoorsy: string; rvshare: string; label: s
   "san-diego-ca": {
     label: "san-diego-ca",
     outdoorsy:
-      "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental&filter[vehicle_type]=b-van",
+      "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental",
     rvshare:
-      "https://rvshare.com/rv-rental?location=san+diego+ca&type%5B%5D=class-b",
+      "https://rvshare.com/rv-rental?location=san+diego+ca",
   },
 };
 
