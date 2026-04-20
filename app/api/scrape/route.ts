@@ -61,16 +61,16 @@ async function scrapeMarket(
   ] as const) {
     try {
       const result = await firecrawl.scrape(url, {
-        formats: ["extract"],
-        extract: { schema: ListingExtractSchema },
+        formats: ["json"],
+        jsonOptions: { schema: ListingExtractSchema },
       });
 
-      if (!result.success || !result.extract) {
+      if (!result.success || !result.json) {
         errors.push(`${platform}: extraction returned no data`);
         continue;
       }
 
-      const { listings } = result.extract as z.infer<typeof ListingExtractSchema>;
+      const { listings } = result.json as z.infer<typeof ListingExtractSchema>;
 
       if (!listings?.length) {
         errors.push(`${platform}: 0 listings extracted`);
