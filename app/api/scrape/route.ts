@@ -20,16 +20,11 @@ type ScrapeTarget = { platform: "outdoorsy" | "rvshare"; url: string };
 
 const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
   "san-diego-ca": [
-    // Outdoorsy — filter[vehicle_type] values confirmed from their URL scheme
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=a-class" },
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=b-van" },
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=c-class" },
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=travel-trailer" },
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=fifth-wheel" },
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=toy-hauler" },
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=pop-up" },
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=truck-camper" },
-    // RVshare — type param is read by React Router on load; Firecrawl runs the JS
+    // Outdoorsy — one unfiltered call. Per-class calls need stealth proxy (~20s each),
+    // 8 × 20s = 160s which blows the 60s function limit. Single call + LLM classification works.
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental" },
+    // RVshare — per-class; JS filter applied by Firecrawl's headless browser.
+    // 8 targets in batches of 2 → 4 batches × ~12s ≈ 48s, fits within 60s.
     { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-a" },
     { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-b" },
     { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-c" },
@@ -287,9 +282,18 @@ async function scrapeMarket(
           return true;
         });
 
+      // Deduplicate by listing_url within this batch (same URL can appear on
+      // multiple class-filtered pages, which causes ON CONFLICT errors)
+      const seen = new Set<string>();
+      const dedupedRows = rows.filter(r => {
+        if (seen.has(r.listing_url)) return false;
+        seen.add(r.listing_url);
+        return true;
+      });
+
       const { error } = await supabase
         .from("listings")
-        .upsert(rows, { onConflict: "listing_url", ignoreDuplicates: false });
+        .upsert(dedupedRows, { onConflict: "listing_url", ignoreDuplicates: false });
 
       if (error) {
         localErrors.push(`${label} upsert: ${error.message}`);
@@ -303,8 +307,8 @@ async function scrapeMarket(
     return { inserted: localInserted, skipped: localSkipped, errors: localErrors };
   };
 
-  // Run in batches of 3 to stay within Firecrawl's per-key concurrency limit
-  const BATCH_SIZE = 3;
+  // Run in batches of 2 — fits Firecrawl concurrency and keeps each batch ~12s
+  const BATCH_SIZE = 2;
   const allResults: PromiseSettledResult<{ inserted: number; skipped: number; errors: string[] }>[] = [];
   for (let i = 0; i < targets.length; i += BATCH_SIZE) {
     const batch = targets.slice(i, i + BATCH_SIZE);
