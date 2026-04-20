@@ -1,17 +1,12 @@
 {
   "functions": {
     "app/api/scrape/route.ts": {
-      "maxDuration": 60
+      "maxDuration": 300
     }
   },
   "crons": [
-    {
-      "path": "/api/scrape?platform=rvshare",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy",
-      "schedule": "5 6 * * *"
-    }
+    { "path": "/api/scrape?platform=rvshare-1",   "schedule": "0 6 * * *"  },
+    { "path": "/api/scrape?platform=rvshare-2",   "schedule": "10 6 * * *" },
+    { "path": "/api/scrape?platform=outdoorsy-1", "schedule": "20 6 * * *" }
   ]
 }

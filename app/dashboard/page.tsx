@@ -138,6 +138,7 @@ export default function DashboardPage() {
         .select("id, platform, host_name, rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, listing_url, scraped_at")
         .eq("market", market)
         .eq("rv_class", rvClass)
+        .eq("is_active", true)
         .order("nightly_rate", { ascending: false });
 
       setListings(data ?? []);
@@ -156,6 +157,14 @@ export default function DashboardPage() {
   const rateDistribution = buildRateDistribution(listings);
   const lastUpdated = formatLastUpdated(listings);
   const marketLabel = market === "san-diego-ca" ? "San Diego" : market;
+
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const freshCount = listings.filter(
+    (l) => new Date(l.scraped_at).getTime() > sevenDaysAgo
+  ).length;
+  const freshPct = listings.length
+    ? Math.round((freshCount / listings.length) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -238,7 +247,9 @@ export default function DashboardPage() {
             </Select>
           </div>
           <Badge variant="secondary" className="ml-auto text-xs">
-            {loading ? "Loading…" : `${listings.length} listings · ${rvClass} · ${marketLabel}`}
+            {loading
+              ? "Loading…"
+              : `${listings.length} listings · ${freshCount} priced in 7d · ${rvClass} · ${marketLabel}`}
           </Badge>
         </div>
 
@@ -269,9 +280,9 @@ export default function DashboardPage() {
                 trend="up"
               />
               <MetricCard
-                label="Active Inventory"
-                value={`${listings.length}`}
-                sub="listings tracked"
+                label="Priced in Last 7d"
+                value={`${freshCount}`}
+                sub={listings.length ? `${freshPct}% of ${listings.length} active` : "no data yet"}
                 trend="neutral"
               />
             </>

@@ -42,8 +42,37 @@ export type Database = {
           avg_rating: number;
           amenities: string[];
           scraped_at: string;
+          first_seen_at: string;
+          last_seen_at: string;
+          is_active: boolean;
+          enriched_at: string | null;
         };
-        Insert: Omit<Database["public"]["Tables"]["listings"]["Row"], "id" | "created_at">;
+        Insert: Omit<
+          Database["public"]["Tables"]["listings"]["Row"],
+          "id" | "created_at" | "first_seen_at" | "is_active" | "enriched_at"
+        > & {
+          first_seen_at?: string;
+          is_active?: boolean;
+          enriched_at?: string | null;
+        };
+      };
+      listing_snapshots: {
+        Row: {
+          listing_id: string;
+          captured_at: string;
+          nightly_rate: number;
+          weekly_rate: number | null;
+          review_count: number | null;
+          avg_rating: number | null;
+        };
+        Insert: {
+          listing_id: string;
+          captured_at?: string;
+          nightly_rate: number;
+          weekly_rate?: number | null;
+          review_count?: number | null;
+          avg_rating?: number | null;
+        };
       };
       availability_snapshots: {
         Row: {

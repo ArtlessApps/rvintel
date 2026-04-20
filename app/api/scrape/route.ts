@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 300; // 5 min — needed for 16 Firecrawl calls per market
+export const maxDuration = 300;
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
@@ -16,23 +16,30 @@ function getServiceSupabase() {
 // Outdoorsy's 403 bot-block; RVshare filters are client-side JS so Firecrawl's
 // headless browser applies them after the 4s waitFor.
 
-type ScrapeTarget = { platform: "outdoorsy" | "rvshare"; url: string };
+// group field splits Outdoorsy into two cron invocations (4 classes each, 2 parallel
+// batches × ~20s = ~40s) to stay within Vercel Hobby's 60s function limit.
+type ScrapeTarget = { platform: "outdoorsy" | "rvshare"; url: string; group?: string };
 
 const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
   "san-diego-ca": [
-    // Outdoorsy — one unfiltered call. Per-class calls need stealth proxy (~20s each),
-    // 8 × 20s = 160s which blows the 60s function limit. Single call + LLM classification works.
-    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental" },
+    // Outdoorsy per-class using the confirmed working URL format.
+    // skip_defaults=true + filter[renter_age]=25 are required for results to show.
+    // page[offset] pagination is handled in buildPageUrl (increments by 12).
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
     // RVshare — per-class; JS filter applied by Firecrawl's headless browser.
-    // 8 targets in batches of 2 → 4 batches × ~12s ≈ 48s, fits within 60s.
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-a" },
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-b" },
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-c" },
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=travel-trailer" },
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=fifth-wheel" },
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=toy-hauler" },
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=pop-up" },
-    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=truck-camper" },
+    // Split into two groups (4 targets each) so RVshare stays well under the
+    // function timeout even when Firecrawl queues.
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-a" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-b" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-c" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=travel-trailer" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=fifth-wheel" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=toy-hauler" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=pop-up" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=truck-camper" },
   ],
 };
 
@@ -181,89 +188,97 @@ async function scrapeMarket(
 ): Promise<{ inserted: number; skipped: number; errors: string[] }> {
   const allTargets = MARKET_TARGETS[market];
   if (!allTargets) throw new Error(`Unknown market: ${market}`);
-  const targets = platformFilter ? allTargets.filter(t => t.platform === platformFilter) : allTargets;
+
+  // platformFilter can be "outdoorsy", "rvshare", "outdoorsy-1", or "outdoorsy-2"
+  const platformName = platformFilter?.split("-")[0] as "outdoorsy" | "rvshare" | undefined;
+  const groupFilter = platformFilter?.includes("-") ? platformFilter.split("-")[1] : undefined;
+
+  const targets = allTargets.filter(t => {
+    if (!platformName) return true;
+    if (t.platform !== platformName) return false;
+    if (groupFilter && t.group !== groupFilter) return false;
+    return true;
+  });
 
   const supabase = getServiceSupabase();
   const errors: string[] = [];
   let inserted = 0;
   let skipped = 0;
 
+  // How many pages to fetch per class per run. Intentionally low — coverage is
+  // achieved across many daily cron runs, not by exhausting pagination in one shot.
+  // Firecrawl Hobby = 2 concurrent, ~20/min; bigger per-run scopes hit rate limits.
+  const MAX_PAGES: Record<string, number> = { outdoorsy: 2, rvshare: 2 };
+  // Outdoorsy shows 12 listings/page; stop paginating if a page returns fewer than this.
+  const MIN_PAGE_RESULTS = 5;
+
+  const VALID_DOMAINS: Record<string, string> = { outdoorsy: "outdoorsy.com", rvshare: "rvshare.com" };
+
+  function buildPageUrl(baseUrl: string, platform: string, page: number): string {
+    const u = new URL(baseUrl);
+    if (page === 0) return u.toString();
+    if (platform === "outdoorsy") {
+      u.searchParams.set("page[offset]", String(page * 12));
+    } else {
+      u.searchParams.set("page", String(page + 1));
+    }
+    return u.toString();
+  }
+
+  const EXTRACTION_PROMPT =
+    "Extract every RV rental listing visible on the page. For each listing return: listing_url, host_name, rv_title (verbatim), rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, amenities, and rv_class.\n\n" +
+    "CRITICAL — listing_url must be a real, complete URL from the page (e.g. https://www.outdoorsy.com/rentals/... or https://rvshare.com/rv-rental/...). NEVER invent, guess, or use placeholder URLs like example.com, /rv1, /rv2, or any made-up path. If you cannot find the real URL for a listing, omit that listing entirely rather than fabricating a URL.\n\n" +
+    "ALWAYS include rv_title copied word-for-word from the listing card headline (e.g. '2019 Four Winds 26B'). This is required — do not skip it.\n\n" +
+    "CRITICAL — model/floorplan codes are NOT class designators:\n" +
+    "A trailing letter like A, B, C, E, F, G, J, K, M after a number is a FLOORPLAN code, not an RV class. '26B', '22E', '30A', '24F', '59K' say nothing about class. IGNORE those letters when classifying. Classify only from the body style (photo) and the brand/series name.\n\n" +
+    "CLASSIFICATION RULES — be precise. Decide rv_class from the photo and the brand/series:\n" +
+    "- Class A: large bus-style coach with flat front and huge windshield. Examples: Tiffin Allegro, Newmar Dutch Star, Fleetwood Bounder, Winnebago Vista/Adventurer, Thor Hurricane.\n" +
+    "- Class B: van-sized campervan with a CONTINUOUS van roofline and NO bed hanging over the cab. Examples: Winnebago Travato/Solis/Revel/Ekko 22, Airstream Interstate, Coachmen Galleria, Storyteller Overland, Thor Sequence/Tellaro, any Mercedes Sprinter / Ford Transit / Ram Promaster conversion.\n" +
+    "- Class C: motorhome on a cut-away van/truck chassis with a VERY DISTINCTIVE bed or storage bump that juts out OVER the driver cab. Examples: Winnebago Minnie Winnie/View/Navion, Thor Four Winds/Chateau/Quantum/Freedom Elite, Jayco Redhawk/Greyhawk/Melbourne, Coachmen Leprechaun/Freelander, Forest River Sunseeker/Forester.\n" +
+    "- Travel Trailer: towable, no motor, bumper-pull hitch. Examples: Airstream Bambi/Flying Cloud, Jayco Jay Flight, Grand Design Imagine, R-Pod, Happier Camper, Taxa.\n" +
+    "- Fifth Wheel: towable with a raised kingpin/gooseneck that sits in a pickup bed.\n" +
+    "- Toy Hauler: trailer or motorhome with a rear ramp door garage.\n" +
+    "- Pop Up: folding tent trailer.\n" +
+    "- Truck Camper: a slide-in camper unit that sits INSIDE a pickup truck bed; you can see the pickup's cab in front of and below the camper. Examples: Lance, Northern Lite, Four Wheel Campers, Palomino Backpack.\n" +
+    "- Not an RV: a bare pickup truck, SUV, car, sedan, van with no camper interior, or any tow vehicle by itself. If the photo just shows a pickup truck with no camper mounted, you MUST return 'Not an RV'. Do NOT label pickup trucks as Class C.\n" +
+    "- Other: only if nothing above fits.\n\n" +
+    "Brand-name cheat sheet (use these as authoritative — any listing whose title contains these words is that class regardless of model code):\n" +
+    "Class B: Travato, Solis, Revel, Ekko, Boldt, Airstream Interstate, Galleria, Beyond, Storyteller, Sequence, Tellaro, Rize, Scope, Sanctuary.\n" +
+    "Class C: Four Winds, Chateau, Freedom Elite, Quantum, Axis, Vegas, Minnie Winnie, View, Navion, Spirit, Outlook, Porto, Redhawk, Greyhawk, Melbourne, Seneca, Leprechaun, Freelander, Prism, Sunseeker, Forester, Isata.\n" +
+    "Class A: Tiffin, Allegro, Phaeton, Newmar, Dutch Star, Mountain Aire, Ventana, Bay Star, Bounder, Pace Arrow, Hurricane, Palazzo, Georgetown, Discovery, Vista, Adventurer, Journey, Tour, Forza.\n\n" +
+    "For rv_make, prefer the RV series/brand name (e.g. 'Four Winds', 'Travato') over the chassis manufacturer (e.g. 'Thor', 'Mercedes'). If the title is 'Thor Four Winds 26B', rv_make = 'Four Winds', rv_model = '26B'.\n\n" +
+    "Common mistakes to AVOID:\n" +
+    "1. NEVER let a trailing letter in a model code (22B, 26B, 30A) drive the class. The letter is a floorplan designator.\n" +
+    "2. A 'Four Winds' is ALWAYS Class C — it has a cab-over bed. Never Class B.\n" +
+    "3. Do NOT put Class C motorhomes (with an over-cab bed) into Class B. Class B NEVER has an over-cab bump.\n" +
+    "4. Do NOT put a pickup truck into Class C. A Class C always has a large motorhome body behind the cab; a bare pickup truck has just a cargo bed.\n" +
+    "5. A Sprinter/Transit/Promaster is Class B ONLY if it has the van's original roofline. If it has a boxy motorhome body bolted on with a cab-over, it's Class C.\n" +
+    "6. 'Lance', 'Northern Lite', 'Four Wheel Camper' is a Truck Camper, not Class C.";
+
   const scrapeOne = async ({ platform, url }: ScrapeTarget): Promise<{ inserted: number; skipped: number; errors: string[] }> => {
-    const label = `${platform} ${new URL(url).searchParams.get("filter[vehicle_type]") ?? new URL(url).searchParams.get("type") ?? "all"}`;
+    const label = `${platform} ${new URL(url).searchParams.get("filter[type]") ?? new URL(url).searchParams.get("type") ?? "all"}`;
     const localErrors: string[] = [];
     let localInserted = 0;
     let localSkipped = 0;
 
-    try {
-    const result = await firecrawl.scrape(url, {
-        formats: [
-          "markdown",
-          {
-            type: "json",
-            schema: ListingExtractSchema,
-            prompt:
-              "Extract every RV rental listing visible on the page. For each listing return: listing_url, host_name, rv_title (verbatim), rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, amenities, and rv_class.\n\n" +
-              "ALWAYS include rv_title copied word-for-word from the listing card headline (e.g. '2019 Four Winds 26B'). This is required — do not skip it.\n\n" +
-              "CRITICAL — model/floorplan codes are NOT class designators:\n" +
-              "A trailing letter like A, B, C, E, F, G, J, K, M after a number is a FLOORPLAN code, not an RV class. '26B', '22E', '30A', '24F', '59K' say nothing about class. IGNORE those letters when classifying. Classify only from the body style (photo) and the brand/series name.\n\n" +
-              "CLASSIFICATION RULES — be precise. Decide rv_class from the photo and the brand/series:\n" +
-              "- Class A: large bus-style coach with flat front and huge windshield. Examples: Tiffin Allegro, Newmar Dutch Star, Fleetwood Bounder, Winnebago Vista/Adventurer, Thor Hurricane.\n" +
-              "- Class B: van-sized campervan with a CONTINUOUS van roofline and NO bed hanging over the cab. Examples: Winnebago Travato/Solis/Revel/Ekko 22, Airstream Interstate, Coachmen Galleria, Storyteller Overland, Thor Sequence/Tellaro, any Mercedes Sprinter / Ford Transit / Ram Promaster conversion.\n" +
-              "- Class C: motorhome on a cut-away van/truck chassis with a VERY DISTINCTIVE bed or storage bump that juts out OVER the driver cab. Examples: Winnebago Minnie Winnie/View/Navion, Thor Four Winds/Chateau/Quantum/Freedom Elite, Jayco Redhawk/Greyhawk/Melbourne, Coachmen Leprechaun/Freelander, Forest River Sunseeker/Forester.\n" +
-              "- Travel Trailer: towable, no motor, bumper-pull hitch. Examples: Airstream Bambi/Flying Cloud, Jayco Jay Flight, Grand Design Imagine, R-Pod, Happier Camper, Taxa.\n" +
-              "- Fifth Wheel: towable with a raised kingpin/gooseneck that sits in a pickup bed.\n" +
-              "- Toy Hauler: trailer or motorhome with a rear ramp door garage.\n" +
-              "- Pop Up: folding tent trailer.\n" +
-              "- Truck Camper: a slide-in camper unit that sits INSIDE a pickup truck bed; you can see the pickup's cab in front of and below the camper. Examples: Lance, Northern Lite, Four Wheel Campers, Palomino Backpack.\n" +
-              "- Not an RV: a bare pickup truck, SUV, car, sedan, van with no camper interior, or any tow vehicle by itself. If the photo just shows a pickup truck with no camper mounted, you MUST return 'Not an RV'. Do NOT label pickup trucks as Class C.\n" +
-              "- Other: only if nothing above fits.\n\n" +
-              "Brand-name cheat sheet (use these as authoritative — any listing whose title contains these words is that class regardless of model code):\n" +
-              "Class B: Travato, Solis, Revel, Ekko, Boldt, Airstream Interstate, Galleria, Beyond, Storyteller, Sequence, Tellaro, Rize, Scope, Sanctuary.\n" +
-              "Class C: Four Winds, Chateau, Freedom Elite, Quantum, Axis, Vegas, Minnie Winnie, View, Navion, Spirit, Outlook, Porto, Redhawk, Greyhawk, Melbourne, Seneca, Leprechaun, Freelander, Prism, Sunseeker, Forester, Isata.\n" +
-              "Class A: Tiffin, Allegro, Phaeton, Newmar, Dutch Star, Mountain Aire, Ventana, Bay Star, Bounder, Pace Arrow, Hurricane, Palazzo, Georgetown, Discovery, Vista, Adventurer, Journey, Tour, Forza.\n\n" +
-              "For rv_make, prefer the RV series/brand name (e.g. 'Four Winds', 'Travato') over the chassis manufacturer (e.g. 'Thor', 'Mercedes'). If the title is 'Thor Four Winds 26B', rv_make = 'Four Winds', rv_model = '26B'.\n\n" +
-              "Common mistakes to AVOID:\n" +
-              "1. NEVER let a trailing letter in a model code (22B, 26B, 30A) drive the class. The letter is a floorplan designator.\n" +
-              "2. A 'Four Winds' is ALWAYS Class C — it has a cab-over bed. Never Class B.\n" +
-              "3. Do NOT put Class C motorhomes (with an over-cab bed) into Class B. Class B NEVER has an over-cab bump.\n" +
-              "4. Do NOT put a pickup truck into Class C. A Class C always has a large motorhome body behind the cab; a bare pickup truck has just a cargo bed.\n" +
-              "5. A Sprinter/Transit/Promaster is Class B ONLY if it has the van's original roofline. If it has a boxy motorhome body bolted on with a cab-over, it's Class C.\n" +
-              "6. 'Lance', 'Northern Lite', 'Four Wheel Camper' is a Truck Camper, not Class C.",
-          },
-        ],
-        waitFor: 1500,
-        proxy: "stealth",
-      } as Parameters<typeof firecrawl.scrape>[1]);
+    const allRows: ReturnType<typeof buildRows>[number][] = [];
+    const maxPages = MAX_PAGES[platform] ?? 3;
 
-      const raw = result as Record<string, unknown>;
-      const statusCode = (raw.metadata as Record<string, unknown>)?.statusCode as number | undefined;
-
-      // Use json data if present, regardless of success flag (Firecrawl can return
-      // success:false on 403/bot-blocked pages while still having extracted content)
-      const jsonData = raw.json as z.infer<typeof ListingExtractSchema> | undefined;
-
-      if (!jsonData?.listings?.length) {
-        const md = (raw.markdown as string | undefined)?.slice(0, 400) ?? "(no markdown)";
-        localErrors.push(`${label}: no listings extracted (status ${statusCode ?? "?"}). Preview: ${md}`);
-        return { inserted: 0, skipped: 0, errors: localErrors };
-      }
-
-      const { listings } = jsonData;
-
-      const rows = listings
-        .filter((l) => l.nightly_rate > 0)
+    function buildRows(listings: z.infer<typeof ListingExtractSchema>["listings"]) {
+      return listings
+        .filter((l) => {
+          if (l.nightly_rate <= 0) return false;
+          try {
+            const host = new URL(l.listing_url).hostname.replace(/^www\./, "");
+            return host === VALID_DOMAINS[platform];
+          } catch { return false; }
+        })
         .map((l) => {
-          const resolvedClass = finalClass(
-            l.rv_class as RvClass | undefined,
-            l.rv_title,
-            l.rv_make,
-            l.rv_model,
-            l.listing_url
-          );
+          const now = new Date().toISOString();
           return {
             platform,
             market,
-            rv_class: resolvedClass,
+            rv_class: finalClass(l.rv_class as RvClass | undefined, l.rv_title, l.rv_make, l.rv_model, l.listing_url),
             listing_url: l.listing_url,
             host_name: l.host_name ?? null,
             rv_year: l.rv_year ?? null,
@@ -274,31 +289,97 @@ async function scrapeMarket(
             review_count: l.review_count ?? null,
             avg_rating: l.avg_rating ?? null,
             amenities: l.amenities ?? [],
-            scraped_at: new Date().toISOString(),
+            scraped_at: now,
+            last_seen_at: now,
           };
         })
         .filter((row) => {
           if (row.rv_class === "Not an RV") { localSkipped++; return false; }
           return true;
         });
+    }
 
-      // Deduplicate by listing_url within this batch (same URL can appear on
-      // multiple class-filtered pages, which causes ON CONFLICT errors)
-      const seen = new Set<string>();
-      const dedupedRows = rows.filter(r => {
-        if (seen.has(r.listing_url)) return false;
-        seen.add(r.listing_url);
-        return true;
-      });
+    // Outdoorsy stealth proxy legitimately takes 40–60s per page; RVshare is fast.
+    // Per-platform timeouts avoid killing good Outdoorsy calls prematurely while
+    // still bounding RVshare if something goes wrong.
+    const CALL_TIMEOUT_MS = platform === "outdoorsy" ? 90_000 : 45_000;
+    function withTimeout<T>(promise: Promise<T>): Promise<T> {
+      return Promise.race([
+        promise,
+        new Promise<T>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`firecrawl call timed out after ${CALL_TIMEOUT_MS / 1000}s`)),
+            CALL_TIMEOUT_MS
+          )
+        ),
+      ]);
+    }
 
-      const { error } = await supabase
-        .from("listings")
-        .upsert(dedupedRows, { onConflict: "listing_url", ignoreDuplicates: false });
+    try {
+      for (let page = 0; page < maxPages; page++) {
+        const pageUrl = buildPageUrl(url, platform, page);
+        const result = await withTimeout(firecrawl.scrape(pageUrl, {
+          formats: ["markdown", { type: "json", schema: ListingExtractSchema, prompt: EXTRACTION_PROMPT }],
+          waitFor: 1500,
+          ...(platform === "outdoorsy" ? { proxy: "stealth" } : {}),
+        } as Parameters<typeof firecrawl.scrape>[1]));
 
-      if (error) {
-        localErrors.push(`${label} upsert: ${error.message}`);
-      } else {
-        localInserted = rows.length;
+        const raw = result as Record<string, unknown>;
+        const jsonData = raw.json as z.infer<typeof ListingExtractSchema> | undefined;
+
+        if (!jsonData?.listings?.length) {
+          if (page === 0) {
+            const statusCode = (raw.metadata as Record<string, unknown>)?.statusCode as number | undefined;
+            const md = (raw.markdown as string | undefined)?.slice(0, 400) ?? "(no markdown)";
+            localErrors.push(`${label}: no listings extracted (status ${statusCode ?? "?"}). Preview: ${md}`);
+          }
+          break; // no results on this page — stop paginating
+        }
+
+        const pageRows = buildRows(jsonData.listings);
+        allRows.push(...pageRows);
+
+        // Stop early if we got fewer results than a full page (end of listings)
+        if (jsonData.listings.length < MIN_PAGE_RESULTS) break;
+      }
+
+      if (allRows.length > 0) {
+        // Deduplicate across all pages before upserting
+        const seen = new Set<string>();
+        const dedupedRows = allRows.filter(r => {
+          if (seen.has(r.listing_url)) return false;
+          seen.add(r.listing_url);
+          return true;
+        });
+
+        const { data: upserted, error } = await supabase
+          .from("listings")
+          .upsert(dedupedRows, { onConflict: "listing_url", ignoreDuplicates: false })
+          .select("id, nightly_rate, weekly_rate, review_count, avg_rating");
+
+        if (error) {
+          localErrors.push(`${label} upsert: ${error.message}`);
+        } else {
+          localInserted = dedupedRows.length;
+
+          // Append a time-series snapshot for every row we just upserted.
+          // Append-only — time depth is the moat and cannot be backfilled.
+          if (upserted && upserted.length > 0) {
+            const snapshots = upserted.map((r) => ({
+              listing_id: r.id as string,
+              nightly_rate: r.nightly_rate as number,
+              weekly_rate: (r.weekly_rate ?? null) as number | null,
+              review_count: (r.review_count ?? null) as number | null,
+              avg_rating: (r.avg_rating ?? null) as number | null,
+            }));
+            const { error: snapErr } = await supabase
+              .from("listing_snapshots")
+              .insert(snapshots);
+            if (snapErr) {
+              localErrors.push(`${label} snapshot: ${snapErr.message}`);
+            }
+          }
+        }
       }
     } catch (err) {
       localErrors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
