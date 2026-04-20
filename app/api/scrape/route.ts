@@ -207,9 +207,10 @@ async function scrapeMarket(
 
   // How many pages to fetch per class per run. Intentionally low — coverage is
   // achieved across many daily cron runs, not by exhausting pagination in one shot.
-  // JSON extraction takes 60–90s per page, so we budget conservatively to fit
-  // within the 300s Vercel function cap even when LLM latency spikes.
-  const MAX_PAGES: Record<string, number> = { outdoorsy: 2, rvshare: 1 };
+  // JSON extraction takes 60–90s per page (LLM pass dominates), so with 4 targets
+  // run in batches of 2, MAX_PAGES=1 gives 2 batches × ≤120s = ≤240s worst case,
+  // comfortably inside the 300s Vercel function cap even when latency spikes.
+  const MAX_PAGES: Record<string, number> = { outdoorsy: 1, rvshare: 1 };
   // Outdoorsy shows 12 listings/page; stop paginating if a page returns fewer than this.
   const MIN_PAGE_RESULTS = 5;
 
