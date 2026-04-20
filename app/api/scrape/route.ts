@@ -9,9 +9,9 @@ const MARKET_URLS: Record<string, { outdoorsy: string; rvshare: string; label: s
   "san-diego-ca": {
     label: "san-diego-ca",
     outdoorsy:
-      "https://www.outdoorsy.com/rv-rental/san_diego/ca?type=b-van",
+      "https://www.outdoorsy.com/rv-rental/san-diego--ca?type=b-van",
     rvshare:
-      "https://rvshare.com/rv-rental/san-diego-ca?type[]=class-b",
+      "https://rvshare.com/rv-rental?location=san+diego+ca&type%5B%5D=class-b",
   },
 };
 
@@ -69,7 +69,8 @@ async function scrapeMarket(
             prompt: "Extract all RV rental listings visible on the page. For each listing include the URL, host name, RV year/make/model, nightly rate, weekly rate, review count, average rating, and amenities.",
           },
         ],
-        waitFor: 3000,
+        waitFor: 4000,
+        proxy: "stealth",
       } as Parameters<typeof firecrawl.scrape>[1]);
 
       const raw = result as Record<string, unknown>;
