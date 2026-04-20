@@ -62,16 +62,27 @@ async function scrapeMarket(
     try {
       const result = await firecrawl.scrape(url, {
         formats: [
+          "markdown",
           {
             type: "json",
             schema: ListingExtractSchema,
             prompt: "Extract all RV rental listings visible on the page. For each listing include the URL, host name, RV year/make/model, nightly rate, weekly rate, review count, average rating, and amenities.",
           },
         ],
+        waitFor: 3000,
       } as Parameters<typeof firecrawl.scrape>[1]);
 
-      if (!result.success || !(result as Record<string, unknown>).json) {
-        errors.push(`${platform}: extraction returned no data`);
+      const raw = result as Record<string, unknown>;
+
+      if (!result.success) {
+        errors.push(`${platform}: scrape failed — ${JSON.stringify(raw)}`);
+        continue;
+      }
+
+      if (!raw.json) {
+        // Return markdown snippet so we can see what was scraped
+        const md = (raw.markdown as string | undefined)?.slice(0, 500) ?? "(no markdown)";
+        errors.push(`${platform}: extraction returned no data. Page preview: ${md}`);
         continue;
       }
 
