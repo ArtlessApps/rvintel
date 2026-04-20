@@ -301,8 +301,15 @@ async function scrapeMarket(
     return { inserted: localInserted, skipped: localSkipped, errors: localErrors };
   };
 
-  // Run all 16 targets in parallel — cuts total time from ~160s to ~15s
-  const results = await Promise.allSettled(targets.map(scrapeOne));
+  // Run in batches of 3 to stay within Firecrawl's per-key concurrency limit
+  const BATCH_SIZE = 3;
+  const allResults: PromiseSettledResult<{ inserted: number; skipped: number; errors: string[] }>[] = [];
+  for (let i = 0; i < targets.length; i += BATCH_SIZE) {
+    const batch = targets.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.allSettled(batch.map(scrapeOne));
+    allResults.push(...batchResults);
+  }
+  const results = allResults;
 
   for (const r of results) {
     if (r.status === "fulfilled") {
