@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 300; // 5 min — needed for 16 Firecrawl calls per market
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
@@ -10,15 +12,33 @@ function getServiceSupabase() {
 }
 
 // ─── Market / class config ────────────────────────────────────────────────────
+// One entry per platform+class combination. Firecrawl stealth proxy bypasses
+// Outdoorsy's 403 bot-block; RVshare filters are client-side JS so Firecrawl's
+// headless browser applies them after the 4s waitFor.
 
-const MARKET_URLS: Record<string, { outdoorsy: string; rvshare: string; label: string }> = {
-  "san-diego-ca": {
-    label: "san-diego-ca",
-    outdoorsy:
-      "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental",
-    rvshare:
-      "https://rvshare.com/rv-rental?location=san+diego+ca",
-  },
+type ScrapeTarget = { platform: "outdoorsy" | "rvshare"; url: string };
+
+const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
+  "san-diego-ca": [
+    // Outdoorsy — filter[vehicle_type] values confirmed from their URL scheme
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=a-class" },
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=b-van" },
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=c-class" },
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=travel-trailer" },
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=fifth-wheel" },
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=toy-hauler" },
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=pop-up" },
+    { platform: "outdoorsy", url: "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&filter[vehicle_type]=truck-camper" },
+    // RVshare — type param is read by React Router on load; Firecrawl runs the JS
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-a" },
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-b" },
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-c" },
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=travel-trailer" },
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=fifth-wheel" },
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=toy-hauler" },
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=pop-up" },
+    { platform: "rvshare", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=truck-camper" },
+  ],
 };
 
 // ─── Extraction schema ────────────────────────────────────────────────────────
@@ -163,18 +183,16 @@ async function scrapeMarket(
   firecrawl: FirecrawlApp,
   market: string
 ): Promise<{ inserted: number; skipped: number; errors: string[] }> {
-  const urls = MARKET_URLS[market];
-  if (!urls) throw new Error(`Unknown market: ${market}`);
+  const targets = MARKET_TARGETS[market];
+  if (!targets) throw new Error(`Unknown market: ${market}`);
 
   const supabase = getServiceSupabase();
   const errors: string[] = [];
   let inserted = 0;
   let skipped = 0;
 
-  for (const [platform, url] of [
-    ["outdoorsy", urls.outdoorsy],
-    ["rvshare", urls.rvshare],
-  ] as const) {
+  for (const { platform, url } of targets) {
+    const label = `${platform} ${new URL(url).searchParams.get("filter[vehicle_type]") ?? new URL(url).searchParams.get("type") ?? "all"}`;
     try {
       const result = await firecrawl.scrape(url, {
         formats: [
@@ -225,14 +243,14 @@ async function scrapeMarket(
 
       if (!jsonData?.listings?.length) {
         const md = (raw.markdown as string | undefined)?.slice(0, 400) ?? "(no markdown)";
-        errors.push(`${platform}: no listings extracted (status ${statusCode ?? "?"}). Preview: ${md}`);
+        errors.push(`${label}: no listings extracted (status ${statusCode ?? "?"}). Preview: ${md}`);
         continue;
       }
 
       const { listings } = jsonData;
 
       if (!listings?.length) {
-        errors.push(`${platform}: 0 listings extracted`);
+        errors.push(`${label}: 0 listings extracted`);
         continue;
       }
 
@@ -277,12 +295,12 @@ async function scrapeMarket(
         .upsert(rows, { onConflict: "listing_url", ignoreDuplicates: false });
 
       if (error) {
-        errors.push(`${platform} upsert: ${error.message}`);
+        errors.push(`${label} upsert: ${error.message}`);
       } else {
         inserted += rows.length;
       }
     } catch (err) {
-      errors.push(`${platform}: ${err instanceof Error ? err.message : String(err)}`);
+      errors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
