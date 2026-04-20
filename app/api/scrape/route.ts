@@ -61,16 +61,21 @@ async function scrapeMarket(
   ] as const) {
     try {
       const result = await firecrawl.scrape(url, {
-        formats: ["json"],
-        jsonOptions: { schema: ListingExtractSchema },
-      });
+        formats: [
+          {
+            type: "json",
+            schema: ListingExtractSchema,
+            prompt: "Extract all RV rental listings visible on the page. For each listing include the URL, host name, RV year/make/model, nightly rate, weekly rate, review count, average rating, and amenities.",
+          },
+        ],
+      } as Parameters<typeof firecrawl.scrape>[1]);
 
-      if (!result.success || !result.json) {
+      if (!result.success || !(result as Record<string, unknown>).json) {
         errors.push(`${platform}: extraction returned no data`);
         continue;
       }
 
-      const { listings } = result.json as z.infer<typeof ListingExtractSchema>;
+      const { listings } = (result as Record<string, unknown>).json as z.infer<typeof ListingExtractSchema>;
 
       if (!listings?.length) {
         errors.push(`${platform}: 0 listings extracted`);
