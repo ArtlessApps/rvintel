@@ -23,6 +23,7 @@ Think of it as: **browser ↔ your app on Vercel ↔ Supabase (database)**, plus
 | Home page & dashboard UI | In the visitor’s **browser** | Buttons, forms, charts, navigation |
 | **Supabase client** (anon key) | In the **browser** | Read listings; insert waitlist rows (subject to your Supabase security rules) |
 | **`/api/scrape`** | On **Vercel** (server) | Scrape listing sites, then write to the database with elevated permissions |
+| **`/api/rate-history`** | On **Vercel** (server) | Aggregate historical snapshots into a daily avg-rate series; reads `listing_snapshots` with the service role because that table is RLS-protected |
 | **Cron jobs** | **Vercel** triggers HTTP GETs on a schedule | Kick off scraping in chunks so each run finishes within time limits |
 | **Vercel Analytics** | In **production** only | Anonymous usage metrics |
 
@@ -46,9 +47,10 @@ The dashboard is also a client page. When you pick a **market** and **RV class**
 
 1. The browser uses the same Supabase client (anon key).
 2. It **selects** rows from the **`listings`** table filtered by `market` and `rv_class`, sorted by nightly rate.
-3. It computes summaries in the browser (average rate, min/max, distribution buckets for the bar chart, “most reviewed” list, etc.).
+3. It computes summaries in the browser (average rate, min/max, distribution buckets for the bar chart, etc.).
+4. In parallel, it calls **`/api/rate-history`** — a server route that queries the `listing_snapshots` time-series table and returns a daily **avg nightly rate** series for the chosen market, class, and window. The snapshots table is RLS-protected, so the browser cannot read it directly; the route uses the Supabase service-role key on the server.
 
-**Important:** The time “window” control (e.g. last 7 / 30 / 90 days) may appear in the UI, but listing queries are driven by the latest scraped data for that market/class—not necessarily filtered by that window in code. If you extend the product, that’s where you’d tie dates to `scraped_at` or historical tables.
+**The time “window” control** (7 / 30 / 90 days) drives the rate-history query — pick a wider window and the area chart redraws with more points. The listing table and current-state summaries are still driven by the latest scraped snapshot for that market/class, not by the window.
 
 ---
 
@@ -100,7 +102,7 @@ Variables prefixed with `NEXT_PUBLIC_` are embedded in client bundles—never pu
 ## 5. Other files you might notice
 
 - **`components/dashboard-preview.tsx`** and hero imagery on `/` are **marketing mockups**—they illustrate the product; they are not wired to live data.
-- **`lib/supabase.ts`** — creates the Supabase client and documents TypeScript shapes for `listings`, `availability_snapshots`, and `waitlist`. Not every table may be used by the UI yet.
+- **`lib/supabase.ts`** — creates the Supabase client and documents TypeScript shapes for `listings`, `listing_snapshots`, `availability_snapshots`, `cron_runs`, and `waitlist`. Not every table may be used by the UI yet.
 - **`scripts/`** — optional local scripts (e.g. lead exports); they are not part of the Next.js request path unless you run them yourself.
 
 ---
@@ -114,6 +116,8 @@ Visitor opens /
 
 Visitor opens /dashboard
     → Browser queries Supabase listings (anon key + RLS)
+    → Browser calls /api/rate-history → server reads listing_snapshots (service role)
+      → returns daily avg-rate series → avg-rate-over-time chart renders
 
 Every other day (cron) on Vercel
     → GET /api/scrape?platform=...

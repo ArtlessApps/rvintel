@@ -5,6 +5,8 @@ import Link from "next/link";
 import {
   BarChart,
   Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -118,6 +120,27 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   return null;
 };
 
+type RateHistoryPoint = { date: string; avg: number; count: number };
+
+const RateHistoryTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number; payload: RateHistoryPoint }[]; label?: string }) => {
+  if (active && payload?.length) {
+    const p = payload[0].payload;
+    const d = new Date(label ?? "");
+    const dateLabel = isNaN(d.getTime())
+      ? label
+      : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return (
+      <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-md text-sm">
+        <p className="font-semibold text-foreground">{dateLabel}</p>
+        <p className="text-muted-foreground">
+          <span className="text-foreground font-medium">${p.avg}</span> avg · {p.count} snapshot{p.count !== 1 ? "s" : ""}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -127,6 +150,8 @@ export default function DashboardPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [rateHistory, setRateHistory] = useState<RateHistoryPoint[]>([]);
+  const [rateHistoryLoading, setRateHistoryLoading] = useState(true);
 
   const fetchListings = useCallback(async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true);
@@ -149,6 +174,25 @@ export default function DashboardPage() {
   }, [market, rvClass]);
 
   useEffect(() => { fetchListings(); }, [fetchListings]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setRateHistoryLoading(true);
+    const params = new URLSearchParams({ market, rv_class: rvClass, window: dateWindow });
+    fetch(`/api/rate-history?${params.toString()}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (cancelled) return;
+        setRateHistory(Array.isArray(json?.data) ? json.data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setRateHistory([]);
+      })
+      .finally(() => {
+        if (!cancelled) setRateHistoryLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [market, rvClass, dateWindow]);
 
   const avgRate = listings.length
     ? Math.round(listings.reduce((s, l) => s + l.nightly_rate, 0) / listings.length)
@@ -321,30 +365,78 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Top by review count */}
+          {/* Avg rate over time */}
           <div className="lg:col-span-2 bg-card rounded-xl p-6 shadow-[0_1px_4px_rgba(25,28,30,0.06)]">
-            <h2 className="text-sm font-semibold text-foreground mb-1">Most Reviewed</h2>
-            <p className="text-xs text-muted-foreground mb-5">By review count · last scrape</p>
-            {loading ? (
-              <div className="space-y-4">
-                {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-8 w-full rounded" />)}
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">Avg Rate Over Time</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Daily mean nightly rate · {dateWindow === "7d" ? "last 7 days" : dateWindow === "90d" ? "last 90 days" : "last 30 days"}
+                </p>
               </div>
+              {rateHistory.length > 1 && (() => {
+                const first = rateHistory[0].avg;
+                const last = rateHistory[rateHistory.length - 1].avg;
+                const delta = last - first;
+                const pct = first ? Math.round((delta / first) * 100) : 0;
+                const sign = delta > 0 ? "+" : "";
+                return (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs font-medium ${delta > 0 ? "text-emerald-600" : delta < 0 ? "text-rose-500" : ""}`}
+                  >
+                    {sign}{pct}% vs start
+                  </Badge>
+                );
+              })()}
+            </div>
+            {rateHistoryLoading ? (
+              <Skeleton className="h-[220px] w-full rounded-lg" />
+            ) : rateHistory.length > 0 ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <AreaChart data={rateHistory} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="rateHistoryFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#2dd4bf" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#2dd4bf" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0.005 240)" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 11, fill: "oklch(0.5 0.01 240)" }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(d: string) => {
+                      const date = new Date(d);
+                      return isNaN(date.getTime())
+                        ? d
+                        : date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                    }}
+                    minTickGap={24}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: "oklch(0.5 0.01 240)" }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v: number) => `$${v}`}
+                    domain={["auto", "auto"]}
+                  />
+                  <Tooltip content={<RateHistoryTooltip />} cursor={{ stroke: "oklch(0.85 0.01 240)", strokeWidth: 1 }} />
+                  <Area
+                    type="monotone"
+                    dataKey="avg"
+                    stroke="#2dd4bf"
+                    strokeWidth={2}
+                    fill="url(#rateHistoryFill)"
+                    dot={false}
+                    activeDot={{ r: 4, fill: "#2dd4bf" }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             ) : (
-              <div className="space-y-3">
-                {[...listings]
-                  .sort((a, b) => (b.review_count ?? 0) - (a.review_count ?? 0))
-                  .slice(0, 6)
-                  .map((l) => (
-                    <div key={l.id} className="flex items-center justify-between gap-2">
-                      <span className="text-xs text-foreground truncate max-w-[65%]">
-                        {l.rv_year} {l.rv_make} {l.rv_model}
-                      </span>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-muted-foreground">{l.review_count ?? 0} reviews</span>
-                        <span className="text-xs font-semibold text-foreground">${l.nightly_rate}</span>
-                      </div>
-                    </div>
-                  ))}
+              <div className="h-[220px] flex items-center justify-center text-center text-sm text-muted-foreground px-6">
+                No snapshots in this window yet. History builds up as scrapes run.
               </div>
             )}
           </div>
