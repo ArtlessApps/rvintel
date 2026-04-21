@@ -7,6 +7,7 @@
   "crons": [
     { "path": "/api/scrape?platform=rvshare-1",   "schedule": "0 6 * * *"  },
     { "path": "/api/scrape?platform=rvshare-2",   "schedule": "10 6 * * *" },
-    { "path": "/api/scrape?platform=outdoorsy-1", "schedule": "20 6 * * *" }
+    { "path": "/api/scrape?platform=outdoorsy-1", "schedule": "20 6 * * *" },
+    { "path": "/api/scrape?platform=outdoorsy-2", "schedule": "0 7 * * *"  }
   ]
 }

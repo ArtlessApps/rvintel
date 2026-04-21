@@ -16,8 +16,10 @@ function getServiceSupabase() {
 // Outdoorsy's 403 bot-block; RVshare filters are client-side JS so Firecrawl's
 // headless browser applies them after the 4s waitFor.
 
-// group field splits Outdoorsy into two cron invocations (4 classes each, 2 parallel
-// batches × ~20s = ~40s) to stay within Vercel Hobby's 60s function limit.
+// group field splits Outdoorsy into two cron invocations (2 classes each, 1 batch
+// of 2 parallel calls per cron). The split is spaced ~40 minutes apart so the
+// stealth-proxy rotates IPs between batches and Outdoorsy's bot defense doesn't
+// see 4 near-simultaneous class queries from the same source.
 type ScrapeTarget = { platform: "outdoorsy" | "rvshare"; url: string; group?: string };
 
 const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
@@ -27,8 +29,8 @@ const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
     // page[offset] pagination is handled in buildPageUrl (increments by 12).
     { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
     { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
     // RVshare — per-class; JS filter applied by Firecrawl's headless browser.
     // Split into two groups (4 targets each) so RVshare stays well under the
     // function timeout even when Firecrawl queues.
@@ -208,9 +210,10 @@ async function scrapeMarket(
 
   // How many pages to fetch per class per run. Intentionally low — coverage is
   // achieved across many daily cron runs, not by exhausting pagination in one shot.
-  // JSON extraction takes 60–90s per page (LLM pass dominates), so with 4 targets
-  // run in batches of 2, MAX_PAGES=1 gives 2 batches × ≤120s = ≤240s worst case,
-  // comfortably inside the 300s Vercel function cap even when latency spikes.
+  // JSON extraction takes 60–90s per page (LLM pass dominates). Per-cron budget:
+  //   outdoorsy-{1,2}: 2 targets → 1 batch of 2 → ≤180s worst case.
+  //   rvshare-{1,2}:   4 targets → 2 batches of 2 → typical ~90s, ceiling ~360s.
+  // All well-fed runs stay inside the 300s Vercel function cap in practice.
   const MAX_PAGES: Record<string, number> = { outdoorsy: 1, rvshare: 1 };
   // Outdoorsy shows 12 listings/page; stop paginating if a page returns fewer than this.
   const MIN_PAGE_RESULTS = 5;
@@ -304,9 +307,12 @@ async function scrapeMarket(
     }
 
     // JSON extraction mode runs an LLM over each scraped page; that step dominates
-    // latency and routinely takes 60–90s. A too-tight client timeout throws away
-    // successful Firecrawl responses (and their credits) for no reason.
-    const CALL_TIMEOUT_MS = 120_000;
+    // latency and routinely takes 60–90s, with busy class pages (e.g. Outdoorsy
+    // Class C) regularly brushing past 120s. A too-tight client timeout throws
+    // away successful Firecrawl responses (and their credits) for no reason.
+    // 180s gives the LLM pass room to complete while still leaving headroom
+    // inside the 300s function cap for single-batch crons (outdoorsy-{1,2}).
+    const CALL_TIMEOUT_MS = 180_000;
     function withTimeout<T>(promise: Promise<T>): Promise<T> {
       return Promise.race([
         promise,
