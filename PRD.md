@@ -24,6 +24,7 @@ The opportunity is a **"AirDNA for RVs"** — a subscription product that gives 
 - Provide **current, unbiased** market pricing for every major RV rental market in the US, starting with San Diego.
 - Enable **host-level comp-sets** — "show me 8 listings like mine and what they're charging."
 - Expose **price trend and occupancy data** derived from time-series scraping.
+- Offer a **"Benchmark My Listing" self-serve report** — host pastes their Outdoorsy/RVshare URL and gets an instant head-to-head vs. the market (class, price percentile, comp-set, occupancy gap).
 - Maintain a **defensible methodology** buyers can interrogate: sample size, freshness, coverage.
 
 ### Non-Goals
@@ -216,6 +217,44 @@ Rationale for acceleration: every day of relevance-sorted capture bakes biased s
 - [ ] Comp-set UI: kNN query on attributes + time-series aggregate over the set
 - [ ] Gated behind paid tier
 
+### Phase 4.5 — Benchmark My Listing (Weeks 5-7, overlaps Phase 4)
+
+A public-facing "paste your listing URL → get a benchmark report" tool, modeled on AirDNA's Rentalizer. Doubles as the top-of-funnel acquisition magnet for the waitlist and the highest-intent upsell surface for paid tiers: the host lands on their own report and sees exactly what they're missing.
+
+**Input:** a single Outdoorsy or RVshare listing URL (optionally unauthenticated for the free teaser; gated for the full report).
+
+**Pipeline:**
+1. Parse URL → resolve to `listings.id` if already in registry; else one-shot `/api/enrich` to ingest it (≤5 credits, synchronous, cached 24h)
+2. Pull latest snapshot for price + attributes; fall back to live scrape if `scraped_at > 48h`
+3. Run the Phase 4 kNN comp-set over the listing's attributes (class, length, sleeps, delivery radius, market)
+4. Compute benchmark deltas against the comp-set and the market rollup
+
+**Report surface (single scrollable page):**
+- **Header card:** the host's listing — hero image, title, class, price, "benchmarked against 42 similar RVs in San Diego, data fresh as of [timestamp]"
+- **Price percentile:** "$185/night — you're in the 38th percentile for Class B in San Diego. Median is $210."
+- **Comp-set table:** 8 nearest listings side-by-side (price, length, sleeps, delivery, fees, occupancy signal)
+- **Fees & policies audit:** host's cleaning fee / delivery fee / min-nights vs. comp-set median (surfaces hidden competitiveness gaps)
+- **Occupancy gap** (gated, Phase 4 dependency): "Comp-set is booked 62% of the next 30 days. You're at 34%."
+- **Suggested price band:** "Comparable listings in your percentile tier charge $195-$240. Raising to $215 would move you to the 55th percentile without pricing you above your comp-set."
+- **Methodology drawer:** sample size, freshness, which attributes drove kNN weighting — consistent with §7.1's honesty posture
+
+**Gating model:**
+- Free teaser (unauthenticated): header card + price percentile + anonymized comp-set count. No per-comp detail, no occupancy, no price suggestion. Email wall to unlock the rest → feeds waitlist.
+- Full report (paid tier, or time-limited trial post-waitlist-activation): everything above.
+- Rate limit: 3 URL lookups per IP per day unauthenticated, to cap enrichment credit spend from curiosity traffic.
+
+**Engineering notes:**
+- New route: `/benchmark` (public) and `/benchmark/[listing_id]` (shareable permalink, cached 24h)
+- New API: `POST /api/benchmark` → returns report JSON; reuses `/api/enrich` for cold URLs
+- New table: `benchmark_reports` — `(id, listing_id, requested_by_email, created_at, report_json, visibility)` — so each report is cacheable, shareable, and attributable for funnel analytics
+- Reuses Phase 4 comp-set engine verbatim; do not fork
+- Triggers a cold enrichment path — validate `/api/enrich` handles one-off URLs cleanly before Phase 4.5 ships
+
+**Success metrics:**
+- ≥20% of waitlist signups originate from a benchmark report (funnel attribution)
+- Median time-to-first-report <15s on cached listings, <90s on cold URLs
+- Benchmark → paid conversion ≥2× the marketing-site baseline
+
 ### Phase 5 — Sweeper & Cleanup (Ongoing)
 - [ ] Daily sweeper cron flips `is_active = false` when `last_seen_at < now() - 14d`
 - [ ] Env var hygiene: re-set Supabase URL/anon key cleanly (currently has literal `\n` inside stored values)
@@ -308,4 +347,5 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 - **2026-04-20:** Deferred **Firecrawl Growth upgrade** until multi-market expansion. Hobby 3k credits/mo fits single-market daily cadence with ~600 headroom.
 - **2026-04-20:** **RVezy** and **RVnGO** deferred to Phase 6; **Motorhome Republic** and **Campanda** excluded permanently (fleet/dealer pricing, not P2P).
 - **2026-04-20:** **Pulled Phase 2 (Diversified Discovery) from Week 2 into the back half of Week 1.** Relevance-sorted capture produces biased snapshots, and principle 4.3 makes that bias permanent — every day of delay corrupts the time-series moat we cannot backfill. Acceleration preserves the sort-param verification dependency (day 3) and adds a days 1–3 default-sort baseline so variant lift is measurable rather than assumed.
+- **2026-04-20:** **Added "Benchmark My Listing" as Phase 4.5** (AirDNA Rentalizer analog). Chose to piggyback on the Phase 4 comp-set engine rather than build a parallel pipeline — same kNN, same snapshots, applied to a user-supplied URL instead of a dashboard filter. Placed it *after* Phase 4 because occupancy gap is the differentiating insight vs. pure price comparison, and occupancy requires the calendar scraper. Free-tier teaser + email gate is the acquisition lever; full report is a paid-tier upsell, so it doubles as top-of-funnel and bottom-of-funnel in one surface.
 - **2026-04-20:** **Shipped Tier 1 dashboard gate (passcode splash) instead of full auth.** The dashboard had no access control — a public URL serving what will eventually be a paid product. Tier 1 (middleware + shared passcode) closes the visibility gap in an hour without committing to a provider, session model, or RLS rewrite before there is a logged-in feature to justify them. Tiers 2 and 3 are staged to trigger at Phase 4 (comp-sets) and paid-tier launch respectively, so each layer of auth cost buys a concrete user-facing capability rather than speculative infrastructure.
