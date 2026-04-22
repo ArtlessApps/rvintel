@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   BarChart,
   Bar,
@@ -216,11 +217,21 @@ export default function DashboardPage() {
       <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-[20px] border-b border-border">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-foreground">RVIntel</span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/RVIntel logo Light.png"
+                alt="RVIntel"
+                width={600}
+                height={600}
+                className="h-[120px] w-auto block dark:hidden"
+              />
+              <Image
+                src="/RVIntel logo Dark.png"
+                alt="RVIntel"
+                width={600}
+                height={600}
+                className="h-[120px] w-auto hidden dark:block"
+              />
             </Link>
             <span className="text-border">|</span>
             <span className="text-sm text-muted-foreground">Market Dashboard</span>
