@@ -80,16 +80,16 @@ export default function WaitlistPage() {
               <Image
                 src="/RVIntel logo Light.png"
                 alt="RVIntel"
-                width={120}
-                height={120}
-                className="h-8 w-auto block dark:hidden"
+                width={600}
+                height={600}
+                className="h-40 w-auto block dark:hidden"
               />
               <Image
                 src="/RVIntel logo Dark.png"
                 alt="RVIntel"
-                width={120}
-                height={120}
-                className="h-8 w-auto hidden dark:block"
+                width={600}
+                height={600}
+                className="h-40 w-auto hidden dark:block"
               />
             </div>
             <nav className="hidden md:flex items-center gap-8">
@@ -342,16 +342,16 @@ export default function WaitlistPage() {
             <Image
               src="/RVIntel logo Light.png"
               alt="RVIntel"
-              width={90}
-              height={90}
-              className="h-6 w-auto block dark:hidden"
+              width={600}
+              height={600}
+              className="h-[120px] w-auto block dark:hidden"
             />
             <Image
               src="/RVIntel logo Dark.png"
               alt="RVIntel"
-              width={90}
-              height={90}
-              className="h-6 w-auto hidden dark:block"
+              width={600}
+              height={600}
+              className="h-[120px] w-auto hidden dark:block"
             />
           </div>
           <p className="text-sm text-muted-foreground">
