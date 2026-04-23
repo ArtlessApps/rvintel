@@ -162,15 +162,23 @@ function buildRateDistribution(units: DedupedUnit[]) {
     .map(([range, count]) => ({ range, count }));
 }
 
+// Intentionally coarse. Exposing an exact "last updated" timestamp would let
+// upstream rental platforms reverse-engineer our refresh cadence and time
+// anti-bot rules around it. Bucket the freshness so users still get a sense
+// of recency without leaking the schedule.
 function formatLastUpdated(units: DedupedUnit[]) {
   if (!units.length) return "—";
-  const latest = units.reduce((a, b) =>
-    a.latestScrapedAt > b.latestScrapedAt ? a : b
-  ).latestScrapedAt;
-  return new Date(latest).toLocaleString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
-    hour: "numeric", minute: "2-digit", timeZoneName: "short",
-  });
+  const latestMs = units.reduce((acc, u) => {
+    const t = new Date(u.latestScrapedAt).getTime();
+    return Number.isFinite(t) && t > acc ? t : acc;
+  }, 0);
+  if (!latestMs) return "—";
+  const ageMs = Date.now() - latestMs;
+  const day = 24 * 60 * 60 * 1000;
+  if (ageMs < day) return "within the last 24 hours";
+  if (ageMs < 7 * day) return "within the past week";
+  if (ageMs < 30 * day) return "within the past month";
+  return "over a month ago";
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -344,7 +352,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             {!loading && listings.length > 0 && (
               <p className="text-xs text-muted-foreground hidden sm:block">
-                Updated: <span className="text-foreground font-medium">{lastUpdated}</span>
+                Refreshed <span className="text-foreground font-medium">{lastUpdated}</span>
               </p>
             )}
             <Button
@@ -554,7 +562,7 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             ) : (
               <div className="h-[220px] flex items-center justify-center text-center text-sm text-muted-foreground px-6">
-                No snapshots in this window yet. History builds up as scrapes run.
+                No snapshots in this window yet. History builds up as data refreshes.
               </div>
             )}
           </div>
@@ -571,7 +579,7 @@ export default function DashboardPage() {
             </div>
             {!loading && listings.length > 0 && (
               <p className="text-xs text-muted-foreground hidden sm:block">
-                Updated: {lastUpdated}
+                Refreshed {lastUpdated}
               </p>
             )}
           </div>
@@ -584,12 +592,12 @@ export default function DashboardPage() {
               </div>
             ) : units.length === 0 ? (
               <div className="p-12 text-center text-sm text-muted-foreground">
-                No listings scraped for this market yet.{" "}
+                No listings tracked for this market yet.{" "}
                 <button
                   onClick={() => fetchListings(true)}
                   className="text-primary hover:underline"
                 >
-                  Trigger a scrape
+                  Refresh now
                 </button>{" "}
                 to populate data.
               </div>

@@ -106,6 +106,18 @@ export default function WaitlistPage() {
                 Preview
               </a>
               <a
+                href="/markets"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Markets
+              </a>
+              <a
+                href="/learn"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Learn
+              </a>
+              <a
                 href="/dashboard"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
