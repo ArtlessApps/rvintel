@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.5 · 2026-04-23
+**Status:** Draft v1.6 · 2026-04-23
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -322,6 +322,15 @@ A public-facing "paste your listing URL → get a benchmark report" tool, modele
 - Median time-to-first-report <15s on cached listings, <90s on cold URLs
 - Benchmark → paid conversion ≥2× the marketing-site baseline
 
+### Marketing site (ongoing, parallel)
+
+Top-of-funnel content surfaces that support the waitlist funnel without depending on core data pipeline milestones.
+
+- [x] **Markets page** (`/markets`) — regional market reports hub; 6 region cards (Southwest, Mountain West, Pacific Coast, Southeast, Midwest, Northeast) with "Coming soon" state; CTA strip to waitlist. Ready to wire to real report pages as regional data accumulates. **(2026-04-23)**
+- [x] **Learn page** (`/learn`) — blog-style host education hub; 6 placeholder posts seeded (Pricing Strategy, Seasonal Trends, Market Analysis, Host Growth); category filter bar ready for client-side filtering once posts exist; newsletter CTA to waitlist. **(2026-04-23)**
+- [ ] Publish first real Learn post (dynamic pricing 101) once Phase 2.5 dedup metrics are presentable as an external case study
+- [ ] Wire Markets region cards to real per-market report pages as Phase 6 markets come online
+
 ### Phase 5 — Sweeper & Cleanup (Ongoing)
 - [ ] Daily sweeper cron flips `is_active = false` when `last_seen_at < now() - 14d`
 - [ ] Env var hygiene: re-set Supabase URL/anon key cleanly (currently has literal `\n` inside stored values)
@@ -331,36 +340,49 @@ A public-facing "paste your listing URL → get a benchmark report" tool, modele
 
 Three tiers of protection for `/dashboard`. We ship only the tier the current phase actually needs — each tier has different cost, different blast-radius, and different user-experience commitments. **The cost of auth is ongoing, not one-time** (sessions, password resets, email deliverability, provider migrations), so we hold at the lowest tier that clears the current threat model.
 
-**Tier 1 — Passcode splash (SHIPPED 2026-04-20)**
-- [x] `middleware.ts` intercepts `/dashboard/*`, redirects to `/early-access` when the `rvintel_access` cookie is missing or stale
-- [x] `/early-access` page with a shared-passcode form + server action that validates against `DASHBOARD_ACCESS_CODE` and sets a signed cookie containing `DASHBOARD_ACCESS_SIGNATURE`
-- [x] Env vars documented in `.env.local.example`; both unset = gate disabled (dev-friendly, mirrors `CRON_SECRET` pattern)
-- [x] Migration `004_listings_rls.sql` makes the anon-readable posture on `public.listings` explicit (RLS ON with a named SELECT policy, not implicit RLS-OFF)
+**Tier 1 — Passcode splash (SHIPPED 2026-04-20 · SUPERSEDED 2026-04-23 by Tier 2)**
 
-What Tier 1 protects: link-preview crawlers, casual visitors, anyone who hasn't been handed the passcode.
-What it does **not** protect: the Supabase `listings` table itself — the anon key is still shipped in the client bundle and `listings` has an `anon` SELECT policy. A determined visitor who opens devtools can still hit the Supabase REST endpoint directly. That is acceptable while there is nothing behind the login that is not also visible in the marketing site.
+~~`proxy.ts` (formerly `middleware.ts`) intercepts `/dashboard/*`, redirects to `/early-access` when the `rvintel_access` cookie is missing or stale~~. The shared-passcode gate and `/early-access` page remain in the codebase but are no longer wired as the `/dashboard` guard. Superseded by Tier 2 magic-link auth.
 
-**Tier 2 — Server-rendered dashboard + session-gated data (TRIGGER: start of Phase 4)**
+- [x] Migration `004_listings_rls.sql` (retained) — makes the anon-readable posture on `public.listings` explicit (RLS ON with a named SELECT policy)
 
-Move the dashboard from a client component that queries Supabase with the anon key to a React Server Component that queries with the service role key. At that point the anon key can no longer read `listings` and Tier 1's cosmetic gate becomes a real data gate.
+**Tier 2 — Magic-link auth via Supabase (SHIPPED 2026-04-23)**
+
+`@supabase/ssr` replaces the passcode gate. `proxy.ts` (Next.js 16 renamed from `middleware.ts`) now refreshes the Supabase session on every request and redirects unauthenticated visitors to `/login`. The dashboard still queries Supabase with the anon key from the client — the `listings_anon_read` RLS policy is unchanged. Tier 2 closes the visibility gap; it is not yet a data gate.
+
+- [x] `@supabase/ssr` installed (replaces `@supabase/auth-helpers-nextjs`)
+- [x] `lib/supabase/client.ts` — `createBrowserClient` wrapper for client components and Route Handlers
+- [x] `lib/supabase/server.ts` — `createServerClient` wrapper with async cookie handling for Server Components
+- [x] `proxy.ts` — refreshes session on every non-static request; redirects `/dashboard/*` → `/login` when no session exists
+- [x] `app/login/page.tsx` — email input → `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })` → "check your email" confirmation state; shadcn/ui, design-system compliant
+- [x] `app/auth/callback/route.ts` — exchanges the magic-link `code` for a session via `exchangeCodeForSession`; redirects to `/dashboard` on success, `/login?error=1` on failure
+- [x] Sign-out button added to dashboard header — calls `supabase.auth.signOut()` then redirects to `/login`
+- [x] `.env.local.example` updated — documents Supabase Redirect URL configuration required in the Supabase dashboard (no new env vars needed; `emailRedirectTo` is derived from `window.location.origin` at runtime)
+- [ ] Rotate `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the current one is already exposed in every deploy's client bundle (deferred to Tier 2.5 / Phase 4 RSC refactor below)
+- [ ] Restrict `waitlist` email list as the allowlist for who can request a magic link (currently any email can sign in)
+
+What Tier 2 adds over Tier 1: real identity — we know who is in the dashboard, not just that they had the passcode. Magic-link is passwordless, which fits the waitlist-activation model: invite a user → they click the link → they're authenticated.
+What it still does **not** protect: the Supabase `listings` table itself — the anon key is still shipped in the client bundle and `listings` has an `anon` SELECT policy. A determined visitor who opens devtools can still hit the Supabase REST endpoint directly. That gap closes in the Tier 2.5 RSC refactor below.
+
+**Tier 2.5 — Server-rendered dashboard + session-gated data (TRIGGER: start of Phase 4)**
+
+Move the dashboard from a client component that queries Supabase with the anon key to a React Server Component that queries with the service role key. At that point the anon key can no longer read `listings` and the auth gate becomes a real data gate.
 
 - [ ] Rotate `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the current one is already exposed in every deploy's client bundle
-- [ ] Refactor `app/dashboard/page.tsx` to an RSC that loads listings server-side via the service role
+- [ ] Refactor `app/dashboard/page.tsx` to an RSC that loads listings server-side via `lib/supabase/server.ts` + service role key
 - [ ] Drop the `listings_anon_read` policy introduced in `004_listings_rls.sql`; anon now sees zero rows
-- [ ] Replace shared-passcode auth with a waitlist-scoped magic-link flow (email token → signed session cookie), keeping the `waitlist` table as the source of truth for who gets in
-- [ ] Middleware validates the session cookie's HMAC + expiry instead of comparing against `DASHBOARD_ACCESS_SIGNATURE`
-- [ ] Interactive dashboard controls (market/class selects, refresh) become server actions or narrow client islands that call server functions — never Supabase directly
+- [ ] Interactive dashboard controls (market/class selects, refresh) become server actions or narrow client islands that call server functions — never Supabase directly from the browser
 
-Why Phase 4 is the trigger: comp-sets are the first feature where logged-in state matters (each user's set is different, and comp-sets are paid-tier gated). Shipping Tier 2 earlier means owning the session infrastructure before any feature needs it — auth maintenance without auth payoff.
+Why Phase 4 is the trigger: comp-sets are the first feature where logged-in state matters (each user's set is different, and comp-sets are paid-tier gated). Shipping the RSC refactor earlier means owning the service-role query pattern before any feature needs it — infrastructure cost without auth payoff.
 
 **Tier 3 — Full auth provider + per-user RLS (TRIGGER: paid-tier launch)**
 
 Only when we're charging money or when a feature needs user-scoped data (saved filters, host-claimed listings, B2B orgs for the fleet tier).
 
-- [ ] Pick a provider — default recommendation is **Clerk via Vercel Marketplace** (native integration, rich UX, webhook to Supabase for user mirroring). Supabase Auth is the alternative if consolidating on one vendor matters more than the Clerk UX.
+- [ ] Already on **Supabase Auth** (magic-link, Tier 2) — evaluate whether to stay on Supabase Auth (adding OAuth providers, MFA) or migrate to Clerk via Vercel Marketplace for richer UI/orgs. The Tier 2 session model (`@supabase/ssr` + cookie-based JWTs) is compatible with both; migration cost is low pre-scale.
 - [ ] Stripe integration for paid tiers, mirroring subscription status into the users table
 - [ ] RLS rewrite on `listings`, `listing_snapshots`, and any future user-scoped tables — policies gate on `auth.uid()` and subscription tier claims
-- [ ] Migrate Tier 2 magic-link users into the provider (or invalidate and ask them to re-register — acceptable pre-scale)
+- [ ] Extend Tier 2 magic-link users with paid-tier claims (no forced re-registration needed if staying on Supabase Auth)
 - [ ] Organization/team model deferred until the fleet tier has signal (per §3, ≥90 days of time-series)
 
 Why not earlier: Tier 3's RLS model depends on knowing what users actually do. Designing user-scoped policies before the product has user-scoped features produces speculative RLS that gets rewritten when real features ship — with production user data in the middle of the migration.
@@ -446,4 +468,7 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 - **2026-04-23:** **Built cross-platform duplicate detection (migrations 007–009) before adding new markets.** The scraped dataset has two platforms sitting side-by-side with no shared identifier; every market-size chart on the dashboard double-counts cross-listed RVs, and a host's Phase 4 comp-set can include their own listing from the other platform — the single most trust-breaking failure mode the dashboard can exhibit. Chose a three-migration rollout — detection-only, retune HIGH thresholds on reviewed data, tighten again after a false positive — rather than shipping one speculative migration. The discipline paid off: migration 008 promoted 15 medium pairs to HIGH based on a rule that passed review on 31 pairs, and migration 009 caught the one case where that rule failed (a pair of commoditized 2025 Coleman 17B trailers in Menifee at identical $99/night but 2.41 miles apart — same model, different owners, same fleet market) before any false positive reached the dashboard. The `canonical_vehicles` table + `canonical_vehicle_id` FK ships next in migration 010; until then the detection output is observable but not wired into any aggregate.
 - **2026-04-23:** **Chose geography-only HIGH tier over image-hash gating for canonical promotion.** The Coleman 17B false positive surfaced in migration 008 review demonstrated that stored numeric/string signals alone cannot discriminate same-model-different-owner pairs from same-owner-cross-listed pairs in high-density fleet zones — rate identity is a market-level signal for commoditized inventory, not an owner-level signal. The discriminating bit is the primary image (a same-RV cross-listing typically shares the owner's actual photos; two different units have visibly different angles / interiors / surroundings). Options considered: (a) tighten HIGH geography to `≤ 0.5 mi` and accept that rate-only real matches drop to MEDIUM where reviewer verdict promotes them (chosen); (b) add a `primary_image_phash` column, backfill ~3,400 Cloudinary/imagedelivery.net URLs, and let image-similarity discriminate the rate-only tier. Option (b) is ~2–3h of engineering + the backfill, and reopens the exact HIGH-tier failure mode for stock-photo fleet operators where all units share the manufacturer's hero image. Deferred until (a) shows measurable MEDIUM queue pain. The tightened rule classifies 32/33 reviewed pairs correctly; the one lost match is recoverable via `reviewer_verdict='match'` and will be re-promoted by migration 010's SPI on the next run.
 - **2026-04-23:** **Outdoorsy `meta.price_*` fields are in cents, not dollars.** Discovered during verification after the backfills — `search_snapshots.price_median = 29600` for Class A (should be $296, not $29,600). The per-listing `price_per_day` field is also in cents (already known and handled with `/100` division), but we missed applying the same conversion to the meta price stats when inserting `search_snapshots`. Fixed in `lib/outdoorsy-api.ts#normalizeMeta` (added `centsToDollars` helper), the backfill script, and a one-shot data-fix script (`scripts/fix_outdoorsy_search_snapshot_units.mjs`) that corrected the 10 existing stale rows. Going forward: treat every Outdoorsy numeric money field as cents until proven otherwise.
+- **2026-04-23:** **`middleware.ts` renamed to `proxy.ts` (Next.js 16).** Next.js 16 deprecated the `middleware` file convention in favor of `proxy`. The file is functionally identical; the rename eliminates the build-time deprecation warning. All PRD and code references updated to `proxy.ts`.
+- **2026-04-23:** **Shipped Tier 2 magic-link auth ahead of Phase 4.** The original plan deferred magic-link auth to Phase 4's start, gating on "comp-sets are the first feature where logged-in state matters." Pulled forward because: (1) the waitlist is actively growing and a real identity layer — even without data gating — lets us associate dashboard sessions with waitlist email addresses, which is table-stakes for the Phase 4.5 Benchmark funnel; (2) `@supabase/ssr` is a clean install with no migration cost since we were already on `@supabase/supabase-js`; (3) passcode rotation (`DASHBOARD_ACCESS_SIGNATURE`) was becoming operational friction as more users were onboarded. The dashboard still queries Supabase with the anon key from the browser — Tier 2 is a visibility gate, not a data gate. The Tier 2.5 RSC refactor (service-role server queries + anon policy drop) remains Phase 4-triggered.
+- **2026-04-23:** **Added `/markets` and `/learn` to the marketing site nav.** Both are placeholder pages (region cards with "Coming soon" state; seeded blog posts) built ahead of content to: (1) establish URL permanence before any external link or SEO index; (2) give the waitlist CTA a context-appropriate hook on each page ("get notified when reports launch" / "get new guides in your inbox"); (3) define the information architecture before content volume forces a structural rewrite. Pages follow the "Pristine Curator" design system with the signature gradient CTA strip. Active nav state highlights the current page.
 - **2026-04-23:** **Dashboard dedup rewire lives in the client, not in a view.** Option A was a Postgres view (`active_listings_deduped` or similar) that pre-joins `listings` ↔ `canonical_vehicles` and picks a representative per canonical, so the dashboard could keep its current single-table query. Option B (chosen) does the grouping client-side in a `useMemo` after fetching the raw `listings` rows with `canonical_vehicle_id` added to the SELECT. Chose B because: (1) the dashboard fetches ≤1k rows per market/class; grouping 1k rows into ~300–900 units is sub-millisecond JS and keeps the DB path unchanged; (2) a view locks in one "pick representative" rule (e.g. `primary_listing_id`), but the dashboard wants a different rule than analytics queries will want — most-reviewed listing as the comp-table face, vs. rate-mean across members for the metric cards, vs. whichever-is-cheaper for the future Benchmark feature. Each consumer can pick its own rule without fighting a shared view; (3) the cross-listing UI (both platform badges, `×N cross-listed` indicator, per-member external links) needs the full member array per group, which a view can only deliver via `array_agg`, which is awkward to type through PostgREST. A view becomes worthwhile the day two independent pages (Benchmark, public market pages) both need the same dedup shape; until then the client-side helper stays colocated with the one consumer.

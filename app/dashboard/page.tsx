@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
 import {
   BarChart,
   Bar,
@@ -278,6 +280,7 @@ const TABLE_COLUMNS: Array<SortableColumn | StaticColumn> = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [market, setMarket] = useState("san-diego-ca");
   const [rvClass, setRvClass] = useState("Class B");
   const [dateWindow, setDateWindow] = useState("30d");
@@ -384,6 +387,12 @@ export default function DashboardPage() {
     );
   };
 
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   const avgRate = units.length
     ? Math.round(units.reduce((s, u) => s + u.nightlyRate, 0) / units.length)
     : 0;
@@ -431,6 +440,14 @@ export default function DashboardPage() {
                 Refreshed <span className="text-foreground font-medium">{lastUpdated}</span>
               </p>
             )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-muted-foreground"
+              onClick={handleSignOut}
+            >
+              Sign out
+            </Button>
             <Button
               variant="outline"
               size="sm"
