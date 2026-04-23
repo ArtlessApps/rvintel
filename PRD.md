@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.2 · 2026-04-22
+**Status:** Draft v1.4 · 2026-04-23
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -59,7 +59,11 @@ A representative sample of 150 listings gives averages within ±2% of the true m
 Scraping is commodity. Time-series depth cannot be bought or backfilled. Every day we delay capture is a day of moat we never recover. **Append-only snapshots start immediately and never stop.**
 
 ### 4.4 Detail depth unlocks differentiation
-Search-page aggregates get us to parity with "any competitor could scrape this." Detail-page attributes (length, sleeps, slides, delivery, fees) plus availability calendars unlock comp-sets and occupancy inference — the two features that justify a paid subscription.
+**Updated 2026-04-23.** The original framing of "search-page vs. detail-page" has been overtaken by events. The Outdoorsy and RVshare search APIs return the core comp-set attributes — `length_ft`, `sleeps`, `instant_book`, `delivery`, `delivery_radius_miles`, `minimum_days`, `cancel_policy`, `location_{lat,lng}` — natively on every daily cron run. These were previously assumed to require detail-page enrichment.
+
+What remains genuinely locked behind detail pages is the *behavioral and amenity* layer: `slides`, `fuel_type`, `delivery_per_mile_fee`, `cleaning_fee`, `solar`, `pet_policy`, `host_response_rate`, `host_response_time`. These are the features that push a comp-set from "same class, similar price" to "same class, similar price, same amenity bundle." Plus availability calendars, which are the basis for occupancy inference.
+
+The restated principle: **passive daily crons now supply ~80% of the attribute surface needed for Phase 4 comp-sets. Phase 3 enrichment captures the remaining 20% that detail pages uniquely expose.**
 
 ---
 
@@ -71,40 +75,44 @@ Four-layer data model, built in order:
 ┌─────────────────────────────────────────────────────┐
 │ 4. Comp-Set Engine (premium)                         │
 │    kNN on attributes → query snapshots for the set   │
+│    Core kNN attrs (length, sleeps, delivery, loc)    │
+│    already populated — kNN buildable pre-Phase 3     │
 ├─────────────────────────────────────────────────────┤
 │ 3. Aggregations (current dashboard)                  │
 │    Market × class rollups; distribution charts       │
+│    search_snapshots — market-size trend over time    │
+│    rental_score / sort_score — platform visibility   │
 ├─────────────────────────────────────────────────────┤
 │ 2. Snapshots (time-series moat)                      │
 │    listing_snapshots — append-only per scrape        │
+│    search_snapshots — market rollup per cron run     │
 │    availability_snapshots — weekly calendars         │
 ├─────────────────────────────────────────────────────┤
 │ 1. Registry                                          │
 │    listings — one row per listing_url                │
-│    slow-changing attributes filled by /api/enrich    │
+│    ~80% of comp-set attrs populated at discovery     │
+│    /api/enrich fills residual amenity/behavioral     │
 └─────────────────────────────────────────────────────┘
 ```
 
 ### 5.1 Data capture strategy
 
-Three distinct scrape jobs with different cadences and costs:
+Four distinct data jobs with different cadences and costs:
 
 | Job | Cadence | Source | Cost per run | Purpose |
 |---|---|---|---|---|
-| **Discovery + pricing — Outdoorsy** | Daily | `search.outdoorsy.com/rentals` JSON:API | **$0** (direct fetch, no Firecrawl) | Captures **full** URLs + current prices + 140 attributes per listing |
-| **Discovery + pricing — RVshare** | Daily | Search pages via Firecrawl (LLM extraction) | ~40 Firecrawl credits | Captures URLs + current prices |
-| **Enrichment** | Once per new listing | Detail pages | ~5 credits per listing | Captures length, sleeps, slides, fees, policies (Outdoorsy enrichment is free — delivered by the same search API response) |
-| **Calendar** | Weekly per active listing | Detail pages | ~1 credit per listing | Powers occupancy inference |
+| **Discovery + pricing — Outdoorsy** | Daily | `search.outdoorsy.com/rentals` JSON:API | **$0** | Captures full URLs + current prices + 140 attributes per listing — including `length_ft`, `sleeps`, `sleeps_adults/kids`, `instant_book`, `minimum_days`, `cancel_policy`, `delivery`, `delivery_radius_miles`, `location_{city,state,lat,lng,zip}`, `primary_image_url`, `first_published`, `rental_score`, `sort_score`, vehicle dimensions. Writes one `search_snapshots` row per class (price stats + histogram). |
+| **Discovery + pricing — RVshare** | Daily | `rvshare.com/rv-rental.json` JSON:API | **$0** | Captures full URLs + current prices + 27 attributes per listing — including `sleeps`, `length_ft`, `instant_book`, `delivery`, `insurance_status`, `electric_service`, `fresh_water_tank`, `generator_usage_included`, `nightly_mileage_included`, `location_{state,lat,lng}`, `owner_id`, `premier_owner`, `guest_favorite`, `new_listing_without_reviews`, `primary_image_url`, `weekly/monthly_discount_percent`. Writes one `search_snapshots` row (full-market grain) with 5 histograms. |
+| **Enrichment** | Once per new listing | Detail pages | ~5 credits per listing | Captures the **residual detail-page-only fields** not exposed by search APIs: `slides`, `fuel_type`, `delivery_per_mile_fee`, `cleaning_fee`, `solar`, `pet_policy`, `photo_count`, `host_response_rate`, `host_response_time`. Core comp-set attributes (`length_ft`, `sleeps`, `delivery`, `location`) are already populated at discovery — enrichment adds the amenity/behavioral layer that separates "same class, similar price" comp-sets from "same class, same amenity bundle" comp-sets. |
+| **Calendar** | Weekly per active listing | Detail pages | ~1 credit per listing | Powers occupancy inference via `availability_snapshots`. |
 
-Outdoorsy moved to direct JSON:API on 2026-04-22 (see §11). One API call returns 24 fully structured listings with 140 attributes each, bypassing the LLM extraction that previously dominated cost and latency. RVshare still uses Firecrawl markdown+LLM until its internal API (if any) is discovered.
+Both platforms moved to direct JSON:API on 2026-04-22 (see §11). A full SD sweep across both platforms is ~135 HTTPS requests totaling ~65s end-to-end at zero external cost. LLM extraction via Firecrawl is retained as a dormant fallback on both platforms (`OUTDOORSY_SCRAPER`, `RVSHARE_SCRAPER` env flags).
 
-### 5.2 Diversified discovery (Phase 2)
+### 5.2 Diversified discovery (Phase 2) — SUPERSEDED
 
-To avoid bias from platforms' relevance-sorted defaults, discovery rotates query shape across days:
-- `sort=price_asc`, `sort=price_desc`, `sort=newest`, `sort=most_reviewed`
-- Or price-band stratification: `price<150`, `150-300`, `300+`
+~~To avoid bias from platforms' relevance-sorted defaults, discovery rotates query shape across days.~~
 
-A week of daily runs with rotating variants gives a representative census without ever paginating deeply.
+**Superseded by the 2026-04-22 direct JSON:API pivot.** The diversification problem was a consequence of pagination depth limits (Firecrawl's per-page credit cost prevented us from paginating to full coverage) and of relevance-sort bias in the default rankings. The direct API paths paginate the full universe on every daily sweep — 100% coverage is the baseline, not a target. The bias mitigation section is retained as historical context; it is not an active engineering task.
 
 ### 5.3 Lifecycle tracking
 
@@ -126,25 +134,24 @@ Every listing has:
 | JSON extraction | 5 | 60-90s (up to 150s on busy classes) |
 | Stealth proxy | 5× multiplier | 40-60s |
 
-JSON extraction dominates cost **and latency** — for RVshare. Outdoorsy no longer uses Firecrawl as of 2026-04-22; the direct JSON:API approach makes the two-tier scrape architecture moot for that platform. See §11 (2026-04-22) for the full pivot.
+JSON extraction dominated cost **and latency** pre-pivot. After the 2026-04-22 dual pivot (Outdoorsy + RVshare both onto direct JSON:APIs), Firecrawl is a dormant fallback on both platforms — the two-tier scrape architecture is moot for SD. The Firecrawl budget below applies only when `OUTDOORSY_SCRAPER` or `RVSHARE_SCRAPER` is flipped to `firecrawl`.
 
-**Steady-state budget at daily cadence (San Diego only):**
-- RVshare: 8 targets × 1 page × 5 credits = **40/day**
+**Steady-state budget at daily cadence (San Diego only), post-2026-04-22 pivot:**
+- RVshare: direct API calls, **0 credits/day** (~65 HTTPS requests totaling ~50s end-to-end)
 - Outdoorsy: direct API calls, **0 credits/day** (~70 HTTPS requests totaling ~15s end-to-end)
-- Total: **40/day × 30 = 1,200/month**
+- Total: **0 credits/month** (Firecrawl credits only consumed if a fallback flag is flipped)
 
-Fits within the 3,000/month Hobby allowance with ~1,800 headroom — enough to add a second market (e.g. Los Angeles) on RVshare without upgrading tier. Outdoorsy multi-market expansion is effectively free until RVshare catches up.
+The Hobby 3,000/month allowance is now entirely reserved for enrichment (Phase 3) and future market expansion. San Diego at daily cadence costs zero credits across both platforms — a 97% reduction from the pre-pivot 1,200/mo projection.
 
 ### Vercel (Pro, 300s function cap)
 
 | Cron | Target count | Worst-case duration | Status |
 |---|---|---|---|
-| `rvshare-1` | 4 | ~240s | Fits |
-| `rvshare-2` | 4 | ~240s | Fits |
+| `rvshare` | 1 unified sweep | ~60s (65 pages × ~300ms) | Fits |
 | `outdoorsy-1` (classes `b`, `a`) | 2 classes → ~23 API pages | ~30s | Fits |
 | `outdoorsy-2` (classes `c`, `trailer`) | 2 classes → ~47 API pages | ~60s | Fits |
 
-Four staggered crons at 6:00, 6:10, 6:20, 7:00 UTC. The Outdoorsy split (2026-04-21) originally spaced Firecrawl batches ~40 min apart to dodge stealth-proxy IP reuse; after the 2026-04-22 pivot to direct JSON:API, the split is retained for durability (one failure does not tank the whole platform) and symmetry with RVshare rather than for bot-defense reasons. Outdoorsy cron duration is now I/O-bound, not LLM-bound, so `CALL_TIMEOUT_MS` is irrelevant for that path — a per-request 10s fetch timeout is all that's needed.
+Three staggered crons at 6:00, 6:20, 7:00 UTC. The Outdoorsy split (2026-04-21) originally spaced Firecrawl batches ~40 min apart to dodge stealth-proxy IP reuse; after the 2026-04-22 pivot to direct JSON:API, the split is retained for durability (one failure does not tank the whole platform) rather than for bot-defense reasons. Both platform paths are now I/O-bound, not LLM-bound, so `CALL_TIMEOUT_MS` is irrelevant — a per-request 15s fetch timeout is all that's needed. The RVshare cron was collapsed from 2 cron jobs × 4 per-type URLs into a single unified sweep on 2026-04-22 after discovering the `type=` URL parameter was cosmetic (see §11).
 
 ---
 
@@ -169,28 +176,42 @@ Chart aggregates further filter `scraped_at > now() - 7d`.
 
 When `freshCount / totalActive < 0.6`, show a "Calibrating — coverage building" banner instead of partial charts.
 
+### 7.4 Market-size trend (search_snapshots)
+
+The `search_snapshots` table accumulates one row per cron run per (platform, class) with `total_results` and price stats. This enables:
+- A **"true market size" denominator** on the dashboard — "1,286 RVshare listings in SD as of today" — that comes from platform-reported totals, not from counting our DB rows (which may lag by a cron cycle).
+- A **market-size trend card** once we have ≥14 days of data: "SD inventory up 4% week-over-week (1,286 → 1,337)."
+- **Platform-level price distribution trend** for Outdoorsy (per-class price histograms captured daily) without re-computing from individual listing rows. Useful for the dashboard's "market median over 60 days" line chart.
+
+### 7.5 Platform visibility score (Outdoorsy rental_score / sort_score)
+
+Outdoorsy's `rental_score` and `sort_score` are internal ranking signals stored per listing as of migration 005 (2026-04-23). These unlock a new dashboard card: **"Platform visibility — your listing's sort_score vs. comp-set median."** A host whose sort_score is in the 20th percentile for their class is likely being buried in search results regardless of price. No other market intelligence tool surfaces this signal. Planned for the comp-set surface (Phase 4), but the data is already flowing.
+
 ---
 
 ## 8. Roadmap
 
-### Phase 1 — Foundation (COMPLETE 2026-04-20, hardened 2026-04-21, Outdoorsy re-platformed 2026-04-22)
+### Phase 1 — Foundation (COMPLETE 2026-04-20, hardened 2026-04-21, both platforms re-platformed to direct JSON:API 2026-04-22)
 - [x] `listing_snapshots` table (time-series capture)
 - [x] `first_seen_at`, `last_seen_at`, `is_active`, `enriched_at` columns
 - [x] Scrape route writes snapshot row per listing per run
 - [x] Dashboard shows "priced in last 7d" metric + filters `is_active = true`
-- [x] Staggered daily crons — `rvshare-1`, `rvshare-2`, `outdoorsy-1`, `outdoorsy-2` (Outdoorsy split on 2026-04-21 to mitigate bot defense)
+- [x] Staggered daily crons — `rvshare`, `outdoorsy-1`, `outdoorsy-2` (RVshare collapsed 2 → 1 on 2026-04-22 after finding `type=` was cosmetic; Outdoorsy split 2026-04-21 to mitigate bot defense, retained for durability)
 - [x] Firecrawl client timeout raised to 120s (2026-04-20), then to 180s (2026-04-21) after observing Class C LLM extractions brushing 120s
 - [x] Daily cron observability — `CRON_QUERIES.md` with 12 SQL queries (status, coverage, trends, triage) plus a `cron_runs` table capturing per-invocation status, duration, error arrays, and write counts
 - [x] One-off Outdoorsy San Diego backfill script — `scripts/backfill_outdoorsy_sd.mjs`, standalone Node runner. **Re-written 2026-04-22** to use the direct JSON:API path instead of neighborhood-sweep markdown scraping.
-- [x] **Outdoorsy internal JSON:API discovered and integrated (2026-04-22).** `search.outdoorsy.com/rentals` returns JSON:API-formatted responses with 140 attributes per listing, no Cloudflare challenge, no bot defense. Daily Outdoorsy cron no longer consumes Firecrawl credits and completes in seconds instead of minutes. See §11 (2026-04-22) for the full investigation.
-- [x] **Silent bug fixed (2026-04-22):** `filter[type]=tt` (used in the old Outdoorsy UI URL) is not recognized by the backend and returns `total=0`; the correct backend enum for travel trailer is `trailer`. Under the old Firecrawl path this masked ~692 SD travel trailers from discovery. New direct-API path uses the correct codes.
+- [x] **Outdoorsy internal JSON:API discovered and integrated (2026-04-22).** `search.outdoorsy.com/rentals` returns JSON:API-formatted responses with 140 attributes per listing, no Cloudflare challenge, no bot defense. Daily Outdoorsy cron no longer consumes Firecrawl credits and completes in seconds instead of minutes. See §11 (2026-04-22 Outdoorsy) for the full investigation.
+- [x] **RVshare internal JSON:API discovered and integrated (2026-04-22).** `rvshare.com/rv-rental.json` returns a JSON:API-formatted response with 27 attributes per listing + market-wide histograms (nightly rate, length, generator, fresh-water tank, mileage). No auth, no Cloudflare bot defense, no rate limit observed across 65-page sweeps. Daily RVshare cron no longer consumes Firecrawl credits and completes in ~50s instead of ~480s. See §11 (2026-04-22 RVshare) for the full investigation.
+- [x] **Silent bug fixed — Outdoorsy (2026-04-22):** `filter[type]=tt` (used in the old Outdoorsy UI URL) is not recognized by the backend and returns `total=0`; the correct backend enum for travel trailer is `trailer`. Under the old Firecrawl path this masked ~692 SD travel trailers from discovery. New direct-API path uses the correct codes.
+- [x] **Silent bug fixed — RVshare (2026-04-22):** the `type=` URL parameter on `rvshare.com/rv-rental(.json)` is **cosmetic** — the backend ignores it. All 8 pre-pivot per-type Firecrawl targets (class-a, class-b, …, truck-camper) returned the **identical** 1,283 SD listings in the same order. The pre-pivot cron was doing ~8× redundant work per day, with the LLM client-side-classifying the same shared universe 8 times over. New direct-API path makes one location-scoped sweep and classifies each listing from `attributes.type`.
+- [x] **RVshare one-off backfill via direct API (2026-04-22)** — `scripts/backfill_rvshare_sd.mjs` populated the full SD universe (1,279 unique listings from a reported 1,283 total; 4 cross-page dupes handled by the seen-ID dedup) in 51s. Class breakdown: 601 Travel Trailer · 270 Class C · 132 Class B · 120 Class A · 79 Toy Hauler · 74 Fifth Wheel · 2 Pop Up · 1 Other. Zero errors.
 
 ### Phase 2 — Diversified Discovery (Week 1, back half — accelerated)
 
 Rationale for acceleration: every day of relevance-sorted capture bakes biased snapshots into the time-series moat (see §4.3). Bias is not fixable retroactively, so Phase 2 is pulled forward from Week 2 to days 4–7 of Week 1 — but the sort-param verification dependency is preserved so we don't burn credits on a non-functional rotation.
 
 **Days 1–3 (in parallel with Phase 1 stabilization):** establish a default-relevance baseline
-- [ ] Capture ≥3 days of default-sort snapshots across all active targets
+- [x] Capture ≥3 days of default-sort snapshots across all active targets — **moot post-2026-04-22 pivot**: default-sort bias is eliminated because we paginate the full universe on every run. `listing_snapshots` has been accumulating since Phase 1.
 - [x] Record the per-target URL set each day to measure variant-rotation lift later — `listing_snapshots.source_url` column added in migration `003_snapshot_source_url.sql`; every snapshot now attributes the base `MARKET_TARGETS` URL that surfaced it
 
 **Day 3 — Sort-param verification (COMPLETE 2026-04-21, ~30 credits spent)**
@@ -199,30 +220,35 @@ Rationale for acceleration: every day of relevance-sorted capture bakes biased s
 - [x] Price-band filter (`filter[price_low]` / `filter[price_high]`) tested — these **are** server-side but surface the same top-ranked listings filtered by price, not a re-ranked slice. Lift is limited.
 - [x] **Pagination (`page[offset]`) tested and confirmed working on Outdoorsy.** Default sort is empirically stable within-class (offset=0 and offset=36 return disjoint URL sets; offset=24 in step of 24 gives no overlap). This contradicts the 2026-04-20 "pagination is a bias trap" assumption for stuck classes — see §11 decisions log (2026-04-21).
 - [x] **Bot defense caveat:** Outdoorsy intermittently returns a poison page (`"0 RV rentals"` with 24 empty `Quick Preview` placeholders) on paginated requests when its defense is triggered. Scrapers must treat `"0 results"` as ambiguous — could be end-of-listings or a bot-block. Mitigation: serial class execution with 5s+ cool-downs between classes; retry once on empty responses; don't trust `0` from a pagination step that previously returned data.
-- [ ] RVshare sort/pagination parity test — deferred; RVshare classes are fed more evenly by default sort (2026-04-21 cron runs show ~3 new per day per class), so rotation pressure is lower there.
+- [x] RVshare sort/pagination parity test — **moot post-2026-04-22 pivot.** RVshare's `type=` is cosmetic and the single unified sweep returns 100% of listings. Sort diversification is irrelevant when you already paginate the full universe.
 
-**Days 4–5 — Outdoorsy direct API + RVshare coverage (revised 2026-04-22)**
+**Days 4–5 — Direct JSON:API pivot, both platforms (revised 2026-04-22 after RVshare parity discovery)**
 
-Strategy revision (2026-04-22): the Outdoorsy coverage problem is *solved*, not improved. The direct JSON:API returns every listing for every class in one paginated loop (~15s per class) at zero credit cost. Phase 2's original "diversify to dodge relevance bias" framing no longer applies to Outdoorsy — we now get the full ranked universe every day with `meta.total` telling us exactly how many listings exist. RVshare still needs the diversification work.
+Strategy revision (2026-04-22): the coverage problem is *solved* on **both** platforms, not improved. Direct JSON:APIs return every listing for every class in one paginated loop at zero credit cost. Phase 2's original "diversify to dodge relevance bias" framing no longer applies — we now get the full ranked universe every day, with `meta.total` / `pagination.totalResults` telling us exactly how many listings exist.
 
 - [x] **Outdoorsy: direct JSON:API client (`lib/outdoorsy-api.ts`) + replaced Outdoorsy branch of `/api/scrape`.** Fetches all pages for each class via `search.outdoorsy.com/rentals?address=…&filter[type]=…&page[limit]=24&page[offset]=N`. 100% coverage per cron run. **2026-04-22.**
 - [x] **Outdoorsy: one-off backfill via direct API** — populates the full SD universe (213 Class A + 331 Class B + 411 Class C + 692 Travel Trailer + 56 Fifth Wheel ≈ 1,700 listings) in ~60s.
-- [ ] **Outdoorsy: schema expansion** — capture the high-value fields the JSON:API exposes: `vehicle_length`, `vehicle_height`, `vehicle_dry_weight`, `vehicle_gvwr`, `sleeps`, `sleeps_adults`, `sleeps_kids`, `instant_book`, `minimum_days`, `cancel_policy`, `delivery`, `delivery_radius`, `primary_image_url`, `location.{city,state,lat,lng,zip}`, `first_published`, `last_published`, `rental_score`, `sort_score`. Unlocks Phase 3 enrichment for Outdoorsy with zero extra API calls.
-- [ ] **Market-wide meta snapshots (`search_snapshots`)** — store `meta.total`, `meta.price_histogram`, `meta.price_median`, `meta.price_average`, `meta.price_max/min`, `meta.total_unavailable` per (platform, market, class, date). One row per query, no per-listing fan-out. Powers the "true market size" denominator on the dashboard without any additional calls.
-- [ ] RVshare: refactor `MARKET_TARGETS` to structured shape `{ platform, class, sort?, price_band?, max_pages?, url }`; keep per-target logging.
-- [ ] RVshare: introduce two-tier scrape path (cheap markdown+regex refresh for known URLs, LLM extraction only for new ones) — preserves credit headroom for multi-market expansion.
-- [ ] RVshare: investigate whether `rvshare.com` has an equivalent internal JSON API (follow-up from the Outdoorsy discovery). If yes, same pattern replaces Firecrawl for RVshare too and daily credit consumption drops to zero for SD.
+- [x] **RVshare: direct JSON:API client (`lib/rvshare-api.ts`) + replaced RVshare branch of `/api/scrape`.** Fetches all pages via `rvshare.com/rv-rental.json?location=…&page=N`. Single-sweep covers the entire type-agnostic universe; classification driven by `attributes.type`. 100% coverage per cron run. **2026-04-22.**
+- [x] **RVshare: one-off backfill via direct API** — 1,279 unique listings (vs. 1,283 reported) upserted from SD in 51s, zero errors.
+- [x] **RVshare: cron config collapsed** — `vercel.json` reduced from `rvshare-1` + `rvshare-2` to a single `rvshare` cron at 06:00 UTC. The pre-pivot per-type groups were a consequence of the 8-target Firecrawl load, which no longer exists.
+- [x] **Schema expansion — Outdoorsy** (2026-04-23) — migration `005_schema_expansion.sql` adds `length_ft`, `vehicle_height`, `vehicle_dry_weight`, `vehicle_gvwr`, `sleeps`, `sleeps_adults`, `sleeps_kids`, `instant_book`, `minimum_days`, `cancel_policy`, `delivery`, `delivery_radius_miles`, `primary_image_url`, `location_city/state/lat/lng/zip`, `first_published`, `last_published`, `rental_score`, `sort_score` to `public.listings`. Wired through `scrapeOutdoorsyViaApi` and `scripts/backfill_outdoorsy_sd.mjs`. Zero extra API calls — the JSON:API already returned these on every request, we just weren't persisting them.
+- [x] **Schema expansion — RVshare** (2026-04-23) — same migration adds `sleeps`, `length_ft`, `instant_book`, `delivery`, `insurance_status`, `electric_service`, `fresh_water_tank`, `generator_usage_included`, `nightly_mileage_included`, `location_state/lat/lng`, `distance_from_search_miles`, `owner_id`, `premier_owner`, `guest_favorite`, `new_listing_without_reviews`, `primary_image_url`, `weekly_discount_percent`, `monthly_discount_percent`. `sleeps`, `length_ft`, `instant_book`, `delivery`, `primary_image_url`, and `location_{state,lat,lng}` are shared with the Outdoorsy path so the dashboard can filter/aggregate across platforms with one SQL predicate per column. RVshare's `location.name` ("City, ST" free-text) is deliberately NOT written as `location_city` — we leave it NULL rather than store an unparsed blob under a wrong column. Wired through `scrapeRvshareViaApi` and `scripts/backfill_rvshare_sd.mjs`.
+- [x] **Market-wide meta snapshots (`search_snapshots`)** (2026-04-23) — new table `public.search_snapshots` captures the rollup meta each API returns on every search. Grain diverges by platform (the APIs diverge, not us): Outdoorsy writes one row per `(platform, market, rv_class, captured_at)` with `price_{min,max,median,average}` + `total_unavailable` + `price_histogram`; RVshare writes one row per `(platform, market, captured_at)` with `rv_class=NULL` (backend is type-blind) and the full `{nightly_rate,length,generator,fresh_water_tank,nightly_mileage}` histograms. `raw_meta` jsonb preserves the untransformed payload for future field extraction without re-fetching. One row per cron run, one row per backfill run — append-only time-series, cannot be backfilled retroactively so it starts ticking the moment the migration runs.
 
 **Days 6–7 — Fan-out**
-- [ ] Confirm 7-day coverage reaches **100%** of Outdoorsy SD universe (now measurable via `meta.total`). RVshare target remains ≥90% until that platform's API path is clarified.
-- [ ] Monitor credit consumption daily against the 3,000/mo Hobby ceiling — expected to fall well below prior projections now that Outdoorsy is free.
-- [ ] Retire the backfill script once the daily direct-API cron has run ≥3 consecutive full sweeps without regressions.
+- [x] **Coverage denominator now live** — `search_snapshots.total_results` gives us the ground-truth platform-reported universe on every cron run; 7-day coverage confirmation is now a SQL query against `search_snapshots`, not an estimate. Outdoorsy SD: 1,703 active listings confirmed. RVshare SD: 1,286 confirmed.
+- [x] **Credit consumption confirmed at zero** for SD — both platforms running on direct JSON:API; Firecrawl credits entirely reserved for Phase 3 enrichment and multi-market expansion.
+- [ ] Retire both backfill scripts (`backfill_outdoorsy_sd.mjs`, `backfill_rvshare_sd.mjs`) once the daily direct-API crons have run ≥3 consecutive full sweeps without regressions. (Retain as the canonical pattern for bootstrapping new markets.)
 
 ### Phase 3 — Detail Enrichment (Weeks 2-3)
+
+**Scope revised 2026-04-23.** The schema expansion (migration 005) captured `length_ft`, `sleeps`, `delivery`, `delivery_radius_miles`, `minimum_days`, `cancel_policy`, and `instant_book` from search-page APIs for 100% of active inventory — eliminating most of the originally planned enrichment work. Phase 3 now targets the **residual detail-page-only fields** that neither search API exposes.
+
 - [ ] New route: `/api/enrich`
-- [ ] Schema additions: `length_ft`, `sleeps`, `slides`, `fuel_type`, `delivery_radius_mi`, `delivery_per_mile_fee`, `cleaning_fee`, `min_nights`, `included_miles`, `generator`, `solar`, `pet_policy`, `photo_count`, `host_response_rate`, `host_response_time`
-- [ ] Nightly cron drains oldest `enriched_at IS NULL` queue
-- [ ] Banner on dashboard: "X of Y listings enriched"
+- [ ] Residual schema additions: `slides`, `fuel_type`, `delivery_per_mile_fee`, `cleaning_fee`, `solar`, `pet_policy`, `photo_count`, `host_response_rate`, `host_response_time`
+- [ ] Nightly cron drains oldest `enriched_at IS NULL` queue (lowest `scraped_at` first — ensures oldest-discovered listings get enriched before new ones)
+- [ ] Banner on dashboard: "X of Y listings enriched (amenity detail)"
+- [ ] Note: for RVshare, `electric_service`, `fresh_water_tank`, `generator_usage_included`, and `nightly_mileage_included` are now populated at search-page discovery; do not re-fetch these from detail pages.
 
 ### Phase 4 — Occupancy & Comp-Sets (Weeks 4-7)
 - [ ] Weekly calendar scrape → `availability_snapshots`
@@ -237,10 +263,10 @@ A public-facing "paste your listing URL → get a benchmark report" tool, modele
 **Input:** a single Outdoorsy or RVshare listing URL (optionally unauthenticated for the free teaser; gated for the full report).
 
 **Pipeline:**
-1. Parse URL → resolve to `listings.id` if already in registry; else one-shot `/api/enrich` to ingest it (≤5 credits, synchronous, cached 24h)
+1. Parse URL → resolve to `listings.id` if already in registry (the full SD registry is populated with core comp-set attributes as of 2026-04-23 schema expansion); else one-shot `/api/enrich` to ingest it (≤5 credits, synchronous, cached 24h)
 2. Pull latest snapshot for price + attributes; fall back to live scrape if `scraped_at > 48h`
-3. Run the Phase 4 kNN comp-set over the listing's attributes (class, length, sleeps, delivery radius, market)
-4. Compute benchmark deltas against the comp-set and the market rollup
+3. Run the Phase 4 kNN comp-set over the listing's attributes (`rv_class`, `length_ft`, `sleeps`, `delivery_radius_miles`, `location_{lat,lng}`) — all five dimensions are now populated at discovery time for in-registry listings; Phase 3 enrichment adds `slides`, `solar`, `pet_policy` as optional refinement dimensions
+4. Compute benchmark deltas against the comp-set and the market rollup (use `search_snapshots.price_median` for the market-level reference price rather than re-aggregating from individual listing rows)
 
 **Report surface (single scrollable page):**
 - **Header card:** the host's listing — hero image, title, class, price, "benchmarked against 42 similar RVs in San Diego, data fresh as of [timestamp]"
@@ -320,38 +346,44 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 
 ## 9. Success metrics
 
-| Metric | Week 1 target | Week 4 target | Quarter 1 target |
-|---|---|---|---|
-| Markets covered | 1 | 1 | 10 |
-| Unique listings in registry | 300+ | 500+ | 15,000+ |
-| % listings priced in last 7d | 70% | 90% | 95% |
-| % listings enriched | 0% | 80% | 95% |
-| Snapshots captured | 300 | 14,000 | 1M+ |
-| Waitlist signups | 50 | 200 | 1,000 |
-| Paid conversions | 0 | 10 | 50 |
+| Metric | Week 1 target | Week 1 actual (2026-04-23) | Week 4 target | Quarter 1 target |
+|---|---|---|---|---|
+| Markets covered | 1 | **1** | 1 | 10 |
+| Unique listings in registry | 300+ | **~2,980 active** (~3,356 total incl. stale) | 3,000+ | 40,000+ |
+| % listings priced in last 7d | 70% | **100%** (full-universe daily sweep, both platforms) | 100% | 99% |
+| % active listings with core comp-set attrs | 0% | **~99%** (length, sleeps, delivery, location from search APIs) | 100% | 99% |
+| % listings with detail-page enrichment | 0% | **0%** (Phase 3 not yet started) | 60% | 90% |
+| `listing_snapshots` captured | 300 | **~6,000+** (both backfills + prior cron runs) | 100,000+ | 2M+ |
+| `search_snapshots` captured | — | **12** (5 Outdoorsy class-grain + 2 RVshare market-grain, first day) | 300+ | 3,000+ |
+| Waitlist signups | 50 | — | 200 | 1,000 |
+| Paid conversions | 0 | 0 | 10 | 50 |
 
 ---
 
 ## 10. Risks & open questions
 
 ### Technical risks
-- **Firecrawl rate limits (RVshare only now).** Hobby tier silently queues over rate limit → client timeouts → wasted credits. Mitigated by `MAX_PAGES: 1`, 180s client timeout, and the 2-cron split. Outdoorsy no longer hits Firecrawl as of 2026-04-22, so RVshare is the only surface still exposed to this failure mode.
-- **Outdoorsy JSON:API could be shut down or gated.** The `search.outdoorsy.com/rentals` endpoint is undocumented and required no auth as of 2026-04-22. Outdoorsy could at any time rate-limit it, require a signed header, or move search behind auth. Mitigation: (1) the Firecrawl+LLM path still works and is kept dormant in the codebase as a fallback, not deleted; (2) monitor `cron_runs` for Outdoorsy status; on three consecutive failures, flip the Outdoorsy branch back to Firecrawl without a deploy (feature flag). Long-term, if the API stays stable for 90 days, the Firecrawl fallback can be retired.
+- **Firecrawl is now a dormant fallback only.** Both platforms moved to direct JSON:APIs on 2026-04-22. Firecrawl is exercised zero times in steady state. It remains wired behind `OUTDOORSY_SCRAPER` and `RVSHARE_SCRAPER` env flags, so the rate-limit / queueing / credit-waste failure modes only resurface if we flip a fallback on — which in turn only happens if an API gets gated.
+- **Direct APIs could be shut down or gated — Outdoorsy.** `search.outdoorsy.com/rentals` is undocumented and required no auth as of 2026-04-22. Outdoorsy could at any time rate-limit it, require a signed header, or move search behind auth. Mitigation: (1) the Firecrawl+LLM path still works and is kept dormant in the codebase as a fallback, not deleted; (2) monitor `cron_runs` for Outdoorsy status; on three consecutive failures, flip `OUTDOORSY_SCRAPER=firecrawl` without a deploy. Long-term, if the API stays stable for 90 days, the fallback can be retired.
+- **Direct APIs could be shut down or gated — RVshare.** `rvshare.com/rv-rental.json` is a Rails respond_to negotiation (the same URL returns HTML for browsers via Hypernova SSR and JSON for `Accept: application/json`). It is effectively a public rendering of the search page and therefore harder to shut down than Outdoorsy's dedicated `search.` subdomain — RVshare would have to break their own SSR pipeline to block us. Mitigation follows Outdoorsy's pattern: `RVSHARE_SCRAPER=firecrawl` flag restores the 8-target Firecrawl path without a deploy (note: that path inherits the cosmetic-`type=` redundancy — 8× credits for ~1× distinct listings).
+- **Cross-page duplicate handling (RVshare).** The RVshare backend reorders listings slightly between pages on busy days — our 2026-04-22 backfill saw 4 cross-page duplicate IDs out of 1,283. Already handled by the `seenIds` Set in both `lib/rvshare-api.ts#fetchRvshareMarket` and the route-side upsert. Worth re-verifying if the universe count ever drops unexpectedly.
 - **Platform bot protection — poison-page variant (Outdoorsy UI, observed 2026-04-21).** Still a hazard if we ever scrape `www.outdoorsy.com` again (e.g. for detail-page enrichment). The search API path does not exhibit this behavior; but any future per-listing detail-page scrape must re-encode the retry/serial/cool-down posture or inherit the hazard.
-- **LLM extraction drift (RVshare only now).** Firecrawl's JSON extraction latency varies with their model provider load. 180s timeout absorbs most variance. Low priority unless RVshare's LLM pass starts consistently exceeding 180s.
-- **Config hygiene.** `.env.local` currently stores some values with literal `\n` inside the quoted strings; Next.js's built-in dotenv tolerates this, but hand-rolled parsers (e.g. the backfill script's env loader) must expand-and-trim or every DB write silently 204s into the void. Tracked in Phase 5.
+- **Config hygiene.** `.env.local` currently stores some values with literal `\n` inside the quoted strings; Next.js's built-in dotenv tolerates this, but hand-rolled parsers (e.g. the backfill scripts' env loaders) must expand-and-trim or every DB write silently 204s into the void. Tracked in Phase 5.
 - **Occupancy inference accuracy.** Calendar diffs assume "available → booked" means "booked" — but hosts also block dates manually. Need to validate against 1-2 known-booked listings.
+- **Outdoorsy sentinel timestamps.** The Outdoorsy API returns `"0000-12-31T16:07:02-07:52"` for `first_published` / `last_published` on some listings where those fields are unset. Postgres `timestamptz` rejects year-0000 values as out-of-range. Mitigated in `lib/outdoorsy-api.ts` (`asTimestamp` helper rejects pre-epoch strings) and in the backfill script (`asTs` helper). Any future consumer of these columns must be aware the field is nullable for this reason.
+- **RVshare decimal-valued spec fields.** Fields like `fresh_water_tank`, `electric_service`, `generator_usage_included`, and `nightly_mileage_included` are returned as floats (e.g. `"40.5"` gallons) despite appearing integer in most documentation. Migration 006 relaxed these columns to `numeric`. Do not assume integer semantics when doing arithmetic on these.
 
 ### Product risks
-- **Coverage ≠ value.** Users must understand a 150-listing sample is a feature, not a limitation. Messaging is "rigorous methodology," not "incomplete data."
-- **Time-series patience.** Comp-sets need ≥60 days of snapshots to be interesting. Launch messaging must manage expectations during bootstrap.
+- **Coverage ≠ value.** Users must understand even a comprehensive dataset requires time depth to be actionable. Messaging is "rigorous daily methodology," not "we have every listing." (Updated from the bootstrap-era framing — we now genuinely have full SD coverage.)
+- **Time-series patience.** Comp-sets need ≥60 days of snapshots to be interesting. `search_snapshots` started ticking 2026-04-23. Launch messaging must manage expectations during bootstrap.
 - **Competitive moat.** Once the time-series depth exists, a copycat is 60+ days behind. Moving fast on expansion is the best defense.
+- **`rental_score` / `sort_score` interpretation.** These are Outdoorsy-internal signals whose weighting is undocumented. We can surface them as relative rankings within our dataset, but we cannot claim to know exactly what drives them. Present as "platform visibility rank" with a methodology disclosure, not as an absolute score.
 
 ### Open questions
-- ~~Do Outdoorsy and RVshare respect server-side `sort` params, or is sorting client-side JS?~~ **Answered 2026-04-21 for Outdoorsy:** moot after 2026-04-22 pivot — the direct JSON:API returns the canonical ranked universe; sort params on the UI are no longer on our critical path. RVshare parity test still pending.
-- ~~Does the two-tier scrape architecture ship before or after Phase 2 pagination expansion?~~ **Resolved 2026-04-22:** moot for Outdoorsy (direct API obsoletes LLM extraction entirely). Still a live question for RVshare if we can't find a parallel internal API there.
-- **Does RVshare have an undocumented search API equivalent to Outdoorsy's?** Same investigation method applies: inspect the search page's network calls, check for subdomains like `api.rvshare.com` / `search.rvshare.com`, probe for JSON:API response shapes. If yes, Firecrawl spend for SD drops to zero.
-- Is there a legal ceiling on scrape volume per platform? (Monitor; rotate request shape; the direct-API path is lower profile than Firecrawl's headless browser, but it is still undocumented access.)
+- ~~Do Outdoorsy and RVshare respect server-side `sort` params, or is sorting client-side JS?~~ **Answered 2026-04-21 for Outdoorsy, moot 2026-04-22 for both platforms:** direct JSON:APIs return the canonical ranked universe on each platform; sort params on the UIs are no longer on our critical path. RVshare's `type=` filter turned out to be cosmetic (2026-04-22) — by extension we should assume any RVshare search-UI querystring is decorative until proven otherwise, and lean on client-side classification from `attributes.type` wherever possible.
+- ~~Does the two-tier scrape architecture ship before or after Phase 2 pagination expansion?~~ **Resolved 2026-04-22:** moot for both platforms — direct APIs obsolete LLM extraction entirely. The two-tier pattern survives as a mental model for any future platform that doesn't expose a JSON endpoint (e.g. RVezy, RVnGO in Phase 6).
+- ~~Does RVshare have an undocumented search API equivalent to Outdoorsy's?~~ **Answered 2026-04-22:** yes — `rvshare.com/rv-rental.json` is a Rails JSON respond_to negotiation on the same path as the HTML search page. Auth-free, bot-defense-free, rate-limit-free in 65-page sweeps. See §11 (2026-04-22 RVshare).
+- Is there a legal ceiling on scrape volume per platform? (Monitor; rotate request shape; the direct-API paths are lower profile than Firecrawl's headless browser, but both are still undocumented access.)
 - When does fleet-tier pricing make sense to launch? (Gate on having ≥30 days of trend data + occupancy.)
 
 ---
@@ -374,3 +406,9 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 - **2026-04-22:** **Discovered Outdoorsy's internal JSON:API at `search.outdoorsy.com/rentals` and moved the entire Outdoorsy ingestion path off Firecrawl onto direct HTTPS.** Investigation chain: (1) fetched the `/rv-search` HTML via Firecrawl stealth to inspect `__NEXT_DATA__` and Redux initial state — pageProps were empty (page is client-hydrated, not SSR-driven), but `initialReduxState.rentals.currentFilters` leaked the exact backend query shape (`filter[type]`, `page[limit]`, `page[offset]`, `price[min/max]`, `date[from/to]`, `sleeps[adults/children]`); (2) CT-log subdomain enumeration surfaced `api.outdoorsy.com` and `search.outdoorsy.com`; (3) direct curl to `https://search.outdoorsy.com/rentals?address=San+Diego,+CA&filter[type]=b` returned a 200 with standard JSON:API `{data, included, meta}` and no Cloudflare challenge. **Impact:** Outdoorsy daily cron moved from ~180s + 40 credits/day (Firecrawl+LLM) to ~15s + 0 credits/day; per-listing payload expanded from ~10 regex-parsed fields to 140 native attributes (unblocks most of Phase 3 enrichment with zero extra calls); market-wide stats (`meta.total`, `meta.price_histogram`, `meta.price_median`) now come free on every call. Coverage ceiling changed from "~55% via default-sort page 1" to **100% every day** — with `meta.total` providing a ground-truth denominator the old path could never produce.
 - **2026-04-22:** **Silent bug: `filter[type]=tt` is a UI-only enum, not a backend enum.** The old Firecrawl-based Outdoorsy cron built URLs with `filter[type]=tt` (copied from the `outdoorsy.com/rv-search` UI querystring). The search UI accepts this and client-side-filters a broader server response down to travel trailers; the backend API at `search.outdoorsy.com/rentals` treats `tt` as an unknown filter and returns unfiltered results (or `total=0` on the direct-API probe). Empirically confirmed: `filter[type]=tt` → `total=0`; `filter[type]=trailer` → `total=692` for San Diego. The old cron has been under-counting SD travel trailers by roughly 5-10× for its entire lifetime. Fix rolled out alongside the direct-API pivot: backend-correct filter codes are `a`, `b`, `c`, `trailer`, `fifth-wheel`.
 - **2026-04-22:** **Retained the Firecrawl-based Outdoorsy code path as a dormant fallback rather than deleting it.** Rationale: the direct-API endpoint is undocumented. If Outdoorsy adds auth, rate limits aggressively, or redesigns the API, we need a same-day recovery path that already works in production. The Firecrawl path is now gated behind an `OUTDOORSY_SCRAPER` env flag (`api` | `firecrawl`, default `api`); flipping the flag in Vercel does not require a deploy. Once the direct-API path runs clean for ≥90 days, the fallback can be retired.
+- **2026-04-22 (RVshare):** **Discovered RVshare's internal JSON:API at `rvshare.com/rv-rental.json` and moved RVshare ingestion off Firecrawl onto direct HTTPS.** Investigation chain, run immediately after the Outdoorsy pivot landed: (1) fetched the `/rv-rental?location=san+diego+ca` HTML and grepped for embedded data structures — found a `<script type="application/json" data-hypernova-key="CombinedSearchExplorer">` block holding a *complete* server-rendered search response (Airbnb's Hypernova SSR framework); (2) CT-log enumeration surfaced `api.rvshare.com`, but probing it returned HTTP 401 with a Rails Devise `"You need to sign in or sign up before continuing"` body — that subdomain requires full user auth and is unusable for anonymous scraping; (3) on a hunch, re-requested the search URL with `Accept: application/json` — Rails respond_to returned the raw JSON envelope directly, no HTML wrapper, no auth required; (4) appended `.json` extension to the path and observed identical behavior with or without the Accept header, confirming the endpoint is deliberately public; (5) paginated via `&page=N` cleanly through 65 pages of SD inventory with `pagination.totalResults=1283` on every response. **Impact:** RVshare daily cron moved from ~480s + 40 credits/day (8 Firecrawl+LLM targets) to ~50s + 0 credits/day (single paginated sweep); per-listing payload expanded from ~10 LLM-regex-parsed fields to 27 native attributes plus 5 market-wide histograms (nightly rate, length, generator usage, fresh-water tank, nightly mileage) on every call. Coverage ceiling changed from "~15% per class via page-1 Firecrawl" to **100% every day** with `pagination.totalResults` as the ground-truth denominator.
+- **2026-04-22 (RVshare):** **Silent bug: `type=` URL parameter on RVshare is cosmetic.** The pre-pivot cron hit 8 per-type URLs daily (`type=class-a`, `type=class-b`, …, `type=truck-camper`) on the theory that each returned a class-filtered result set. Empirically — and verified across the Hypernova SSR payload, the `.json` API response, and the HTML rendering — the RVshare backend **ignores** `type=` entirely: all 8 URLs returned the identical 1,283 SD listings in the same order. The LLM was silently client-side-classifying the same shared universe 8 times per day. The filtering visible to a browser user is applied by client-side JS post-hydration. **Impact:** `vercel.json` collapsed from 2 RVshare crons (`rvshare-1`, `rvshare-2`) covering 4+4 per-type targets to a single unified `rvshare` cron that makes one location-scoped sweep and categorizes from `attributes.type`. Classification distribution from the 2026-04-22 backfill (1,279 rows): Travel Trailer 601 · Class C 270 · Class B 132 · Class A 120 · Toy Hauler 79 · Fifth Wheel 74 · Pop Up 2 · Other 1. The one "Other" was a Jay Flight Bungalow (park model / destination trailer); lookup table in `lib/rvshare-api.ts` can grow as new `attributes.type` strings appear.
+- **2026-04-22 (RVshare):** **Retained the Firecrawl-based RVshare code path as a dormant fallback, gated behind `RVSHARE_SCRAPER` env flag.** Symmetric with the Outdoorsy decision above. Same rationale: if RVshare ever blocks the JSON endpoint or breaks their Hypernova pipeline, we need a same-day recovery without a deploy. One caveat: if the Firecrawl fallback is ever activated, it inherits the cosmetic-`type=` redundancy (8 targets × 1 page × 5 credits = 40 credits/day for ~1× distinct listings vs. a single API call). If RVshare's JSON endpoint stays stable for 90 days, retire the Firecrawl path rather than also fixing its redundancy.
+- **2026-04-23:** **Schema expansion (migrations 005 + 006) — persisted all high-value fields both APIs already returned.** Pre-expansion we were writing ~10 columns per listing; both APIs were returning 27-140 attributes that we fetched and discarded. Migration 005 added 9 shared columns, 13 Outdoorsy-only columns, and 12 RVshare-only columns to `public.listings`, plus the new `search_snapshots` table for market-wide rollup time-series. Migration 006 relaxed 4 RVshare spec columns from `integer` to `numeric` after the first backfill caught decimal values (`fresh_water_tank=40.5` etc.). **Impact:** ~82-100% of Phase 3's originally planned "enrichment" work is now done at zero additional API cost — `length_ft`, `sleeps`, `delivery`, `delivery_radius_miles`, `minimum_days`, `cancel_policy`, `instant_book`, and `location_{lat,lng,state}` are fully populated for active SD inventory on both platforms. Phase 3 scope is now narrowed to the 8-9 genuinely detail-page-only fields.
+- **2026-04-23:** **Two data-quality bugs found by running the expanded backfills.** (1) Outdoorsy returns `"0000-12-31T16:07:02-07:52"` as a sentinel for unset `first_published` / `last_published` fields; Postgres rejects year-0000 as out-of-range for `timestamptz`, causing entire 50-row upsert chunks to fail silently. Fixed with an `asTimestamp` / `asTs` helper that treats pre-epoch strings as `null`. (2) RVshare returns float values (e.g. `"40.5"`) for fields we typed as `integer` in migration 005 — same chunk-failure behavior. Fixed with migration 006 (`alter column type numeric`). Lesson: always run the backfill immediately after any schema migration that adds new write paths — the backfill stress-tests the full real-world value range in a controlled way that cron runs (which only write new/changed rows) would take days to surface.
+- **2026-04-23:** **Outdoorsy `meta.price_*` fields are in cents, not dollars.** Discovered during verification after the backfills — `search_snapshots.price_median = 29600` for Class A (should be $296, not $29,600). The per-listing `price_per_day` field is also in cents (already known and handled with `/100` division), but we missed applying the same conversion to the meta price stats when inserting `search_snapshots`. Fixed in `lib/outdoorsy-api.ts#normalizeMeta` (added `centsToDollars` helper), the backfill script, and a one-shot data-fix script (`scripts/fix_outdoorsy_search_snapshot_units.mjs`) that corrected the 10 existing stale rows. Going forward: treat every Outdoorsy numeric money field as cents until proven otherwise.

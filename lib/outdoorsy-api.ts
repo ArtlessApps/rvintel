@@ -210,6 +210,20 @@ function asBoolean(v: unknown): boolean | null {
   return null;
 }
 
+// Outdoorsy occasionally returns sentinel timestamps like
+// "0000-12-31T16:07:02-07:52" for un-set first_published / last_published
+// fields. Postgres `timestamptz` rejects year 0000 as "out of range", which
+// used to fail the entire 50-row upsert chunk. Treat anything older than
+// 1970 (and anything that fails Date parsing) as null.
+function asTimestamp(v: unknown): string | null {
+  const s = asString(v);
+  if (s === null) return null;
+  const ms = Date.parse(s);
+  if (!Number.isFinite(ms)) return null;
+  if (ms < 0) return null;
+  return s;
+}
+
 function normalizeRental(raw: RawRental): OutdoorsyListing {
   const a = raw.attributes ?? {};
   const loc = (a.location ?? {}) as Record<string, unknown>;
@@ -263,14 +277,22 @@ function normalizeRental(raw: RawRental): OutdoorsyListing {
     location_lat: asNumber(loc.lat),
     location_lng: asNumber(loc.lng),
     published: asBoolean(a.published),
-    first_published: asString(a.first_published),
-    last_published: asString(a.last_published),
-    created_at: asString(a.created),
-    updated_at: asString(a.updated),
+    first_published: asTimestamp(a.first_published),
+    last_published: asTimestamp(a.last_published),
+    created_at: asTimestamp(a.created),
+    updated_at: asTimestamp(a.updated),
     rental_score: asNumber(a.rental_score),
     sort_score: asNumber(a.sort_score),
     raw: a,
   };
+}
+
+// Outdoorsy's `meta.price_*` fields are in cents (same as per-listing
+// `price_per_day`). We convert to dollars here so search_snapshots and
+// listings share a single currency convention (`nightly_rate` is dollars).
+// `price_histogram` is an array of bucket counts, NOT prices — don't convert.
+function centsToDollars(v: number | null): number | null {
+  return v === null ? null : v / 100;
 }
 
 function normalizeMeta(rawMeta: Record<string, unknown> | undefined): OutdoorsyMeta {
@@ -284,10 +306,10 @@ function normalizeMeta(rawMeta: Record<string, unknown> | undefined): OutdoorsyM
     lat: asNumber(m.lat),
     lng: asNumber(m.lng),
     radius: asNumber(m.radius),
-    price_min: asNumber(m.price_min),
-    price_max: asNumber(m.price_max),
-    price_average: asNumber(m.price_average),
-    price_median: asNumber(m.price_median),
+    price_min: centsToDollars(asNumber(m.price_min)),
+    price_max: centsToDollars(asNumber(m.price_max)),
+    price_average: centsToDollars(asNumber(m.price_average)),
+    price_median: centsToDollars(asNumber(m.price_median)),
     price_histogram: Array.isArray(hist?.data) ? (hist.data as number[]) : null,
     total_unavailable: asNumber(m.total_unavailable),
   };

@@ -12,6 +12,7 @@ import {
   type OutdoorsyClassCode,
   type OutdoorsyListing,
 } from "@/lib/outdoorsy-api";
+import { fetchRvshareMarket, type RvshareListing } from "@/lib/rvshare-api";
 
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -20,16 +21,28 @@ function getServiceSupabase() {
 }
 
 // ─── Market / class config ────────────────────────────────────────────────────
-// RVshare still uses Firecrawl (JS-rendered filters, LLM extraction).
-// Outdoorsy migrated to direct JSON:API calls on 2026-04-22 — see PRD §11 and
-// OUTDOORSY_API_TARGETS below. The Firecrawl Outdoorsy config is retained
-// (OUTDOORSY_FIRECRAWL_TARGETS) for the OUTDOORSY_SCRAPER=firecrawl fallback.
+// Both platforms now ingest via direct JSON:API (Outdoorsy pivoted 2026-04-22,
+// RVshare pivoted 2026-04-22 — see PRD §11). Firecrawl config survives as a
+// dormant fallback behind `*_SCRAPER=firecrawl` env flags in case either
+// backend is ever gated.
+//
+// RVshare `type=` was proven COSMETIC during the pivot: all 8 pre-pivot per-
+// type targets returned the same 1,283 SD listings in the same order. The API
+// path makes one location-scoped sweep and categorizes each listing from
+// `attributes.type`, eliminating 7 redundant cron calls per day.
 
 type ScrapeTarget = { platform: "outdoorsy" | "rvshare"; url: string; group?: string };
 
+// RVshare Firecrawl fallback targets. Only touched when RVSHARE_SCRAPER=firecrawl.
+// Kept at the pre-pivot 8 per-type URLs even though we now know the backend
+// ignored `type` — the Firecrawl path relies on the headless browser's
+// client-side JS to apply the `type` filter visually, so these URLs were
+// doing real work on that code path (via LLM-classified page output) even if
+// the underlying HTTP response was type-blind. If you ever flip back, be
+// aware you'll be paying 8× the Firecrawl credits for <2× the distinct
+// listings vs a single API sweep.
 const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
   "san-diego-ca": [
-    // RVshare — per-class; JS filter applied by Firecrawl's headless browser.
     { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-a" },
     { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-b" },
     { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-c" },
@@ -39,6 +52,13 @@ const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=pop-up" },
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=truck-camper" },
   ],
+};
+
+// RVshare direct-API targets. One entry per market — the backend returns the
+// full type-agnostic universe for a location in a single paginated sweep.
+type RvshareApiTarget = { location: string };
+const RVSHARE_API_TARGETS: Record<string, RvshareApiTarget> = {
+  "san-diego-ca": { location: "san diego ca" },
 };
 
 // ─── Outdoorsy direct-API targets (active as of 2026-04-22) ──────────────────
@@ -264,6 +284,9 @@ async function scrapeOutdoorsyViaApi(
 
       // Map API listings → listings table rows. Price fields on the API are in
       // cents; our schema stores dollars in nightly_rate / weekly_rate.
+      // Every "expanded" field below is one the JSON:API already returned on
+      // this exact request — persisting them costs zero extra API calls and
+      // unlocks Phase 3 enrichment / Phase 4.5 kNN comp-sets at query time.
       const now = new Date().toISOString();
       const rows = listings
         .filter((l): l is OutdoorsyListing & { price_per_day_cents: number } => {
@@ -291,6 +314,30 @@ async function scrapeOutdoorsyViaApi(
             amenities: [] as string[],
             scraped_at: now,
             last_seen_at: now,
+            // Shared expansion columns (migration 005)
+            sleeps: l.sleeps,
+            length_ft: l.vehicle_length,
+            instant_book: l.instant_book,
+            delivery: l.delivery,
+            primary_image_url: l.primary_image_url,
+            location_city: l.location_city,
+            location_state: l.location_state,
+            location_lat: l.location_lat,
+            location_lng: l.location_lng,
+            // Outdoorsy-only expansion columns
+            sleeps_adults: l.sleeps_adults,
+            sleeps_kids: l.sleeps_kids,
+            minimum_days: l.minimum_days,
+            cancel_policy: l.cancel_policy,
+            delivery_radius_miles: l.delivery_radius_miles,
+            vehicle_height: l.vehicle_height,
+            vehicle_dry_weight: l.vehicle_dry_weight,
+            vehicle_gvwr: l.vehicle_gvwr,
+            location_zip: l.location_zip,
+            first_published: l.first_published,
+            last_published: l.last_published,
+            rental_score: l.rental_score,
+            sort_score: l.sort_score,
           };
         });
 
@@ -333,9 +380,237 @@ async function scrapeOutdoorsyViaApi(
           snapshotsInserted += snapshots.length;
         }
       }
+
+      // Market-wide meta snapshot — one row per (platform, market, rv_class,
+      // cron run). Outdoorsy queries are per-class so rv_class is NOT NULL
+      // here. Failure to write this is a soft error — the per-listing data
+      // has already landed above.
+      const rvClassForSnapshot = OUTDOORSY_CODE_TO_RV_CLASS[target.classCode];
+      const { error: searchSnapErr } = await supabase.from("search_snapshots").insert({
+        platform: "outdoorsy",
+        market,
+        rv_class: rvClassForSnapshot,
+        source_url: sourceUrl,
+        total_results: meta.total,
+        total_unavailable: meta.total_unavailable,
+        total_pages: null,
+        price_min: meta.price_min,
+        price_max: meta.price_max,
+        price_average: meta.price_average,
+        price_median: meta.price_median,
+        price_histogram: meta.price_histogram,
+        length_histogram: null,
+        generator_histogram: null,
+        fresh_water_tank_histogram: null,
+        nightly_mileage_histogram: null,
+        raw_meta: meta,
+      });
+      if (searchSnapErr) {
+        errors.push(`${label} search_snapshot: ${searchSnapErr.message}`);
+      }
     } catch (err) {
       errors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
     }
+  }
+
+  return { inserted, snapshotsInserted, skipped, errors };
+}
+
+// ─── RVshare direct-API scrape path ───────────────────────────────────────────
+// New in 2026-04-22. Replaces the Firecrawl+LLM path for RVshare. See PRD §11.
+// One location-scoped call per market returns the full type-agnostic universe;
+// we classify each listing from `attributes.type` and upsert in one batch.
+//
+// `groupFilter` is accepted for backward cron-path compatibility (rvshare-1,
+// rvshare-2) but is IGNORED on the API path — the groups only existed to
+// spread the Firecrawl 8-target load across two cron windows. A single API
+// sweep completes in ~50s end-to-end and needs no grouping.
+async function scrapeRvshareViaApi(
+  market: string,
+  _groupFilter: string | undefined,
+): Promise<{ inserted: number; snapshotsInserted: number; skipped: number; errors: string[] }> {
+  const target = RVSHARE_API_TARGETS[market];
+  if (!target) {
+    return { inserted: 0, snapshotsInserted: 0, skipped: 0, errors: [`no rvshare api target for market ${market}`] };
+  }
+
+  const supabase = getServiceSupabase();
+  const errors: string[] = [];
+  let inserted = 0;
+  let snapshotsInserted = 0;
+  let skipped = 0;
+  const label = `rvshare api ${market}`;
+
+  try {
+    // maxPages=80 is a safety cap; RVshare reports ~65 pages for SD. delayMs
+    // 200 keeps us far under any conceivable rate limit (we've seen 0 errors
+    // across full 65-page sweeps at this cadence). fetchTimeoutMs 15s is the
+    // same as Outdoorsy.
+    const { listings, meta, pagesFetched, sourceUrl } = await fetchRvshareMarket({
+      location: target.location,
+      maxPages: 80,
+      delayMs: 200,
+      fetchTimeoutMs: 15_000,
+    });
+
+    if (listings.length === 0) {
+      errors.push(`${label}: api returned 0 listings (totalResults=${meta.totalResults}, pages=${pagesFetched})`);
+      return { inserted, snapshotsInserted, skipped, errors };
+    }
+
+    // Map API listings → listings table rows. RVshare `rate` is already in
+    // dollars (unlike Outdoorsy's cents); no divide-by-100. Every "expanded"
+    // field below is one the search-page JSON was already returning on this
+    // exact request — persisting them costs zero extra API calls.
+    const now = new Date().toISOString();
+    const rows = listings
+      .filter((l): l is RvshareListing & { nightly_rate: number } => {
+        return typeof l.nightly_rate === "number" && l.nightly_rate > 0;
+      })
+      .map((l) => ({
+        platform: "rvshare" as const,
+        market,
+        rv_class: l.rv_class,
+        listing_url: l.listing_url,
+        host_name: null,
+        rv_year: l.year,
+        rv_make: l.make,
+        rv_model: l.model,
+        nightly_rate: l.nightly_rate,
+        weekly_rate: null, // RVshare search response has no direct weekly_rate
+        review_count: l.review_count,
+        avg_rating: l.avg_rating,
+        amenities: [] as string[],
+        scraped_at: now,
+        last_seen_at: now,
+        // Shared expansion columns (migration 005)
+        sleeps: l.sleeps,
+        length_ft: l.length_ft,
+        instant_book: l.is_instant_book,
+        delivery: l.delivery,
+        primary_image_url: l.primary_image_url,
+        // RVshare doesn't expose a parsed city string — location.name is a
+        // free-text "City, ST" blob (e.g. "Chula Vista, CA"). Leave city
+        // NULL rather than storing the unparsed blob under a wrong column.
+        location_city: null,
+        location_state: l.location_state,
+        location_lat: l.location_lat,
+        location_lng: l.location_lng,
+        // RVshare-only expansion columns
+        insurance_status: l.insurance_status,
+        electric_service: l.electric_service,
+        fresh_water_tank: l.fresh_water_tank,
+        generator_usage_included: l.generator_usage_included,
+        nightly_mileage_included: l.nightly_mileage_included,
+        distance_from_search_miles: l.distance_from_search_miles,
+        owner_id: l.owner_id,
+        premier_owner: l.premier_owner,
+        guest_favorite: l.guest_favorite,
+        new_listing_without_reviews: l.new_listing_without_reviews,
+        weekly_discount_percent: l.weekly_discount_percent,
+        monthly_discount_percent: l.monthly_discount_percent,
+      }));
+
+    skipped += listings.length - rows.length;
+    if (rows.length === 0) {
+      return { inserted, snapshotsInserted, skipped, errors };
+    }
+
+    // Dedupe by listing_url. Defensive — we saw ~4 cross-page dupes out of
+    // 1,283 on the RVshare backfill (backend shuffles boundary slightly).
+    const seen = new Set<string>();
+    const deduped = rows.filter((r) => {
+      if (seen.has(r.listing_url)) return false;
+      seen.add(r.listing_url);
+      return true;
+    });
+
+    // Chunked upsert — Supabase upsert payload ceiling sits well above our
+    // row count at 50-chunks, but keeping this symmetric with the backfill
+    // script means a single mental model for both call sites.
+    const UPSERT_CHUNK = 100;
+    const upsertedIds: Array<{
+      id: string;
+      nightly_rate: number;
+      weekly_rate: number | null;
+      review_count: number | null;
+      avg_rating: number | null;
+      listing_url: string;
+    }> = [];
+
+    for (let i = 0; i < deduped.length; i += UPSERT_CHUNK) {
+      const chunk = deduped.slice(i, i + UPSERT_CHUNK);
+      const { data: upserted, error: upErr } = await supabase
+        .from("listings")
+        .upsert(chunk, { onConflict: "listing_url", ignoreDuplicates: false })
+        .select("id, listing_url, nightly_rate, weekly_rate, review_count, avg_rating");
+
+      if (upErr) {
+        errors.push(`${label} upsert[${i}]: ${upErr.message}`);
+        continue;
+      }
+      inserted += chunk.length;
+      if (upserted) {
+        for (const r of upserted) {
+          upsertedIds.push({
+            id: r.id as string,
+            nightly_rate: r.nightly_rate as number,
+            weekly_rate: (r.weekly_rate ?? null) as number | null,
+            review_count: (r.review_count ?? null) as number | null,
+            avg_rating: (r.avg_rating ?? null) as number | null,
+            listing_url: r.listing_url as string,
+          });
+        }
+      }
+    }
+
+    if (upsertedIds.length > 0) {
+      const snapshots = upsertedIds.map((r) => ({
+        listing_id: r.id,
+        nightly_rate: r.nightly_rate,
+        weekly_rate: r.weekly_rate,
+        review_count: r.review_count,
+        avg_rating: r.avg_rating,
+        source_url: sourceUrl,
+      }));
+      const { error: snapErr } = await supabase.from("listing_snapshots").insert(snapshots);
+      if (snapErr) {
+        errors.push(`${label} snapshot: ${snapErr.message}`);
+      } else {
+        snapshotsInserted += snapshots.length;
+      }
+    }
+
+    // Market-wide meta snapshot — one row per (platform, market, cron run).
+    // RVshare queries are type-agnostic (backend ignores `type=`) so rv_class
+    // is NULL here; histograms describe the full-market distribution. Failure
+    // to write this is a soft error — the per-listing data has already landed.
+    const { error: searchSnapErr } = await supabase.from("search_snapshots").insert({
+      platform: "rvshare",
+      market,
+      rv_class: null,
+      source_url: sourceUrl,
+      total_results: meta.totalResults,
+      total_unavailable: null,
+      total_pages: meta.totalPages,
+      // RVshare doesn't expose price summary stats the way Outdoorsy does —
+      // the nightly_rate histogram buckets are the only price signal.
+      price_min: null,
+      price_max: null,
+      price_average: null,
+      price_median: null,
+      price_histogram: meta.nightly_rate_histogram,
+      length_histogram: meta.length_histogram,
+      generator_histogram: meta.generator_histogram,
+      fresh_water_tank_histogram: meta.fresh_water_tank_histogram,
+      nightly_mileage_histogram: meta.nightly_mileage_histogram,
+      raw_meta: meta,
+    });
+    if (searchSnapErr) {
+      errors.push(`${label} search_snapshot: ${searchSnapErr.message}`);
+    }
+  } catch (err) {
+    errors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   return { inserted, snapshotsInserted, skipped, errors };
@@ -346,26 +621,37 @@ async function scrapeMarket(
   market: string,
   platformFilter?: "outdoorsy" | "rvshare"
 ): Promise<{ inserted: number; snapshotsInserted: number; skipped: number; errors: string[] }> {
-  // platformFilter can be "outdoorsy", "rvshare", "outdoorsy-1", or "outdoorsy-2"
+  // platformFilter can be "outdoorsy", "rvshare", "outdoorsy-1", "outdoorsy-2",
+  // "rvshare-1", or "rvshare-2". Group suffix is a legacy artifact — ignored
+  // on the API path for RVshare (the single-sweep API needs no grouping).
   const platformName = platformFilter?.split("-")[0] as "outdoorsy" | "rvshare" | undefined;
   const groupFilter = platformFilter?.includes("-") ? platformFilter.split("-")[1] : undefined;
 
-  // Outdoorsy path selection — direct JSON:API by default, Firecrawl as
-  // fallback (env-flagged so we can flip without a deploy if the API is gated).
+  // Path selection per platform — direct JSON:API by default, Firecrawl as
+  // fallback (env-flagged so we can flip without a deploy if a backend is gated).
   const outdoorsyMode =
     (process.env.OUTDOORSY_SCRAPER ?? "api").toLowerCase() === "firecrawl" ? "firecrawl" : "api";
+  const rvshareMode =
+    (process.env.RVSHARE_SCRAPER ?? "api").toLowerCase() === "firecrawl" ? "firecrawl" : "api";
 
   if (platformName === "outdoorsy" && outdoorsyMode === "api") {
     return scrapeOutdoorsyViaApi(market, groupFilter);
   }
+  if (platformName === "rvshare" && rvshareMode === "api") {
+    return scrapeRvshareViaApi(market, groupFilter);
+  }
 
-  // Below this point = Firecrawl path for RVshare (always) and Outdoorsy
-  // (only when OUTDOORSY_SCRAPER=firecrawl).
-  const rvshareTargets = MARKET_TARGETS[market];
-  if (!rvshareTargets) throw new Error(`Unknown market: ${market}`);
+  // Below this point = Firecrawl path. Triggered only when at least one
+  // platform is on `*_SCRAPER=firecrawl` or the target is on the Firecrawl-
+  // only path. Under default config (both modes = "api") and a platform-
+  // scoped invocation this block is never reached.
+  const rvshareFirecrawlTargets = MARKET_TARGETS[market];
+  if (!rvshareFirecrawlTargets) throw new Error(`Unknown market: ${market}`);
   const outdoorsyFirecrawlTargets = OUTDOORSY_FIRECRAWL_TARGETS[market] ?? [];
-  const allTargets: ScrapeTarget[] =
-    outdoorsyMode === "firecrawl" ? [...outdoorsyFirecrawlTargets, ...rvshareTargets] : rvshareTargets;
+
+  const firecrawlRvshare = rvshareMode === "firecrawl" ? rvshareFirecrawlTargets : [];
+  const firecrawlOutdoorsy = outdoorsyMode === "firecrawl" ? outdoorsyFirecrawlTargets : [];
+  const allTargets: ScrapeTarget[] = [...firecrawlOutdoorsy, ...firecrawlRvshare];
 
   const targets = allTargets.filter(t => {
     if (!platformName) return true;
@@ -374,12 +660,16 @@ async function scrapeMarket(
     return true;
   });
 
-  // Special case: whole-market run (no platformFilter) + default outdoorsyMode.
-  // The Firecrawl loop below only handles RVshare in that config, so kick off
-  // Outdoorsy via the API path in parallel and merge the results at the end.
+  // Whole-market run (no platformFilter) + either platform on API mode: kick
+  // those off in parallel and merge at the end. The Firecrawl loop below
+  // handles the remaining platform(s) (if any) via standard iteration.
   const outdoorsyApiPromise =
     !platformName && outdoorsyMode === "api"
       ? scrapeOutdoorsyViaApi(market, undefined)
+      : null;
+  const rvshareApiPromise =
+    !platformName && rvshareMode === "api"
+      ? scrapeRvshareViaApi(market, undefined)
       : null;
 
   const supabase = getServiceSupabase();
@@ -611,7 +901,7 @@ async function scrapeMarket(
     }
   }
 
-  // Merge Outdoorsy direct-API results for the whole-market run case.
+  // Merge direct-API results for the whole-market run case.
   if (outdoorsyApiPromise) {
     try {
       const apiResult = await outdoorsyApiPromise;
@@ -621,6 +911,17 @@ async function scrapeMarket(
       errors.push(...apiResult.errors);
     } catch (err) {
       errors.push(`outdoorsy api: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  if (rvshareApiPromise) {
+    try {
+      const apiResult = await rvshareApiPromise;
+      inserted += apiResult.inserted;
+      snapshotsInserted += apiResult.snapshotsInserted;
+      skipped += apiResult.skipped;
+      errors.push(...apiResult.errors);
+    } catch (err) {
+      errors.push(`rvshare api: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -675,16 +976,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const apiKey = process.env.FIRECRAWL_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: "FIRECRAWL_API_KEY not set" }, { status: 500 });
-  }
-
   const body = await req.json().catch(() => ({}));
   const market = body.market ?? "san-diego-ca";
   const platformFilter = body.platform as "outdoorsy" | "rvshare" | undefined;
 
-  const firecrawl = new FirecrawlApp({ apiKey });
+  // Firecrawl is only needed when at least one platform is on `*_SCRAPER=firecrawl`.
+  // Under the post-pivot default (both modes=api) we never instantiate the client,
+  // so the missing-key 500 that used to guard every invocation is now gated on
+  // whether the current path actually needs Firecrawl.
+  const outdoorsyMode = (process.env.OUTDOORSY_SCRAPER ?? "api").toLowerCase() === "firecrawl" ? "firecrawl" : "api";
+  const rvshareMode = (process.env.RVSHARE_SCRAPER ?? "api").toLowerCase() === "firecrawl" ? "firecrawl" : "api";
+  const needsFirecrawl = outdoorsyMode === "firecrawl" || rvshareMode === "firecrawl";
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (needsFirecrawl && !apiKey) {
+    return NextResponse.json({ error: "FIRECRAWL_API_KEY not set (required when OUTDOORSY_SCRAPER or RVSHARE_SCRAPER is 'firecrawl')" }, { status: 500 });
+  }
+
+  // Stub client when we don't actually need Firecrawl — the scrapeMarket code
+  // path doesn't touch it in all-API mode, but the type signature still wants
+  // a FirecrawlApp. Using a bogus key is safe because the client lazily
+  // authenticates on first request.
+  const firecrawl = new FirecrawlApp({ apiKey: apiKey ?? "unused" });
   const startedAt = new Date();
 
   try {

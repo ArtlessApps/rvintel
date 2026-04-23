@@ -113,10 +113,29 @@ async function fetchPage(url) {
 }
 
 // ── normalizer (mirror of lib/outdoorsy-api.ts#normalizeRental) ───────────────
+// Schema expansion (2026-04-23): capture every high-value field the JSON:API
+// returns. Keep this in sync with lib/outdoorsy-api.ts#normalizeRental and the
+// corresponding mapping in app/api/scrape/route.ts#scrapeOutdoorsyViaApi.
+const asNum = (v) => (typeof v === "number" && Number.isFinite(v) ? v : null);
+const asStr = (v) => (typeof v === "string" && v.trim() !== "" ? v : null);
+const asBool = (v) => (typeof v === "boolean" ? v : null);
+// Outdoorsy occasionally returns sentinel timestamps like
+// "0000-12-31T16:07:02-07:52" for un-set first_published / last_published.
+// Postgres `timestamptz` rejects year 0000 as "out of range", which was
+// failing entire 50-row upsert chunks on the first backfill pass (2026-04-23).
+// Treat pre-epoch and unparseable strings as null.
+const asTs = (v) => {
+  const s = asStr(v);
+  if (s === null) return null;
+  const ms = Date.parse(s);
+  if (!Number.isFinite(ms) || ms < 0) return null;
+  return s;
+};
+
 function normalizeRental(raw) {
   const a = raw.attributes ?? {};
   const loc = a.location ?? {};
-  const slug = typeof a.slug === "string" && a.slug.trim() ? a.slug : null;
+  const slug = asStr(a.slug);
   const listing_url = slug
     ? `https://www.outdoorsy.com${slug}`
     : `https://www.outdoorsy.com/rv-rental/listing/${raw.id}`;
@@ -127,21 +146,68 @@ function normalizeRental(raw) {
     const s = Number(a.average_reviews.rental[0]?.score);
     if (Number.isFinite(s)) avg_rating = s;
   }
-  const review_count = typeof a.reviews_num === "number" ? a.reviews_num : null;
+  const review_count = asNum(a.reviews_num);
 
   return {
     id: raw.id,
     listing_url,
-    display_vehicle_type: typeof a.display_vehicle_type === "string" ? a.display_vehicle_type : null,
-    vehicle_year: typeof a.vehicle_year === "number" ? a.vehicle_year : null,
-    vehicle_make: typeof a.vehicle_make === "string" ? a.vehicle_make : null,
-    vehicle_model: typeof a.vehicle_model === "string" ? a.vehicle_model : null,
-    price_per_day_cents: typeof a.price_per_day === "number" ? a.price_per_day : null,
-    price_per_week_cents: typeof a.price_per_week === "number" ? a.price_per_week : null,
+    display_vehicle_type: asStr(a.display_vehicle_type),
+    vehicle_year: asNum(a.vehicle_year),
+    vehicle_make: asStr(a.vehicle_make),
+    vehicle_model: asStr(a.vehicle_model),
+    price_per_day_cents: asNum(a.price_per_day),
+    price_per_week_cents: asNum(a.price_per_week),
     avg_rating,
     review_count,
-    location_city: typeof loc.city === "string" ? loc.city : null,
-    location_state: typeof loc.state === "string" ? loc.state : null,
+    // Capacity / booking policy
+    sleeps: asNum(a.sleeps),
+    sleeps_adults: asNum(a.sleeps_adults),
+    sleeps_kids: asNum(a.sleeps_kids),
+    instant_book: asBool(a.instant_book),
+    minimum_days: asNum(a.minimum_days),
+    cancel_policy: asStr(a.cancel_policy),
+    // Delivery
+    delivery: asBool(a.delivery),
+    delivery_radius_miles: asNum(a.DeliveryRadiusMiles),
+    // Physical dimensions
+    vehicle_length: asNum(a.vehicle_length),
+    vehicle_height: asNum(a.vehicle_height),
+    vehicle_dry_weight: asNum(a.vehicle_dry_weight),
+    vehicle_gvwr: asNum(a.vehicle_gvwr),
+    // Media
+    primary_image_url: asStr(a.primary_image_url),
+    // Location
+    location_city: asStr(loc.city),
+    location_state: asStr(loc.state),
+    location_zip: asStr(loc.zip),
+    location_lat: asNum(loc.lat),
+    location_lng: asNum(loc.lng),
+    // Lifecycle
+    first_published: asTs(a.first_published),
+    last_published: asTs(a.last_published),
+    // Ranking signals
+    rental_score: asNum(a.rental_score),
+    sort_score: asNum(a.sort_score),
+  };
+}
+
+// Outdoorsy `meta.price_*` fields are in cents (same as per-listing
+// `price_per_day`). Convert to dollars so search_snapshots matches the
+// `nightly_rate` (dollars) convention on listings. `price_histogram` is an
+// array of bucket counts, not prices — leave as-is.
+const centsToDollars = (v) => (v === null ? null : v / 100);
+
+function normalizeMeta(rawMeta) {
+  const m = rawMeta ?? {};
+  const hist = m.price_histogram ?? {};
+  return {
+    total: asNum(m.total),
+    price_min: centsToDollars(asNum(m.price_min)),
+    price_max: centsToDollars(asNum(m.price_max)),
+    price_average: centsToDollars(asNum(m.price_average)),
+    price_median: centsToDollars(asNum(m.price_median)),
+    price_histogram: Array.isArray(hist?.data) ? hist.data : null,
+    total_unavailable: asNum(m.total_unavailable),
   };
 }
 
@@ -154,6 +220,7 @@ async function sweepClass(classCfg) {
   const listings = [];
   const seenIds = new Set();
   let total = null;
+  let latestMeta = null;
   let pagesFetched = 0;
   const errors = [];
 
@@ -169,7 +236,8 @@ async function sweepClass(classCfg) {
       break;
     }
     pagesFetched++;
-    if (total === null) total = typeof json.meta?.total === "number" ? json.meta.total : null;
+    latestMeta = normalizeMeta(json.meta);
+    if (total === null) total = latestMeta.total;
     const data = Array.isArray(json.data) ? json.data : [];
     let newThisPage = 0;
     for (const raw of data) {
@@ -184,12 +252,41 @@ async function sweepClass(classCfg) {
     await new Promise((r) => setTimeout(r, PAGE_DELAY_MS));
   }
 
+  // Market-wide meta snapshot — one row per class per run. Write even when
+  // listings.length === 0 so we capture the "this class was empty on this
+  // date" signal (e.g. RV fleet churn in a slow season).
+  if (latestMeta) {
+    const { error: searchSnapErr } = await supabase.from("search_snapshots").insert({
+      platform: PLATFORM,
+      market: MARKET,
+      rv_class: classCfg.rv_class,
+      source_url: sourceUrl,
+      total_results: latestMeta.total,
+      total_unavailable: latestMeta.total_unavailable,
+      total_pages: null,
+      price_min: latestMeta.price_min,
+      price_max: latestMeta.price_max,
+      price_average: latestMeta.price_average,
+      price_median: latestMeta.price_median,
+      price_histogram: latestMeta.price_histogram,
+      length_histogram: null,
+      generator_histogram: null,
+      fresh_water_tank_histogram: null,
+      nightly_mileage_histogram: null,
+      raw_meta: latestMeta,
+    });
+    if (searchSnapErr) {
+      errors.push(`search_snapshot: ${searchSnapErr.message}`);
+      log(`  search_snapshot FAILED: ${searchSnapErr.message}`);
+    }
+  }
+
   if (listings.length === 0) {
     log(`DONE — no listings (meta.total=${total ?? "null"}, errors=${errors.length})`);
     return { code: classCfg.code, total, unique: 0, upserted: 0, snapshots: 0, errors };
   }
 
-  // 2) Build rows
+  // 2) Build rows — full expanded schema (migration 005).
   const now = new Date().toISOString();
   const rows = listings
     .filter((l) => l.price_per_day_cents !== null && l.price_per_day_cents > 0)
@@ -209,6 +306,30 @@ async function sweepClass(classCfg) {
       amenities: [],
       scraped_at: now,
       last_seen_at: now,
+      // Shared expansion columns
+      sleeps: l.sleeps,
+      length_ft: l.vehicle_length,
+      instant_book: l.instant_book,
+      delivery: l.delivery,
+      primary_image_url: l.primary_image_url,
+      location_city: l.location_city,
+      location_state: l.location_state,
+      location_lat: l.location_lat,
+      location_lng: l.location_lng,
+      // Outdoorsy-only expansion columns
+      sleeps_adults: l.sleeps_adults,
+      sleeps_kids: l.sleeps_kids,
+      minimum_days: l.minimum_days,
+      cancel_policy: l.cancel_policy,
+      delivery_radius_miles: l.delivery_radius_miles,
+      vehicle_height: l.vehicle_height,
+      vehicle_dry_weight: l.vehicle_dry_weight,
+      vehicle_gvwr: l.vehicle_gvwr,
+      location_zip: l.location_zip,
+      first_published: l.first_published,
+      last_published: l.last_published,
+      rental_score: l.rental_score,
+      sort_score: l.sort_score,
     }));
 
   // 3) Upsert + snapshot in chunks
