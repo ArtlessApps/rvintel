@@ -23,6 +23,8 @@ import {
   Star,
   ExternalLink,
   Loader2,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -247,6 +249,34 @@ const RateHistoryTooltip = ({ active, payload, label }: { active?: boolean; payl
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+// Columns that accept a click-to-sort. "RV" is a compound of year/make/model
+// and rarely useful to sort; action column is obviously non-sortable.
+type SortKey = "platform" | "nightly" | "weekly" | "reviews" | "rating";
+type SortDir = "asc" | "desc";
+
+type SortableColumn = {
+  key: SortKey;
+  label: string;
+  align: "left" | "right";
+  defaultDir: SortDir;
+};
+
+type StaticColumn = {
+  key: null;
+  label: string;
+  align: "left" | "right";
+};
+
+const TABLE_COLUMNS: Array<SortableColumn | StaticColumn> = [
+  { key: null, label: "RV", align: "left" },
+  { key: "platform", label: "Platform", align: "left", defaultDir: "desc" },
+  { key: "nightly", label: "Nightly", align: "right", defaultDir: "desc" },
+  { key: "weekly", label: "Weekly", align: "right", defaultDir: "desc" },
+  { key: "reviews", label: "Reviews", align: "right", defaultDir: "desc" },
+  { key: "rating", label: "Rating", align: "right", defaultDir: "desc" },
+  { key: null, label: "", align: "right" },
+];
+
 export default function DashboardPage() {
   const [market, setMarket] = useState("san-diego-ca");
   const [rvClass, setRvClass] = useState("Class B");
@@ -256,6 +286,10 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [rateHistory, setRateHistory] = useState<RateHistoryPoint[]>([]);
   const [rateHistoryLoading, setRateHistoryLoading] = useState(true);
+  const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({
+    key: "nightly",
+    dir: "desc",
+  });
 
   const fetchListings = useCallback(async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true);
@@ -305,6 +339,51 @@ export default function DashboardPage() {
   // chart still reflects raw listing_snapshots. Flagged for a follow-up.
   const units = useMemo(() => dedupeListings(listings), [listings]);
 
+  // Apply the active sort to the deduped units. Nulls always go to the bottom
+  // regardless of direction (sorting asc on "reviews" should not pile null
+  // values at the top and distort the read). Tie-break by u.key so row order
+  // is stable across re-renders.
+  const sortedUnits = useMemo(() => {
+    const arr = [...units];
+    const { key, dir } = sort;
+    const mult = dir === "asc" ? 1 : -1;
+
+    const getValue = (u: DedupedUnit): number | null => {
+      switch (key) {
+        case "platform":
+          return u.memberCount;
+        case "nightly":
+          return u.nightlyRate;
+        case "weekly":
+          return u.weeklyRate;
+        case "reviews":
+          return u.reviewCount;
+        case "rating":
+          return u.avgRating;
+      }
+    };
+
+    arr.sort((a, b) => {
+      const av = getValue(a);
+      const bv = getValue(b);
+      if (av == null && bv == null) return a.key < b.key ? -1 : 1;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      if (av < bv) return -1 * mult;
+      if (av > bv) return 1 * mult;
+      return a.key < b.key ? -1 : 1;
+    });
+    return arr;
+  }, [units, sort]);
+
+  const toggleSort = (key: SortKey, defaultDir: SortDir) => {
+    setSort((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: defaultDir },
+    );
+  };
+
   const avgRate = units.length
     ? Math.round(units.reduce((s, u) => s + u.nightlyRate, 0) / units.length)
     : 0;
@@ -320,9 +399,6 @@ export default function DashboardPage() {
   const freshPct = units.length
     ? Math.round((freshCount / units.length) * 100)
     : 0;
-
-  const rawListingCount = listings.length;
-  const dedupCollapsed = rawListingCount - units.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -414,13 +490,6 @@ export default function DashboardPage() {
               </SelectContent>
             </Select>
           </div>
-          <Badge variant="secondary" className="ml-auto text-xs">
-            {loading
-              ? "Loading…"
-              : dedupCollapsed > 0
-                ? `${units.length} unique RVs (${rawListingCount} raw listings, ${dedupCollapsed} cross-platform dupes merged) · ${freshCount} priced in 7d · ${rvClass} · ${marketLabel}`
-                : `${units.length} listings · ${freshCount} priced in 7d · ${rvClass} · ${marketLabel}`}
-          </Badge>
         </div>
 
         {/* Metric cards */}
@@ -575,6 +644,9 @@ export default function DashboardPage() {
               <h2 className="text-sm font-semibold text-foreground">Comp Listings</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 All {rvClass} rentals tracked in {marketLabel}
+                {!loading && units.length > 0 && (
+                  <> · {units.length} unique RV{units.length === 1 ? "" : "s"}</>
+                )}
               </p>
             </div>
             {!loading && listings.length > 0 && (
@@ -583,7 +655,7 @@ export default function DashboardPage() {
               </p>
             )}
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-auto max-h-[640px]">
             {loading ? (
               <div className="p-6 space-y-3">
                 {Array.from({ length: 8 }).map((_, i) => (
@@ -604,16 +676,50 @@ export default function DashboardPage() {
             ) : (
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/40">
-                    {["RV", "Platform", "Nightly", "Weekly", "Reviews", "Rating", ""].map((h) => (
-                      <th key={h} className={`text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3 ${h === "RV" ? "text-left pl-6" : h === "" ? "" : "text-right"}`}>
-                        {h}
-                      </th>
-                    ))}
+                  <tr>
+                    {TABLE_COLUMNS.map((col, i) => {
+                      const alignClass =
+                        col.align === "left"
+                          ? i === 0
+                            ? "text-left pl-6"
+                            : "text-left"
+                          : "text-right";
+                      const baseClass = `sticky top-0 z-10 bg-muted text-xs font-semibold uppercase tracking-widest text-muted-foreground px-4 py-3 ${alignClass}`;
+
+                      if (col.key === null) {
+                        return (
+                          <th key={`static-${i}`} className={baseClass}>
+                            {col.label}
+                          </th>
+                        );
+                      }
+
+                      const isActive = sort.key === col.key;
+                      const Chev = isActive
+                        ? sort.dir === "asc"
+                          ? ChevronUp
+                          : ChevronDown
+                        : null;
+
+                      return (
+                        <th key={col.key} className={baseClass} aria-sort={isActive ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}>
+                          <button
+                            type="button"
+                            onClick={() => toggleSort(col.key, col.defaultDir)}
+                            className={`inline-flex items-center gap-1 select-none hover:text-foreground transition-colors ${
+                              col.align === "right" ? "w-full justify-end" : ""
+                            } ${isActive ? "text-foreground" : ""}`}
+                          >
+                            <span>{col.label}</span>
+                            {Chev && <Chev className="w-3 h-3" />}
+                          </button>
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {units.map((u) => {
+                  {sortedUnits.map((u) => {
                     const l = u.primary;
                     const crossListed = u.memberCount > 1;
                     return (
