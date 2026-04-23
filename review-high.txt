@@ -1,0 +1,319 @@
+Reviewing candidate duplicates: market="san-diego-ca" tier="high" limit=25
+
+Showing 21 pair(s), sorted by make_model_sim desc:
+
+━━━━ Candidate #794 [HIGH] ━━━━
+  A (outdoorsy)  2022 Roadtrek Zion
+             https://www.outdoorsy.com/rv-rental/lakeside_ca/2022_roadtrek_zion_329977-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1664390309/p/rentals/329977/images/wde5ak0wgtbipxjjhywk.jpg
+             loc: Lakeside, CA  host: ?
+  B (rvshare)  2022 Roadtrek Zion
+             https://rvshare.com/rvs/details/1639109
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/80e5d33d6c69c99923167b9efb5f0866.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.12mi  rate=$195↔$190 (Δ3%)
+           sleeps=2↔2  length=20↔21ft (Δ1.0)
+           mkSim=1.00  modSim=1.00  mmSim=1.00  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 794
+           node scripts/review_duplicates.mjs --verdict not_match --id 794
+
+━━━━ Candidate #1912 [HIGH] ━━━━
+  A (outdoorsy)  2011 Freelander Coachmen 21qb Ford 350
+             https://www.outdoorsy.com/rv-rental/anaheim_ca/2011_freelander_coachmen-21qb-ford-350_440169-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1738703697/p/rentals/440169/images/b8bftpeialpfw3cz0lrv.jpg
+             loc: Anaheim, CA  host: ?
+  B (rvshare)  2011 Freelander 21QB  Ford 350
+             https://rvshare.com/rvs/details/1716296
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/5ca3e86648316675dabcc2cdb9e60f7e.png/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.33mi  rate=$175↔$175 (Δ0%)
+           sleeps=6↔6  length=21↔24ft (Δ3.0)
+           mkSim=1.00  modSim=0.61  mmSim=1.00  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1912
+           node scripts/review_duplicates.mjs --verdict not_match --id 1912
+
+━━━━ Candidate #1862 [HIGH] ━━━━
+  A (outdoorsy)  2026 Coleman 17B
+             https://www.outdoorsy.com/rv-rental/san-jacinto_ca/2026_coleman_17b_513938-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1775540496/p/rentals/513938/images/iytowqjihpysrwpmbzbr.jpg
+             loc: San Jacinto, CA  host: ?
+  B (rvshare)  2026 Coleman 17B
+             https://rvshare.com/rvs/details/1766895
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/56b7e7b1dffc29d3842cdb3f8a890dc5.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.24mi  rate=$120↔$130 (Δ8%)
+           sleeps=5↔5  length=20↔20ft (Δ0.0)
+           mkSim=1.00  modSim=1.00  mmSim=1.00  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1862
+           node scripts/review_duplicates.mjs --verdict not_match --id 1862
+
+━━━━ Candidate #1031 [HIGH] ━━━━
+  A (outdoorsy)  2019 Ford Transit Custom
+             https://www.outdoorsy.com/rv-rental/lake-forest_ca/2019_ford_transit-custom_431171-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1736749884/p/rentals/431171/images/z8pesvyl2keovzwibmzx.jpg
+             loc: Lake Forest, CA  host: ?
+  B (rvshare)  2019 Ford Transit Custom
+             https://rvshare.com/rvs/details/1762298
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/ffcebfb8108ab15d5f62d5408d59c461.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.33mi  rate=$200↔$200 (Δ0%)
+           sleeps=4↔4  length=19↔19ft (Δ0.0)
+           mkSim=1.00  modSim=1.00  mmSim=1.00  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1031
+           node scripts/review_duplicates.mjs --verdict not_match --id 1031
+
+━━━━ Candidate #23 [HIGH] ━━━━
+  A (outdoorsy)  2023 AVENGER 24BHSLE
+             https://www.outdoorsy.com/rv-rental/bonita_ca/2023_avenger_24bhsle_476218-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1765209095/p/rentals/476218/images/numqkhhdszrkyhmxfxhy.jpg
+             loc: Bonita, CA  host: ?
+  B (rvshare)  2023 Avenger LE 24BHSLE
+             https://rvshare.com/rvs/details/1749605
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/a9d29bf094bbd9de65e11c7e9ba974f0.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.06mi  rate=$125↔$125 (Δ0%)
+           sleeps=8↔8  length=28↔28ft (Δ0.0)
+           mkSim=0.73  modSim=1.00  mmSim=0.89  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 23
+           node scripts/review_duplicates.mjs --verdict not_match --id 23
+
+━━━━ Candidate #832 [HIGH] ━━━━
+  A (outdoorsy)  2023 Mercedes Benz Mercedes Sprinter 2500
+             https://www.outdoorsy.com/rv-rental/san-diego_ca/2023_mercedes-benz_mercedes-sprinter-2500_379188-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1691703825/p/rentals/379188/images/xpabrjffc8cjpaewlwyi.jpg
+             loc: San Diego, CA  host: ?
+  B (rvshare)  2023 Mercedes Sprinter 2500 Mercedes Sprinter 2500
+             https://rvshare.com/rvs/details/1683188
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/083e73302de5d933b01a80c957e369e6.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.22mi  rate=$250↔$235 (Δ6%)
+           sleeps=4↔4  length=23↔23ft (Δ0.0)
+           mkSim=0.32  modSim=1.00  mmSim=0.82  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 832
+           node scripts/review_duplicates.mjs --verdict not_match --id 832
+
+━━━━ Candidate #2169 [HIGH] ━━━━
+  A (outdoorsy)  2025 Coleman Lantern 17B
+             https://www.outdoorsy.com/rv-rental/rialto_ca/2025_coleman_lantern-17b_472579-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1757005848/p/rentals/472579/images/zzkvsvdkq1ygcf9yq0oy.jpg
+             loc: Rialto, CA  host: ?
+  B (rvshare)  2025 Coleman Lantern
+             https://rvshare.com/rvs/details/1754954
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/76475224936308faca9439b5557a74d3.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.24mi  rate=$100↔$100 (Δ0%)
+           sleeps=5↔5  length=21↔21ft (Δ0.0)
+           mkSim=1.00  modSim=0.67  mmSim=0.80  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 2169
+           node scripts/review_duplicates.mjs --verdict not_match --id 2169
+
+━━━━ Candidate #1482 [HIGH] ━━━━
+  A (outdoorsy)  2025 Coleman Lantern 17B
+             https://www.outdoorsy.com/rv-rental/rialto_ca/2025_coleman_lantern-17b_476214-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1759336628/p/rentals/476214/images/llkyhhnn1060f4vsoqsf.jpg
+             loc: Rialto, CA  host: ?
+  B (rvshare)  2025 Coleman Lantern
+             https://rvshare.com/rvs/details/1754954
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/76475224936308faca9439b5557a74d3.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.24mi  rate=$100↔$100 (Δ0%)
+           sleeps=5↔5  length=21↔21ft (Δ0.0)
+           mkSim=1.00  modSim=0.67  mmSim=0.80  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1482
+           node scripts/review_duplicates.mjs --verdict not_match --id 1482
+
+━━━━ Candidate #1415 [HIGH] ━━━━
+  A (outdoorsy)  2025 Heartland Mallard 17bhl
+             https://www.outdoorsy.com/rv-rental/irvine_ca/2025_heartland_mallard-17bhl_464294-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1753731681/p/rentals/464294/images/sbdzapge9xrsjsbjdpt3.jpg
+             loc: Irvine, CA  host: ?
+  B (rvshare)  2025 Heartland Mallard
+             https://rvshare.com/rvs/details/1751185
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/0c0709998ffd0de8d2b94f37f56094db.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.30mi  rate=$75↔$75 (Δ0%)
+           sleeps=5↔5  length=21↔21ft (Δ0.0)
+           mkSim=1.00  modSim=0.57  mmSim=0.75  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1415
+           node scripts/review_duplicates.mjs --verdict not_match --id 1415
+
+━━━━ Candidate #1093 [HIGH] ━━━━
+  A (outdoorsy)  2023 Winnebago Solis 59P
+             https://www.outdoorsy.com/rv-rental/lakewood_ca/2023_winnebago_solis-59p_310646-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1656005015/p/rentals/310646/images/n05w84aveqlhhyyoj9j8.jpg
+             loc: Lakewood, CA  host: ?
+  B (rvshare)  2023 Solis 59P
+             https://rvshare.com/rvs/details/1612066
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/73b89965fdf54a585afd1f0b180335b8.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.07mi  rate=$250↔$250 (Δ0%)
+           sleeps=4↔4  length=20↔20ft (Δ0.0)
+           mkSim=0.00  modSim=0.40  mmSim=0.70  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1093
+           node scripts/review_duplicates.mjs --verdict not_match --id 1093
+
+━━━━ Candidate #1021 [HIGH] ━━━━
+  A (outdoorsy)  2022 Mercedes Benz Sprinter 2500
+             https://www.outdoorsy.com/rv-rental/corona_ca/2022_mercedes-benz_sprinter-2500_375962-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1690230070/p/rentals/375962/images/p15hxkpkijs8wvpzbbzd.jpg
+             loc: Corona, CA  host: ?
+  B (rvshare)  2022 Mercedez Benz Sprinter
+             https://rvshare.com/rvs/details/1729362
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/0e2b8cb81ca89e6556f08abd0b944c87.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.28mi  rate=$245↔$234 (Δ4%)
+           sleeps=2↔2  length=19↔19ft (Δ0.0)
+           mkSim=0.75  modSim=0.64  mmSim=0.70  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1021
+           node scripts/review_duplicates.mjs --verdict not_match --id 1021
+
+━━━━ Candidate #960 [HIGH] ━━━━
+  A (outdoorsy)  2021 Mercedez-Benz Sprinter
+             https://www.outdoorsy.com/rv-rental/corona_ca/2021_mercedez-benz_sprinter_325030-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1661885966/p/rentals/325030/images/xuoncrb8q95urjdcpf4d.jpg
+             loc: Corona, CA  host: ?
+  B (rvshare)  2021 Mercedez Benz Sprinter 170WB 4X4
+             https://rvshare.com/rvs/details/1634222
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/2a0abf033ac1020bc879139d06ff56c0.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.28mi  rate=$225↔$221 (Δ2%)
+           sleeps=5↔5  length=22↔22ft (Δ0.0)
+           mkSim=1.00  modSim=0.47  mmSim=0.70  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 960
+           node scripts/review_duplicates.mjs --verdict not_match --id 960
+
+━━━━ Candidate #200 [HIGH] ━━━━
+  A (outdoorsy)  2014 Jayco Jay Flight Swift
+             https://www.outdoorsy.com/rv-rental/poway_ca/2014_jayco_jay-flight-swift_34753-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1518303512/p/rentals/34753/images/qglw6e6wwxwa3kukqlsb.jpg
+             loc: Poway, CA  host: ?
+  B (rvshare)  2014 Jay Flight Swift 234MB
+             https://rvshare.com/rvs/details/1076890
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/1518300509.e9c0373d6b34b842d8b9c02880ea11e5.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.24mi  rate=$115↔$115 (Δ0%)
+           sleeps=6↔6  length=23↔23ft (Δ0.0)
+           mkSim=0.15  modSim=0.00  mmSim=0.65  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 200
+           node scripts/review_duplicates.mjs --verdict not_match --id 200
+
+━━━━ Candidate #145 [HIGH] ━━━━
+  A (outdoorsy)  2022 Jayco Jay Feather Micro
+             https://www.outdoorsy.com/rv-rental/escondido_ca_united-states/2022_jayco_jay-feather-micro_346695-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1677201762/p/rentals/346695/images/lg05ifdl9fcc4grkufcf.jpg
+             loc: Escondido, CA  host: ?
+  B (rvshare)  2022 Jay Feather Micro 199MBS
+             https://rvshare.com/rvs/details/1670160
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/c91e8116d3457dcefea4b482501ab0e7.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.24mi  rate=$132↔$149 (Δ11%)
+           sleeps=6↔6  length=23↔23ft (Δ0.0)
+           mkSim=0.14  modSim=0.00  mmSim=0.64  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 145
+           node scripts/review_duplicates.mjs --verdict not_match --id 145
+
+━━━━ Candidate #602 [HIGH] ━━━━
+  A (outdoorsy)  2022 Mirimar 34.8
+             https://www.outdoorsy.com/rv-rental/irvine_ca/2022_mirimar_34-8_452949-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1746410747/p/rentals/452949/images/myk1qq8waipy5judo6h5.jpg
+             loc: Irvine, CA  host: ?
+  B (rvshare)  2022 Miramar 34.8
+             https://rvshare.com/rvs/details/1746296
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/a78ba56bdbf5aa3205d2473e74aea2a7.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.32mi  rate=$395↔$375 (Δ5%)
+           sleeps=10↔10  length=36↔36ft (Δ0.0)
+           mkSim=0.45  modSim=1.00  mmSim=0.63  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 602
+           node scripts/review_duplicates.mjs --verdict not_match --id 602
+
+━━━━ Candidate #32 [HIGH] ━━━━
+  A (outdoorsy)  2024 Jayco Jay Flight SLX
+             https://www.outdoorsy.com/rv-rental/spring-valley_ca/2024_jayco_jay-flight-slx_428109-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1724358334/p/rentals/428109/images/edh8ycxjcgvm5lymlqx0.jpg
+             loc: Spring Valley, CA  host: ?
+  B (rvshare)  2024 Jay Flight SLX 174BH
+             https://rvshare.com/rvs/details/1726926
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/3f24422d1f1ad70459077b0cffe4e111.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.14mi  rate=$110↔$100 (Δ9%)
+           sleeps=5↔5  length=22↔22ft (Δ0.0)
+           mkSim=0.17  modSim=0.00  mmSim=0.63  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 32
+           node scripts/review_duplicates.mjs --verdict not_match --id 32
+
+━━━━ Candidate #172 [HIGH] ━━━━
+  A (outdoorsy)  2024 East to West Della Terra 291bh
+             https://www.outdoorsy.com/rv-rental/dana-point_ca/2024_east-to-west_della-terra-291bh_455662-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1747892036/p/rentals/455662/images/esnqy3930bjmuf6zbgq9.jpg
+             loc: Dana Point, CA  host: ?
+  B (rvshare)  2024 Della Terra 291BH
+             https://rvshare.com/rvs/details/1745137
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/0d78dea232410b6b447290c9c9c06f28.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.15mi  rate=$150↔$140 (Δ7%)
+           sleeps=10↔10  length=38↔38ft (Δ0.0)
+           mkSim=0.04  modSim=0.33  mmSim=0.62  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 172
+           node scripts/review_duplicates.mjs --verdict not_match --id 172
+
+━━━━ Candidate #995 [HIGH] ━━━━
+  A (outdoorsy)  2021 Mercedes Sprinter Sprinter 2500
+             https://www.outdoorsy.com/rv-rental/costa-mesa_ca/2021_mercedes-sprinter_sprinter-2500_277580-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1695477862/p/rentals/277580/images/plqkqsrgardhqieapo16.jpg
+             loc: Costa Mesa, CA  host: ?
+  B (rvshare)  2021 Sprinter 2500
+             https://rvshare.com/rvs/details/1657629
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/4516a74d4944129e1c6503375d10ecbd.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.09mi  rate=$159↔$145 (Δ9%)
+           sleeps=4↔4  length=22↔22ft (Δ0.0)
+           mkSim=0.50  modSim=0.36  mmSim=0.61  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 995
+           node scripts/review_duplicates.mjs --verdict not_match --id 995
+
+━━━━ Candidate #776 [HIGH] ━━━━
+  A (outdoorsy)  2023 Mercedes-Benz Sprinter
+             https://www.outdoorsy.com/rv-rental/el-cajon_ca/2023_mercedes-benz_sprinter_409748-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1713818395/p/rentals/409748/images/lvaamttaygq2wwovyrxt.jpg
+             loc: El Cajon, CA  host: ?
+  B (rvshare)  2023 Mercedes Sprinter 3500XD
+             https://rvshare.com/rvs/details/1708971
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/9f08d72ab76062cda4596535aea79358.jpg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.24mi  rate=$240↔$240 (Δ0%)
+           sleeps=3↔3  length=24↔14.1ft (Δ9.9)
+           mkSim=0.64  modSim=0.56  mmSim=0.60  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 776
+           node scripts/review_duplicates.mjs --verdict not_match --id 776
+
+━━━━ Candidate #1767 [HIGH] ━━━━
+  A (outdoorsy)  2024 Jayco Jay Feather
+             https://www.outdoorsy.com/rv-rental/orange_ca/2024_jayco_jay-feather_439895-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1745611549/p/rentals/439895/images/limvsxvjx9evwdcdmmwt.jpg
+             loc: Orange, CA  host: ?
+  B (rvshare)  2024 Jay Feather 22BH
+             https://rvshare.com/rvs/details/1733062
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/dc8b6540e260d30c81eb550e68e4abe2.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.27mi  rate=$144.45↔$145 (Δ0%)
+           sleeps=8↔8  length=28↔28ft (Δ0.0)
+           mkSim=0.20  modSim=0.00  mmSim=0.60  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 1767
+           node scripts/review_duplicates.mjs --verdict not_match --id 1767
+
+━━━━ Candidate #251 [HIGH] ━━━━
+  A (outdoorsy)  2021 Jayco Jay Feather
+             https://www.outdoorsy.com/rv-rental/bonsall_ca/2021_jayco_jay-feather_421526-listing
+             img: https://res.cloudinary.com/outdoorsy/image/upload/v1720073412/p/rentals/421526/images/g9lglxz6tsfmafv1hieu.jpg
+             loc: Bonsall, CA  host: ?
+  B (rvshare)  2021 Jay Feather 24BH
+             https://rvshare.com/rvs/details/1717110
+             img: https://imagedelivery.net/eZKniD8IPo85-tfyHjsV4g/85dc4d671e6df14573e6fd9dfe945c6f.jpeg/width=320,height=205,fit=cover,gravity=0.5x0.5,anim=false
+             loc: ?, CA  host: ?
+  signals: dist=0.30mi  rate=$119↔$114 (Δ4%)
+           sleeps=8↔8  length=30↔30ft (Δ0.0)
+           mkSim=0.20  modSim=0.00  mmSim=0.60  yearMatch=true  sleepsMatch=true
+  verdict: node scripts/review_duplicates.mjs --verdict match --id 251
+           node scripts/review_duplicates.mjs --verdict not_match --id 251
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -40,6 +40,7 @@ import { getSupabase } from "@/lib/supabase";
 
 type Listing = {
   id: string;
+  canonical_vehicle_id: string | null;
   platform: string;
   host_name: string | null;
   rv_year: number | null;
@@ -53,12 +54,106 @@ type Listing = {
   scraped_at: string;
 };
 
+// A deduped row represents one physical RV. For cross-platform canonicals it
+// merges 2+ listings into a single market data point; for singletons it is a
+// pass-through of the underlying listing. Aggregations and the comp table
+// render from this shape so the same RV can't contribute twice to any metric.
+type DedupedUnit = {
+  key: string;
+  primary: Listing;
+  platforms: string[];
+  memberCount: number;
+  nightlyRate: number;
+  weeklyRate: number | null;
+  reviewCount: number | null;
+  avgRating: number | null;
+  latestScrapedAt: string;
+  members: Listing[];
+};
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function buildRateDistribution(listings: Listing[]) {
-  const buckets: Record<string, number> = {};
+function dedupeListings(listings: Listing[]): DedupedUnit[] {
+  const groups = new Map<string, Listing[]>();
   for (const l of listings) {
-    const base = Math.floor(l.nightly_rate / 50) * 50;
+    const key = l.canonical_vehicle_id ?? l.id;
+    const bucket = groups.get(key);
+    if (bucket) bucket.push(l);
+    else groups.set(key, [l]);
+  }
+
+  const units: DedupedUnit[] = [];
+  for (const [key, members] of groups) {
+    if (members.length === 1) {
+      const l = members[0];
+      units.push({
+        key,
+        primary: l,
+        platforms: [l.platform],
+        memberCount: 1,
+        nightlyRate: l.nightly_rate,
+        weeklyRate: l.weekly_rate,
+        reviewCount: l.review_count,
+        avgRating: l.avg_rating,
+        latestScrapedAt: l.scraped_at,
+        members,
+      });
+      continue;
+    }
+
+    // Representative: most-reviewed listing as "most established"; ties broken
+    // by most-recent scrape. Deterministic across renders.
+    const primary = [...members].sort((a, b) => {
+      const ra = a.review_count ?? 0;
+      const rb = b.review_count ?? 0;
+      if (rb !== ra) return rb - ra;
+      return a.scraped_at > b.scraped_at ? -1 : 1;
+    })[0];
+
+    const rateSum = members.reduce((s, m) => s + m.nightly_rate, 0);
+    const nightlyRate = Math.round(rateSum / members.length);
+
+    const weeklyMembers = members.filter((m) => m.weekly_rate != null);
+    const weeklyRate = weeklyMembers.length
+      ? Math.round(weeklyMembers.reduce((s, m) => s + (m.weekly_rate ?? 0), 0) / weeklyMembers.length)
+      : null;
+
+    const reviewCount = members.reduce((s, m) => s + (m.review_count ?? 0), 0) || null;
+
+    const ratingMembers = members.filter((m) => m.avg_rating != null);
+    const avgRating = ratingMembers.length
+      ? ratingMembers.reduce((s, m) => s + (m.avg_rating ?? 0), 0) / ratingMembers.length
+      : null;
+
+    const latestScrapedAt = members.reduce(
+      (acc, m) => (m.scraped_at > acc ? m.scraped_at : acc),
+      members[0].scraped_at,
+    );
+
+    const platforms = Array.from(new Set(members.map((m) => m.platform))).sort();
+
+    units.push({
+      key,
+      primary,
+      platforms,
+      memberCount: members.length,
+      nightlyRate,
+      weeklyRate,
+      reviewCount,
+      avgRating,
+      latestScrapedAt,
+      members,
+    });
+  }
+
+  units.sort((a, b) => b.nightlyRate - a.nightlyRate);
+  return units;
+}
+
+function buildRateDistribution(units: DedupedUnit[]) {
+  const buckets: Record<string, number> = {};
+  for (const u of units) {
+    const base = Math.floor(u.nightlyRate / 50) * 50;
     const key = `$${base}–${base + 49}`;
     buckets[key] = (buckets[key] ?? 0) + 1;
   }
@@ -67,11 +162,11 @@ function buildRateDistribution(listings: Listing[]) {
     .map(([range, count]) => ({ range, count }));
 }
 
-function formatLastUpdated(listings: Listing[]) {
-  if (!listings.length) return "—";
-  const latest = listings.reduce((a, b) =>
-    a.scraped_at > b.scraped_at ? a : b
-  ).scraped_at;
+function formatLastUpdated(units: DedupedUnit[]) {
+  if (!units.length) return "—";
+  const latest = units.reduce((a, b) =>
+    a.latestScrapedAt > b.latestScrapedAt ? a : b
+  ).latestScrapedAt;
   return new Date(latest).toLocaleString("en-US", {
     month: "short", day: "numeric", year: "numeric",
     hour: "numeric", minute: "2-digit", timeZoneName: "short",
@@ -161,7 +256,7 @@ export default function DashboardPage() {
     try {
       const { data } = await getSupabase()
         .from("listings")
-        .select("id, platform, host_name, rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, listing_url, scraped_at")
+        .select("id, canonical_vehicle_id, platform, host_name, rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, listing_url, scraped_at")
         .eq("market", market)
         .eq("rv_class", rvClass)
         .eq("is_active", true)
@@ -195,21 +290,31 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, [market, rvClass, dateWindow]);
 
-  const avgRate = listings.length
-    ? Math.round(listings.reduce((s, l) => s + l.nightly_rate, 0) / listings.length)
+  // Collapse cross-platform duplicates into one row per canonical vehicle.
+  // Every downstream aggregate (metric cards, histogram, table) renders from
+  // this deduped array so the same physical RV never contributes twice.
+  // NOTE: /api/rate-history is not yet canonical-aware — the time-series
+  // chart still reflects raw listing_snapshots. Flagged for a follow-up.
+  const units = useMemo(() => dedupeListings(listings), [listings]);
+
+  const avgRate = units.length
+    ? Math.round(units.reduce((s, u) => s + u.nightlyRate, 0) / units.length)
     : 0;
 
-  const rateDistribution = buildRateDistribution(listings);
-  const lastUpdated = formatLastUpdated(listings);
+  const rateDistribution = buildRateDistribution(units);
+  const lastUpdated = formatLastUpdated(units);
   const marketLabel = market === "san-diego-ca" ? "San Diego" : market;
 
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const freshCount = listings.filter(
-    (l) => new Date(l.scraped_at).getTime() > sevenDaysAgo
+  const freshCount = units.filter(
+    (u) => new Date(u.latestScrapedAt).getTime() > sevenDaysAgo
   ).length;
-  const freshPct = listings.length
-    ? Math.round((freshCount / listings.length) * 100)
+  const freshPct = units.length
+    ? Math.round((freshCount / units.length) * 100)
     : 0;
+
+  const rawListingCount = listings.length;
+  const dedupCollapsed = rawListingCount - units.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -304,7 +409,9 @@ export default function DashboardPage() {
           <Badge variant="secondary" className="ml-auto text-xs">
             {loading
               ? "Loading…"
-              : `${listings.length} listings · ${freshCount} priced in 7d · ${rvClass} · ${marketLabel}`}
+              : dedupCollapsed > 0
+                ? `${units.length} unique RVs (${rawListingCount} raw listings, ${dedupCollapsed} cross-platform dupes merged) · ${freshCount} priced in 7d · ${rvClass} · ${marketLabel}`
+                : `${units.length} listings · ${freshCount} priced in 7d · ${rvClass} · ${marketLabel}`}
           </Badge>
         </div>
 
@@ -317,27 +424,27 @@ export default function DashboardPage() {
               <MetricCard
                 label="Avg Market Rate"
                 value={avgRate ? `$${avgRate}/night` : "—"}
-                sub={`across ${listings.length} listings`}
+                sub={`across ${units.length} unique RV${units.length === 1 ? "" : "s"}`}
                 trend="neutral"
               />
               <MetricCard
                 label="Rate Range"
-                value={listings.length ? `$${Math.min(...listings.map(l => l.nightly_rate))}–$${Math.max(...listings.map(l => l.nightly_rate))}` : "—"}
+                value={units.length ? `$${Math.min(...units.map(u => u.nightlyRate))}–$${Math.max(...units.map(u => u.nightlyRate))}` : "—"}
                 sub="min to max nightly"
                 trend="neutral"
               />
               <MetricCard
                 label="Avg Rating"
-                value={listings.filter(l => l.avg_rating).length
-                  ? `${(listings.reduce((s, l) => s + (l.avg_rating ?? 0), 0) / listings.filter(l => l.avg_rating).length).toFixed(2)} ★`
+                value={units.filter(u => u.avgRating).length
+                  ? `${(units.reduce((s, u) => s + (u.avgRating ?? 0), 0) / units.filter(u => u.avgRating).length).toFixed(2)} ★`
                   : "—"}
-                sub="across all listings"
+                sub={`across ${units.filter(u => u.avgRating).length} rated RV${units.filter(u => u.avgRating).length === 1 ? "" : "s"}`}
                 trend="up"
               />
               <MetricCard
                 label="Priced in Last 7d"
                 value={`${freshCount}`}
-                sub={listings.length ? `${freshPct}% of ${listings.length} active` : "no data yet"}
+                sub={units.length ? `${freshPct}% of ${units.length} active` : "no data yet"}
                 trend="neutral"
               />
             </>
@@ -475,7 +582,7 @@ export default function DashboardPage() {
                   <Skeleton key={i} className="h-10 w-full rounded" />
                 ))}
               </div>
-            ) : listings.length === 0 ? (
+            ) : units.length === 0 ? (
               <div className="p-12 text-center text-sm text-muted-foreground">
                 No listings scraped for this market yet.{" "}
                 <button
@@ -498,41 +605,82 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {listings.map((l) => (
-                    <tr key={l.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-3.5">
-                        <div className="font-medium text-foreground">
-                          {[l.rv_year, l.rv_make, l.rv_model].filter(Boolean).join(" ") || "Unknown RV"}
-                        </div>
-                        {l.host_name && (
-                          <div className="text-xs text-muted-foreground">{l.host_name}</div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <Badge variant={l.platform === "outdoorsy" ? "default" : "secondary"} className="text-xs capitalize">
-                          {l.platform}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3.5 text-right font-semibold text-foreground">${l.nightly_rate}</td>
-                      <td className="px-4 py-3.5 text-right text-muted-foreground">
-                        {l.weekly_rate ? `$${l.weekly_rate}` : "—"}
-                      </td>
-                      <td className="px-4 py-3.5 text-right text-muted-foreground">{l.review_count ?? "—"}</td>
-                      <td className="px-4 py-3.5 text-right">
-                        {l.avg_rating ? (
-                          <span className="inline-flex items-center gap-1 text-foreground font-medium">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                            {l.avg_rating.toFixed(1)}
-                          </span>
-                        ) : "—"}
-                      </td>
-                      <td className="px-4 py-3.5 text-right">
-                        <a href={l.listing_url} className="text-primary hover:text-primary/80 transition-colors" target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
+                  {units.map((u) => {
+                    const l = u.primary;
+                    const crossListed = u.memberCount > 1;
+                    return (
+                      <tr key={u.key} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-6 py-3.5">
+                          <div className="font-medium text-foreground flex items-center gap-2">
+                            <span>{[l.rv_year, l.rv_make, l.rv_model].filter(Boolean).join(" ") || "Unknown RV"}</span>
+                            {crossListed && (
+                              <Badge variant="outline" className="text-[10px] font-medium px-1.5 py-0 h-4">
+                                ×{u.memberCount} cross-listed
+                              </Badge>
+                            )}
+                          </div>
+                          {l.host_name && (
+                            <div className="text-xs text-muted-foreground">{l.host_name}</div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <div className="flex flex-wrap items-center gap-1">
+                            {u.platforms.map((p) => (
+                              <Badge
+                                key={p}
+                                variant={p === "outdoorsy" ? "default" : "secondary"}
+                                className="text-xs capitalize"
+                              >
+                                {p}
+                              </Badge>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3.5 text-right font-semibold text-foreground">
+                          ${u.nightlyRate}
+                          {crossListed && (
+                            <div className="text-[10px] font-normal text-muted-foreground">
+                              avg of {u.memberCount}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3.5 text-right text-muted-foreground">
+                          {u.weeklyRate ? `$${u.weeklyRate}` : "—"}
+                        </td>
+                        <td className="px-4 py-3.5 text-right text-muted-foreground">{u.reviewCount ?? "—"}</td>
+                        <td className="px-4 py-3.5 text-right">
+                          {u.avgRating ? (
+                            <span className="inline-flex items-center gap-1 text-foreground font-medium">
+                              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                              {u.avgRating.toFixed(1)}
+                            </span>
+                          ) : "—"}
+                        </td>
+                        <td className="px-4 py-3.5 text-right">
+                          {crossListed ? (
+                            <div className="flex items-center justify-end gap-1">
+                              {u.members.map((m) => (
+                                <a
+                                  key={m.id}
+                                  href={m.listing_url}
+                                  title={`${m.platform} · $${m.nightly_rate}/night`}
+                                  className="text-primary hover:text-primary/80 transition-colors"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
+                              ))}
+                            </div>
+                          ) : (
+                            <a href={l.listing_url} className="text-primary hover:text-primary/80 transition-colors" target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
