@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Logo } from "@/components/logo";
 import {
   TrendingUp,
   TrendingDown,
@@ -22,22 +22,7 @@ export function DashboardPreview() {
         {/* Top Navigation Bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card">
           <div className="flex items-center gap-8">
-            <div className="flex items-center">
-              <Image
-                src="/RVIntel logo Light.png"
-                alt="RVIntel"
-                width={600}
-                height={600}
-                className="h-[120px] w-auto block dark:hidden"
-              />
-              <Image
-                src="/RVIntel logo Dark.png"
-                alt="RVIntel"
-                width={600}
-                height={600}
-                className="h-[120px] w-auto hidden dark:block"
-              />
-            </div>
+            <Logo height="h-7" />
             <nav className="hidden lg:flex items-center gap-6">
               <span className="text-sm font-medium text-primary">DASHBOARD</span>
               <span className="text-sm text-muted-foreground">ANALYTICS</span>

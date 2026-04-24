@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Logo } from "@/components/logo";
 import {
   Truck,
   Plus,
@@ -81,20 +81,7 @@ export default function FleetSidebar() {
       {/* Brand + back link */}
       <div className="px-4 pt-5 pb-3">
         <Link href="/" className="flex items-center">
-          <Image
-            src="/RVIntel logo Light.png"
-            alt="RVIntel"
-            width={300}
-            height={100}
-            className="h-7 w-auto block dark:hidden"
-          />
-          <Image
-            src="/RVIntel logo Dark.png"
-            alt="RVIntel"
-            width={300}
-            height={100}
-            className="h-7 w-auto hidden dark:block"
-          />
+          <Logo />
         </Link>
         <Link
           href="/dashboard"

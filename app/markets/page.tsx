@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { MapPin, TrendingUp, BarChart3, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/logo";
 
 export const metadata = {
   title: "Regional Markets · RVIntel",
@@ -55,20 +55,7 @@ export default function MarketsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center">
-              <Image
-                src="/RVIntel logo Light.png"
-                alt="RVIntel"
-                width={600}
-                height={600}
-                className="h-40 w-auto block dark:hidden"
-              />
-              <Image
-                src="/RVIntel logo Dark.png"
-                alt="RVIntel"
-                width={600}
-                height={600}
-                className="h-40 w-auto hidden dark:block"
-              />
+              <Logo />
             </Link>
             <nav className="hidden md:flex items-center gap-8">
               <Link

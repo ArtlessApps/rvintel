@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { Logo } from "@/components/logo";
 import { ArrowLeft, RefreshCw, Loader2, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,20 +47,7 @@ export default function DashboardPage() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center">
-              <Image
-                src="/RVIntel logo Light.png"
-                alt="RVIntel"
-                width={600}
-                height={600}
-                className="h-[120px] w-auto block dark:hidden"
-              />
-              <Image
-                src="/RVIntel logo Dark.png"
-                alt="RVIntel"
-                width={600}
-                height={600}
-                className="h-[120px] w-auto hidden dark:block"
-              />
+              <Logo />
             </Link>
             <span className="text-border">|</span>
             <span className="text-sm text-muted-foreground">Market Dashboard</span>

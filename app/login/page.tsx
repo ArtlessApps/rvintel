@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Mail, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -42,20 +42,7 @@ export default function LoginPage() {
       <div className="min-h-screen bg-background flex flex-col">
         <header className="px-4 sm:px-6 lg:px-8 py-6">
           <Link href="/" className="inline-flex items-center">
-            <Image
-              src="/RVIntel logo Light.png"
-              alt="RVIntel"
-              width={600}
-              height={600}
-              className="h-32 w-auto block dark:hidden"
-            />
-            <Image
-              src="/RVIntel logo Dark.png"
-              alt="RVIntel"
-              width={600}
-              height={600}
-              className="h-32 w-auto hidden dark:block"
-            />
+            <Logo />
           </Link>
         </header>
 
@@ -89,20 +76,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-4 sm:px-6 lg:px-8 py-6">
         <Link href="/" className="inline-flex items-center">
-          <Image
-            src="/RVIntel logo Light.png"
-            alt="RVIntel"
-            width={600}
-            height={600}
-            className="h-32 w-auto block dark:hidden"
-          />
-          <Image
-            src="/RVIntel logo Dark.png"
-            alt="RVIntel"
-            width={600}
-            height={600}
-            className="h-32 w-auto hidden dark:block"
-          />
+          <Logo />
         </Link>
       </header>
 
