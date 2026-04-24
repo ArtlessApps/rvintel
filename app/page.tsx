@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/logo";
+import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
 import {
   TrendingUp,
@@ -13,7 +14,6 @@ import {
   CheckCircle2,
   ArrowRight,
   Sparkles,
-  Truck,
 } from "lucide-react";
 
 function BrowserWindow({
@@ -93,49 +93,7 @@ export default function WaitlistPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-[20px] border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Logo priority />
-            <nav className="hidden md:flex items-center gap-8">
-              <a
-                href="/markets"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Markets
-              </a>
-              <a
-                href="/learn"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Learn
-              </a>
-              <a
-                href="/dashboard"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Dashboard
-              </a>
-              <a
-                href="/dashboard/fleet"
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Truck className="w-3.5 h-3.5" aria-hidden />
-                My Fleet
-              </a>
-            </nav>
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden sm:flex"
-              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-            >
-              Join Waitlist
-            </Button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader priorityLogo />
 
       <main id="main-content">
         {/* Hero: value prop + primary CTA + prominent product visual (split layout) */}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookOpen, Clock, ArrowRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/logo";
+import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
   title: "Learn · RVIntel",
@@ -71,44 +71,7 @@ const CATEGORIES = ["All", "Pricing Strategy", "Seasonal Trends", "Market Analys
 export default function LearnPage() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-[20px] border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center">
-              <Logo />
-            </Link>
-            <nav className="hidden md:flex items-center gap-8">
-              <Link
-                href="/#features"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Features
-              </Link>
-              <Link
-                href="/markets"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Markets
-              </Link>
-              <Link
-                href="/learn"
-                className="text-sm text-foreground font-medium"
-              >
-                Learn
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Dashboard
-              </Link>
-            </nav>
-            <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-              <Link href="/#waitlist">Join Waitlist</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="pt-16">
         {/* Hero */}
