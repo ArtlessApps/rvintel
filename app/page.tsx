@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Sparkles,
+  Truck,
 } from "lucide-react";
 
 function HeroProductVisual() {
@@ -95,6 +96,13 @@ export default function WaitlistPage() {
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Dashboard
+              </a>
+              <a
+                href="/dashboard/fleet"
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Truck className="w-3.5 h-3.5" aria-hidden />
+                My Fleet
               </a>
             </nav>
             <Button

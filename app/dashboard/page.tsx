@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/logo";
-import { ArrowLeft, RefreshCw, Loader2, Truck } from "lucide-react";
+import { RefreshCw, Loader2, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -83,11 +83,6 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Back to home
-        </Link>
-
         {/* Filter bar */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">

@@ -77,7 +77,7 @@ export default function FleetSidebar() {
   };
 
   return (
-    <aside className="w-72 shrink-0 bg-muted/40 sticky top-0 h-screen flex flex-col overflow-hidden">
+    <aside className="w-72 shrink-0 bg-muted/60 sticky top-0 h-screen flex flex-col overflow-hidden">
       {/* Brand + back link */}
       <div className="px-4 pt-5 pb-3">
         <Link href="/" className="flex items-center">
