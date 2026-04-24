@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DashboardPreview } from "@/components/dashboard-preview";
 import { Logo } from "@/components/logo";
 import { supabase } from "@/lib/supabase";
 import {
@@ -17,63 +16,51 @@ import {
   Truck,
 } from "lucide-react";
 
-function BrowserChrome({ url, compact = false }: { url: string; compact?: boolean }) {
-  const dotSize = compact ? "w-2 h-2" : "w-3 h-3";
-  const barPad = compact ? "px-3 py-2" : "px-4 py-3";
-  const urlText = compact ? "text-[10px] px-2 py-1" : "text-xs px-3 py-1.5";
+function BrowserWindow({
+  url,
+  children,
+  className = "",
+}: {
+  url: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div
-      className={`flex items-center gap-2 ${barPad} bg-muted/60 border-b border-border`}
-      aria-hidden
+    <figure
+      className={`relative bg-card rounded-2xl border border-border shadow-[0_12px_40px_rgba(25,28,30,0.08)] overflow-hidden ${className}`}
     >
-      <div className="flex gap-1.5">
-        <div className={`${dotSize} rounded-full bg-red-400/80`} />
-        <div className={`${dotSize} rounded-full bg-yellow-400/80`} />
-        <div className={`${dotSize} rounded-full bg-green-400/80`} />
-      </div>
-      <div className="flex-1 mx-3 min-w-0">
-        <div
-          className={`bg-background rounded-md ${urlText} text-muted-foreground max-w-md mx-auto text-center truncate`}
-        >
-          {url}
+      <div
+        className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b border-border"
+        aria-hidden
+      >
+        <div className="flex gap-1.5">
+          <div className="w-3 h-3 rounded-full bg-red-400/80" />
+          <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
+          <div className="w-3 h-3 rounded-full bg-green-400/80" />
+        </div>
+        <div className="flex-1 mx-4 min-w-0">
+          <div className="bg-background rounded-md px-3 py-1.5 text-xs text-muted-foreground max-w-md mx-auto text-center truncate">
+            {url}
+          </div>
         </div>
       </div>
-    </div>
+      {children}
+    </figure>
   );
 }
 
 function HeroProductVisual() {
   return (
-    <div className="relative w-full max-w-xl mx-auto lg:max-w-none pr-6 sm:pr-10 lg:pr-14 pb-14 sm:pb-20 lg:pb-24">
-      {/* Ambient gradient glow */}
+    <div className="relative w-full max-w-xl mx-auto lg:max-w-none">
       <div
         className="absolute -inset-3 sm:-inset-4 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-3xl blur-2xl opacity-70"
         aria-hidden
       />
-
-      {/* Secondary screen: My Fleet — peeks from behind, bottom-right */}
-      <figure
-        className="absolute right-0 bottom-0 w-[72%] sm:w-[68%] lg:w-[65%] rotate-[2.5deg] origin-bottom-right bg-card rounded-2xl border border-border shadow-[0_20px_50px_rgba(25,28,30,0.18)] overflow-hidden z-0"
-        aria-hidden
-      >
-        <BrowserChrome url="app.rvintel.io/fleet" compact />
-        <img
-          src="/images/MyFleet.png"
-          alt=""
-          className="block w-full h-auto"
-          width={1767}
-          height={827}
-        />
-      </figure>
-
-      {/* Primary screen: Dashboard */}
-      <figure className="relative z-10 bg-card rounded-2xl border border-border shadow-[0_12px_40px_rgba(25,28,30,0.08)] overflow-hidden">
+      <BrowserWindow url="app.rvintel.io/dashboard">
         <figcaption className="sr-only">
-          Product screenshots: the RVIntel Market Dashboard with rate
-          distribution and pricing analytics, and the My Fleet view showing
-          per-vehicle market positioning
+          RVIntel Market Dashboard with rate distribution, average market rate,
+          and rate trend analytics
         </figcaption>
-        <BrowserChrome url="app.rvintel.io/dashboard" />
         <img
           src="/images/Dashboard.png"
           alt="RVIntel Market Dashboard showing average market rate, rate distribution, and rate trend over time for Class B RVs in San Diego"
@@ -81,7 +68,7 @@ function HeroProductVisual() {
           width={1357}
           height={861}
         />
-      </figure>
+      </BrowserWindow>
     </div>
   );
 }
@@ -278,7 +265,7 @@ export default function WaitlistPage() {
           </div>
         </section>
 
-        {/* Live-style UI preview (distinct from hero screenshot — avoids repeating the same asset) */}
+        {/* Fleet view: per-vehicle market positioning */}
         <section
           id="preview"
           className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-card/50"
@@ -290,16 +277,36 @@ export default function WaitlistPage() {
                 id="preview-heading"
                 className="text-3xl sm:text-4xl font-bold text-foreground mb-4"
               >
-                Your Command Center for RV Revenue
+                See Where Every RV Stands in Its Market
               </h2>
               <p className="text-lg text-muted-foreground">
-                Skim pacing, inventory, and alerts in one view — then drill into
-                the numbers when you are ready to act.
+                Track each vehicle in your fleet against its local comp set.
+                Know instantly if you are priced below market — and how much
+                headroom you have to raise rates.
               </p>
             </div>
 
             <div className="max-w-6xl mx-auto">
-              <DashboardPreview />
+              <div className="relative">
+                <div
+                  className="absolute -inset-3 sm:-inset-4 bg-gradient-to-r from-primary/15 via-primary/5 to-primary/15 rounded-3xl blur-2xl opacity-70"
+                  aria-hidden
+                />
+                <BrowserWindow url="app.rvintel.io/dashboard/fleet">
+                  <figcaption className="sr-only">
+                    My Fleet view highlighting a 2023 Ford Transit priced at
+                    $99 per night — 50.3% below the $199 market median for
+                    Class B RVs in Chino, CA
+                  </figcaption>
+                  <img
+                    src="/images/MyFleet.png"
+                    alt="RVIntel My Fleet view showing a 2023 Ford Transit priced below market with a $99 nightly rate versus the $199 market median, plus overall market rate distribution and trend"
+                    className="block w-full h-auto"
+                    width={1767}
+                    height={827}
+                  />
+                </BrowserWindow>
+              </div>
             </div>
           </div>
         </section>
