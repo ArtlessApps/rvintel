@@ -102,7 +102,7 @@ export default function MarketsPage() {
               Market Reports
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-lg">
-              Deep-dive pricing analysis and demand signals for every major RV rental market in the US — updated weekly from live platform data.
+              Deep-dive pricing analysis and demand signals for every major RV rental market in the US — updated quarterly from live platform data.
             </p>
           </div>
         </section>
@@ -130,8 +130,98 @@ export default function MarketsPage() {
           </div>
         </section>
 
-        {/* Region grid */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* ── LIVE MARKETS ───────────────────────────────────────────── */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-muted-foreground">
+              Live Reports
+            </h2>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-primary">
+                Data current
+              </span>
+            </div>
+          </div>
+
+          {/* San Diego card */}
+          <Link href="/markets/san-diego" className="group block">
+            <div className="relative rounded-sm overflow-hidden bg-muted/30 hover:bg-muted/50 transition-colors p-8 sm:p-10">
+              {/* Gradient accent bar */}
+              <div
+                className="absolute left-0 top-0 bottom-0 w-1 rounded-l-sm"
+                style={{ background: "linear-gradient(180deg, #006b5f, #2dd4bf)" }}
+              />
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                {/* Left: city info */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-primary">
+                      San Diego, CA
+                    </span>
+                  </div>
+                  <h3 className="text-[1.5rem] font-semibold tracking-tight leading-tight mb-1">
+                    San Diego RV Rental Market
+                  </h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    Pricing benchmarks, platform breakdown, and occupancy signals across 3,357 active listings on Outdoorsy & RVshare.
+                  </p>
+                </div>
+
+                {/* Right: key stats */}
+                <div className="flex gap-8 shrink-0">
+                  <div>
+                    <div className="text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground font-medium mb-1">
+                      Avg / night
+                    </div>
+                    <div className="text-[1.5rem] font-semibold tracking-tight">$215</div>
+                  </div>
+                  <div>
+                    <div className="text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground font-medium mb-1">
+                      Listings
+                    </div>
+                    <div className="text-[1.5rem] font-semibold tracking-tight">3,357</div>
+                  </div>
+                  <div>
+                    <div className="text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground font-medium mb-1">
+                      Platforms
+                    </div>
+                    <div className="text-[1.5rem] font-semibold tracking-tight">2</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer row */}
+              <div className="mt-6 pt-6 border-t border-border flex items-center justify-between">
+                <div className="flex gap-6">
+                  {[
+                    { label: "Class A", value: "$325/night" },
+                    { label: "Class C", value: "$249/night" },
+                    { label: "Travel Trailer", value: "$145/night" },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="text-sm">
+                      <span className="text-muted-foreground">{label} · </span>
+                      <span className="font-medium">{value}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1 text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-medium group-hover:gap-2 transition-all">
+                  View full report <ArrowRight className="w-3 h-3" />
+                </div>
+              </div>
+            </div>
+          </Link>
+        </section>
+
+        {/* ── COMING SOON REGIONS ────────────────────────────────────── */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="mb-6">
+            <h2 className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-muted-foreground">
+              Coming Soon
+            </h2>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {REGIONS.map((region) => (
               <div
