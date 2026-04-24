@@ -17,36 +17,69 @@ import {
   Truck,
 } from "lucide-react";
 
+function BrowserChrome({ url, compact = false }: { url: string; compact?: boolean }) {
+  const dotSize = compact ? "w-2 h-2" : "w-3 h-3";
+  const barPad = compact ? "px-3 py-2" : "px-4 py-3";
+  const urlText = compact ? "text-[10px] px-2 py-1" : "text-xs px-3 py-1.5";
+  return (
+    <div
+      className={`flex items-center gap-2 ${barPad} bg-muted/60 border-b border-border`}
+      aria-hidden
+    >
+      <div className="flex gap-1.5">
+        <div className={`${dotSize} rounded-full bg-red-400/80`} />
+        <div className={`${dotSize} rounded-full bg-yellow-400/80`} />
+        <div className={`${dotSize} rounded-full bg-green-400/80`} />
+      </div>
+      <div className="flex-1 mx-3 min-w-0">
+        <div
+          className={`bg-background rounded-md ${urlText} text-muted-foreground max-w-md mx-auto text-center truncate`}
+        >
+          {url}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HeroProductVisual() {
   return (
-    <div className="relative w-full max-w-xl mx-auto lg:max-w-none">
+    <div className="relative w-full max-w-xl mx-auto lg:max-w-none pr-6 sm:pr-10 lg:pr-14 pb-14 sm:pb-20 lg:pb-24">
+      {/* Ambient gradient glow */}
       <div
         className="absolute -inset-3 sm:-inset-4 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-3xl blur-2xl opacity-70"
         aria-hidden
       />
-      <figure className="relative bg-card rounded-2xl border border-border shadow-[0_12px_40px_rgba(25,28,30,0.06)] overflow-hidden">
-        <figcaption className="sr-only">
-          Product screenshot: RVIntel dashboard with pricing analytics and
-          market positioning
-        </figcaption>
-        <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b border-border">
-          <div className="flex gap-1.5" aria-hidden>
-            <div className="w-3 h-3 rounded-full bg-red-400/80" />
-            <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
-            <div className="w-3 h-3 rounded-full bg-green-400/80" />
-          </div>
-          <div className="flex-1 mx-4 min-w-0">
-            <div className="bg-background rounded-md px-3 py-1.5 text-xs text-muted-foreground max-w-md mx-auto text-center truncate">
-              app.rvintel.io/dashboard
-            </div>
-          </div>
-        </div>
+
+      {/* Secondary screen: My Fleet — peeks from behind, bottom-right */}
+      <figure
+        className="absolute right-0 bottom-0 w-[72%] sm:w-[68%] lg:w-[65%] rotate-[2.5deg] origin-bottom-right bg-card rounded-2xl border border-border shadow-[0_20px_50px_rgba(25,28,30,0.18)] overflow-hidden z-0"
+        aria-hidden
+      >
+        <BrowserChrome url="app.rvintel.io/fleet" compact />
         <img
-          src="/images/dashboard-preview.png"
-          alt="RVIntel Market Positioning Dashboard showing pricing analytics, demand forecasting, and smart recommendations"
-          className="w-full h-auto"
-          width={1200}
-          height={750}
+          src="/images/MyFleet.png"
+          alt=""
+          className="block w-full h-auto"
+          width={1767}
+          height={827}
+        />
+      </figure>
+
+      {/* Primary screen: Dashboard */}
+      <figure className="relative z-10 bg-card rounded-2xl border border-border shadow-[0_12px_40px_rgba(25,28,30,0.08)] overflow-hidden">
+        <figcaption className="sr-only">
+          Product screenshots: the RVIntel Market Dashboard with rate
+          distribution and pricing analytics, and the My Fleet view showing
+          per-vehicle market positioning
+        </figcaption>
+        <BrowserChrome url="app.rvintel.io/dashboard" />
+        <img
+          src="/images/Dashboard.png"
+          alt="RVIntel Market Dashboard showing average market rate, rate distribution, and rate trend over time for Class B RVs in San Diego"
+          className="block w-full h-auto"
+          width={1357}
+          height={861}
         />
       </figure>
     </div>
