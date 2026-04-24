@@ -261,7 +261,10 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
 const RateHistoryTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number; payload: RateHistoryPoint }[]; label?: string }) => {
   if (active && payload?.length) {
     const p = payload[0].payload;
-    const d = new Date(label ?? "");
+    // Parse "YYYY-MM-DD" as local midnight, not UTC midnight. Otherwise
+    // `new Date("2026-04-24")` → 2026-04-24T00:00:00Z, which displays as
+    // "Apr 23" in any timezone west of UTC.
+    const d = label ? new Date(`${label}T00:00:00`) : new Date(NaN);
     const dateLabel = isNaN(d.getTime())
       ? label
       : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -559,7 +562,8 @@ export function MarketView({
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(d: string) => {
-                    const date = new Date(d);
+                    // Parse as local midnight — see note in RateHistoryTooltip.
+                    const date = new Date(`${d}T00:00:00`);
                     return isNaN(date.getTime())
                       ? d
                       : date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
