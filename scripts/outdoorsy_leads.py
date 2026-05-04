@@ -1,306 +1,589 @@
 #!/usr/bin/env python3
-"""
-Outdoorsy San Diego RV Fleet Owner Lead Generator
-Scrapes Outdoorsy for RV listings in San Diego, identifies fleet owners (2+ listings),
-and enriches each with contact/web info via Google search.
+"""Outdoorsy fleet-host lead generator (v2 — direct JSON:API rewrite).
+
+Replaces the v1 Firecrawl HTML-scrape path (4 stages, ~250 credits/run, ~120
+listing cap) with two zero-cost JSON:API endpoints that the Outdoorsy web app
+itself consumes:
+
+  1. search.outdoorsy.com/rentals — paginated rental list with full
+     relationships.owner.data.id on every result. One sweep per RV class code
+     (a / b / c / trailer / fifth-wheel) covers the ENTIRE market universe;
+     we group rentals by owner_id and keep owners with ≥ MIN_LISTINGS rentals
+     in the target market.
+
+  2. api.outdoorsy.com/v0/users/<owner_id> — public host profile JSON. Returns
+     business.name, business.website, business.phone, profile.first/last_name,
+     host_type_by_rental_count (SingleListingHost / MultiListingHost), dealer,
+     is_superhost, owner_score, average_response_time, avatar_url. Same source
+     the www.outdoorsy.com/pro/<id> HTML page is hydrated from — no scraping.
+
+The v1 Firecrawl path is gone. If api.outdoorsy.com is ever locked down, the
+search-endpoint sweep alone still produces a usable lead list (owner_id +
+listing count + listing URLs); only the contact-detail enrichment step would
+need to fall back. An optional --firecrawl-fallback flag is wired for that
+case (off by default — typically not needed).
+
+Investigated and validated 2026-04-27 against San Diego:
+  - SD universe across all 5 classes: ~1,000+ rentals (vs v1's 120-listing cap)
+  - business.{name, website, phone} fill rate on multi-listing hosts: ~80%
+  - Zero Firecrawl credits; ~5 sec for the search sweep, ~15 sec for ~50
+    fleet-host profile lookups → full SD lead run < 30 sec.
+
+Usage:
+  python scripts/outdoorsy_leads.py
+  python scripts/outdoorsy_leads.py --address "Phoenix, AZ" --market phoenix-az
+  python scripts/outdoorsy_leads.py --min-listings 3
+  python scripts/outdoorsy_leads.py --firecrawl-fallback  # search Google for missing websites
+  python scripts/outdoorsy_leads.py --output leads_sd.csv
 """
 
+from __future__ import annotations
+
+import argparse
 import csv
+import json
 import re
+import sys
 import time
-from typing import Optional, List
-from urllib.parse import urlparse
-
-from firecrawl import FirecrawlApp
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Optional
 
 # ── Config ────────────────────────────────────────────────────────────────────
-import os
-FIRECRAWL_API_KEY = os.environ["FIRECRAWL_API_KEY"]
-SEARCH_BASE = "https://www.outdoorsy.com/search?address=San+Diego%2C+CA&type=rv-rental"
-OUTPUT_FILE = "san_diego_rv_leads.csv"
-MIN_LISTINGS = 2
-REQUEST_DELAY = 2.5
-MAX_PAGES = 5
+SEARCH_BASE = "https://search.outdoorsy.com/rentals"
+USER_BASE = "https://api.outdoorsy.com/v0/users"
+PROFILE_URL_TEMPLATE = "https://www.outdoorsy.com/pro/{id}"
+
+# Backend filter codes — see PRD §11 (2026-04-22) for the `tt` → `trailer`
+# bug that masked SD travel trailers for months. These are the ONLY values
+# the search.outdoorsy.com backend recognizes.
+CLASS_CODES = ["a", "b", "c", "trailer", "fifth-wheel"]
+PAGE_SIZE = 24
+MAX_PAGES_PER_CLASS = 60  # safety cap; SD's largest class is ~14 pages
+PAGE_DELAY_SEC = 0.25
+USER_DELAY_SEC = 0.4
+HTTP_TIMEOUT_SEC = 15
+
+REQUEST_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/vnd.api+json, application/json",
+    "Origin": "https://www.outdoorsy.com",
+    "Referer": "https://www.outdoorsy.com/",
+}
+
 CSV_COLUMNS = [
-    "Host Name", "Business Name", "Listing Count", "Review Count",
-    "Rating", "Profile URL", "Website", "Email", "Social Media"
+    "Owner ID",
+    "Host Name",
+    "Business Name",
+    "Host Type",          # SingleListingHost | MultiListingHost
+    "Dealer",             # true/false — Outdoorsy's own dealer flag
+    "Pro",                # true/false — Outdoorsy Pro program
+    "Superhost",
+    "Listing Count",      # local to the searched market
+    "RV Classes",
+    "Total Reviews",
+    "Owner Score",        # 0-5
+    "Owner Score Count",
+    "Accept %",
+    "Response Time (hrs)",
+    "Profile URL",
+    "Website",
+    "Phone",
+    "Email",              # only filled if --firecrawl-fallback or visible in bio
+    "Social Media",
+    "Avatar URL",
+    "Bio Excerpt",
+    "Sample Listing URL",
+    "Market",
+    "Scraped At",
 ]
 
-app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
 
+# ── HTTP ──────────────────────────────────────────────────────────────────────
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-def scrape(url: str, formats: List[str] = None) -> Optional[object]:
-    """Scrape a URL with Firecrawl, return Document or None on failure."""
-    if formats is None:
-        formats = ["markdown", "links"]
+def _http_get_json(url: str, *, timeout: int = HTTP_TIMEOUT_SEC) -> Optional[dict]:
+    req = urllib.request.Request(url, headers=REQUEST_HEADERS)
     try:
-        return app.scrape(url, formats=formats)
-    except Exception as e:
-        print(f"  [skip] {url}: {e}")
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = resp.read()
+        return json.loads(data.decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        print(f"  [http {e.code}] {url}: {e.reason}", file=sys.stderr)
+        return None
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
+        print(f"  [err] {url}: {e}", file=sys.stderr)
         return None
 
 
-def get_links(doc) -> List[str]:
-    links = getattr(doc, "links", None) or []
-    return [l if isinstance(l, str) else l.get("href", "") for l in links]
+# ── Stage 1: search.outdoorsy.com sweep ───────────────────────────────────────
+
+@dataclass
+class RentalSummary:
+    rental_id: str
+    listing_url: str
+    display_vehicle_type: Optional[str]
+    review_count: int
+    avg_rating: Optional[float]
 
 
-def get_markdown(doc) -> str:
-    return getattr(doc, "markdown", "") or ""
+@dataclass
+class FleetCandidate:
+    owner_id: str
+    rentals: list[RentalSummary] = field(default_factory=list)
+
+    @property
+    def listing_count(self) -> int:
+        return len(self.rentals)
+
+    @property
+    def total_reviews(self) -> int:
+        return sum(r.review_count for r in self.rentals)
+
+    @property
+    def rv_classes(self) -> list[str]:
+        return sorted({r.display_vehicle_type for r in self.rentals if r.display_vehicle_type})
+
+    @property
+    def sample_listing_url(self) -> str:
+        # Prefer the most-reviewed listing — it's the one a prospect is most
+        # likely to recognize when we cite it in outreach.
+        if not self.rentals:
+            return ""
+        top = max(self.rentals, key=lambda r: (r.review_count, r.avg_rating or 0))
+        return top.listing_url
 
 
-def extract_listing_urls(doc) -> List[str]:
-    """Extract individual RV listing URLs from a search results page."""
-    urls = set()
-    for link in get_links(doc):
-        # Pattern: /rv-rental/<city_state>/<year_make_model_id>-listing
-        if re.search(r'outdoorsy\.com/rv-rental/.+-listing', link):
-            clean = link.split("?")[0]
-            urls.add(clean)
-    # Also check markdown
-    md = get_markdown(doc)
-    for m in re.findall(r'https://www\.outdoorsy\.com/rv-rental/[^\s\)\]"\'<>]+-listing', md):
-        urls.add(m.split("?")[0])
-    return list(urls)
+def _build_search_url(address: str, class_code: str, offset: int) -> str:
+    params = {
+        "address": address,
+        "filter[type]": class_code,
+        "page[limit]": PAGE_SIZE,
+        "page[offset]": offset,
+    }
+    # Encode without escaping the brackets — Outdoorsy's backend accepts both
+    # but the canonical form on the wire uses literal [ and ].
+    return f"{SEARCH_BASE}?{urllib.parse.urlencode(params, safe='[]')}"
 
 
-def extract_host_profile_url(doc) -> Optional[str]:
-    """Extract the /pro/<id> host profile URL from a listing page."""
-    for link in get_links(doc):
-        if re.search(r'outdoorsy\.com/pro/\d+$', link):
-            return link.split("?")[0]
-    md = get_markdown(doc)
-    m = re.search(r'https://www\.outdoorsy\.com/pro/(\d+)', md)
-    if m:
-        return f"https://www.outdoorsy.com/pro/{m.group(1)}"
+def _normalize_rental(raw: dict) -> Optional[RentalSummary]:
+    a = raw.get("attributes") or {}
+    slug = a.get("slug") if isinstance(a.get("slug"), str) else None
+    listing_url = (
+        f"https://www.outdoorsy.com{slug}" if slug
+        else f"https://www.outdoorsy.com/rv-rental/listing/{raw.get('id')}"
+    )
+
+    avg_rating: Optional[float] = None
+    avg_reviews = a.get("average_reviews") or {}
+    rental_block = avg_reviews.get("rental") if isinstance(avg_reviews, dict) else None
+    if isinstance(rental_block, list) and rental_block:
+        score = (rental_block[0] or {}).get("score")
+        if isinstance(score, (int, float)):
+            avg_rating = float(score)
+
+    return RentalSummary(
+        rental_id=str(raw.get("id")),
+        listing_url=listing_url,
+        display_vehicle_type=a.get("display_vehicle_type") if isinstance(a.get("display_vehicle_type"), str) else None,
+        review_count=int(a.get("reviews_num") or 0),
+        avg_rating=avg_rating,
+    )
+
+
+def sweep_market(address: str) -> dict[str, FleetCandidate]:
+    """Return owner_id → FleetCandidate covering the full market universe."""
+    by_owner: dict[str, FleetCandidate] = {}
+    seen_rentals: set[str] = set()
+
+    for class_code in CLASS_CODES:
+        print(f"  class={class_code}")
+        class_total: Optional[int] = None
+        class_collected = 0
+
+        for page in range(MAX_PAGES_PER_CLASS):
+            url = _build_search_url(address, class_code, page * PAGE_SIZE)
+            payload = _http_get_json(url)
+            if payload is None:
+                break
+
+            data = payload.get("data") or []
+            meta = payload.get("meta") or {}
+            if class_total is None:
+                t = meta.get("total")
+                class_total = int(t) if isinstance(t, (int, float)) else None
+
+            new_this_page = 0
+            for raw in data:
+                rid = str(raw.get("id") or "")
+                if not rid or rid in seen_rentals:
+                    continue
+                seen_rentals.add(rid)
+                rs = _normalize_rental(raw)
+                if rs is None:
+                    continue
+
+                owner = (((raw.get("relationships") or {}).get("owner") or {}).get("data") or {})
+                owner_id = str(owner.get("id") or "")
+                if not owner_id:
+                    continue
+
+                cand = by_owner.setdefault(owner_id, FleetCandidate(owner_id=owner_id))
+                cand.rentals.append(rs)
+                new_this_page += 1
+                class_collected += 1
+
+            print(f"    page@{page * PAGE_SIZE}: got {len(data)}, new {new_this_page}, "
+                  f"class total {class_collected}/{class_total if class_total is not None else '?'}")
+
+            if len(data) < PAGE_SIZE:
+                break
+            if class_total is not None and class_collected >= class_total:
+                break
+            time.sleep(PAGE_DELAY_SEC)
+
+    return by_owner
+
+
+# ── Stage 2: api.outdoorsy.com user enrichment ────────────────────────────────
+
+@dataclass
+class HostProfile:
+    owner_id: str
+    first_name: str = ""
+    last_name: str = ""
+    business_name: str = ""
+    business_website: str = ""
+    business_phone: str = ""
+    bio: str = ""
+    host_type: str = ""           # SingleListingHost | MultiListingHost
+    rental_category: str = ""     # RvHost | StayHost | ...
+    dealer: bool = False
+    pro: bool = False
+    is_superhost: bool = False
+    owner_score: Optional[float] = None
+    owner_score_count: int = 0
+    accept_percent: Optional[float] = None
+    response_time_seconds: Optional[float] = None  # average_response_time
+    avatar_url: str = ""
+
+    @property
+    def host_name(self) -> str:
+        full = f"{self.first_name} {self.last_name}".strip()
+        return full or self.business_name
+
+    @property
+    def response_time_hours(self) -> Optional[float]:
+        if self.response_time_seconds is None:
+            return None
+        return round(self.response_time_seconds / 3600, 1)
+
+
+def fetch_host_profile(owner_id: str) -> Optional[HostProfile]:
+    payload = _http_get_json(f"{USER_BASE}/{owner_id}")
+    if payload is None:
+        return None
+
+    profile = payload.get("profile") or {}
+    business = profile.get("business") or {}
+
+    return HostProfile(
+        owner_id=str(payload.get("id") or owner_id),
+        first_name=(profile.get("first_name") or "").strip(),
+        last_name=(profile.get("last_name") or "").strip(),
+        business_name=(business.get("name") or "").strip(),
+        business_website=(business.get("website") or "").strip(),
+        business_phone=(business.get("phone") or "").strip(),
+        bio=(business.get("description") or "").strip(),
+        host_type=str(payload.get("host_type_by_rental_count") or ""),
+        rental_category=str(payload.get("host_type_by_rental_category") or ""),
+        dealer=bool(payload.get("dealer")),
+        pro=bool(payload.get("pro")),
+        is_superhost=bool(payload.get("is_superhost")),
+        owner_score=_as_float(payload.get("owner_score")),
+        owner_score_count=int(payload.get("owner_score_count") or 0),
+        accept_percent=_as_float(payload.get("accept_percent")),
+        response_time_seconds=_as_float(payload.get("average_response_time")),
+        avatar_url=str(profile.get("avatar_url") or ""),
+    )
+
+
+def _as_float(v: Any) -> Optional[float]:
+    if isinstance(v, (int, float)):
+        return float(v)
     return None
 
 
-def parse_host_profile(doc, profile_url: str) -> dict:
-    """Extract host data from a /pro/<id> profile page."""
-    md = get_markdown(doc)
-    metadata = getattr(doc, "metadata", {}) or {}
+# ── Bio mining ────────────────────────────────────────────────────────────────
 
-    host = {
-        "Host Name": "",
-        "Business Name": "",
-        "Listing Count": 0,
-        "Review Count": 0,
-        "Rating": "",
-        "Profile URL": profile_url,
-        "Website": "",
-        "Email": "",
-        "Social Media": "",
-    }
+# Hosts often paste their website / Instagram / email directly into the bio.
+# Cheap to mine and free of false positives if we anchor on URL/email shape.
 
-    # Host/business name — "About <Name>" heading
-    about_match = re.search(r'#+ About (.+)', md)
-    if about_match:
-        name = about_match.group(1).strip()
-        # If name contains business-like words, store as Business Name too
-        if any(w in name for w in ["LLC", "Inc", "Rental", "Fleet", "RV", "Adventures", "Outdoors"]):
-            host["Business Name"] = name
-        host["Host Name"] = name
-
-    # Fallback: page title
-    if not host["Host Name"]:
-        title = metadata.get("title", "") if isinstance(metadata, dict) else getattr(metadata, "title", "")
-        if title:
-            host["Host Name"] = re.split(r" \| | on Outdoorsy", title)[0].strip()
-
-    # Listing count — "X RV available to rent" or "X RVs available to rent"
-    listing_match = re.search(r'(\d+)\s+RV[s]?\s+available to rent', md, re.IGNORECASE)
-    if listing_match:
-        host["Listing Count"] = int(listing_match.group(1))
-    else:
-        # Fallback: count listing links on the profile page
-        listing_links = [l for l in get_links(doc) if re.search(r'/rv-rental/.+-listing', l)]
-        unique_listings = {l.split("?")[0] for l in listing_links}
-        if unique_listings:
-            host["Listing Count"] = len(unique_listings)
-
-    # Review count
-    review_match = re.search(r'(\d+)\s+review', md, re.IGNORECASE)
-    if review_match:
-        host["Review Count"] = int(review_match.group(1))
-
-    # Rating — leading "5.0" or "4.9" at top of profile
-    rating_match = re.search(r'^([45]\.\d)', md.strip())
-    if not rating_match:
-        rating_match = re.search(r'\n([45]\.\d)\n', md)
-    if rating_match:
-        host["Rating"] = rating_match.group(1)
-
-    return host
+URL_RE = re.compile(r"https?://[^\s)\]\"'<>]+", re.I)
+EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}")
+SOCIAL_DOMAINS = ("instagram.com", "facebook.com", "tiktok.com", "youtube.com", "x.com", "twitter.com")
 
 
-def firecrawl_search_enrich(host: dict) -> dict:
-    """Use Firecrawl search to find website, email, and social media for a host."""
-    query_name = host["Business Name"] or host["Host Name"]
-    if not query_name:
-        return host
+def mine_bio(profile: HostProfile) -> tuple[str, str, list[str]]:
+    """Pull (website, email, social_urls) hints out of the host's bio.
 
-    query = f'{query_name} San Diego RV rental'
+    Bio-mined website is only used if business.website is empty. Email is
+    the only realistic source of contact email from the platform — Outdoorsy
+    masks owner emails on every other surface.
+    """
+    if not profile.bio:
+        return ("", "", [])
+
+    website = ""
+    socials: list[str] = []
+    for m in URL_RE.findall(profile.bio):
+        clean = m.rstrip(".,);")
+        host = urllib.parse.urlparse(clean).netloc.lower().replace("www.", "")
+        if any(d in host for d in SOCIAL_DOMAINS):
+            socials.append(clean)
+        elif not website and "outdoorsy.com" not in host:
+            website = clean
+
+    email = ""
+    for m in EMAIL_RE.findall(profile.bio):
+        if not any(s in m.lower() for s in ("noreply", "example.", "schema.")):
+            email = m
+            break
+
+    return (website, email, socials[:2])
+
+
+# ── Optional: Firecrawl fallback for missing websites ─────────────────────────
+
+def _maybe_load_firecrawl():
+    try:
+        import os
+        from firecrawl import FirecrawlApp  # type: ignore
+        key = os.environ.get("FIRECRAWL_API_KEY")
+        if not key:
+            print("  [firecrawl] FIRECRAWL_API_KEY not set — skipping fallback enrichment", file=sys.stderr)
+            return None
+        return FirecrawlApp(api_key=key)
+    except ImportError:
+        print("  [firecrawl] firecrawl-py not installed — skipping fallback enrichment", file=sys.stderr)
+        return None
+
+
+def firecrawl_enrich_website(app, host_name: str, market_label: str) -> str:
+    """Single Google-style search per host for hosts with no business.website."""
+    query = f"{host_name} {market_label} RV rental"
     skip_domains = {
         "outdoorsy.com", "rvshare.com", "hipcamp.com", "yelp.com",
         "tripadvisor.com", "yellowpages.com", "bbb.org", "mapquest.com",
         "local.yahoo.com", "google.com",
     }
-
     try:
         result = app.search(query, limit=8)
-        web_results = getattr(result, "web", []) or []
     except Exception as e:
-        print(f"  [search] Failed for '{query_name}': {e}")
-        return host
+        print(f"  [firecrawl-search] '{host_name}': {e}", file=sys.stderr)
+        return ""
 
-    social_found = []
-    website_found = ""
-    email_found = ""
-
+    web_results = getattr(result, "web", None) or []
     for item in web_results:
         url = getattr(item, "url", "") or ""
-        description = getattr(item, "description", "") or ""
-        domain = urlparse(url).netloc.replace("www.", "")
-
-        # Hunt for email in description text
-        if not email_found:
-            emails = re.findall(r'[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}', description)
-            for em in emails:
-                if not any(s in em for s in ["google.", "schema.", "example."]):
-                    email_found = em
-                    break
-
+        if not url:
+            continue
+        domain = urllib.parse.urlparse(url).netloc.lower().replace("www.", "")
         if any(skip in domain for skip in skip_domains):
             continue
+        if any(s in domain for s in SOCIAL_DOMAINS):
+            continue
+        return url.split("?")[0]
+    return ""
 
-        if "instagram.com" in domain or "facebook.com" in domain:
-            social_found.append(url.split("?")[0])
-        elif not website_found:
-            website_found = url.split("?")[0]
 
-    # If we have a website, scrape it briefly for an email address
-    if website_found and not email_found:
-        try:
-            doc = app.scrape(website_found, formats=["markdown"])
-            page_text = getattr(doc, "markdown", "") or ""
-            emails = re.findall(r'[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}', page_text)
-            for em in emails:
-                if not any(s in em for s in ["google.", "schema.", "example.", "sentry.", "amazonaws."]):
-                    email_found = em
-                    break
-        except Exception:
-            pass
+# ── CSV emission ──────────────────────────────────────────────────────────────
 
-    host["Website"] = website_found
-    host["Email"] = email_found
-    host["Social Media"] = " | ".join(social_found[:2])
-    return host
+def to_row(cand: FleetCandidate, profile: Optional[HostProfile], *,
+           market: str, scraped_at: str,
+           extra_website: str = "", extra_email: str = "",
+           extra_socials: Optional[list[str]] = None) -> dict[str, Any]:
+    row: dict[str, Any] = {col: "" for col in CSV_COLUMNS}
+    row["Owner ID"] = cand.owner_id
+    row["Listing Count"] = cand.listing_count
+    row["Total Reviews"] = cand.total_reviews
+    row["RV Classes"] = " | ".join(cand.rv_classes)
+    row["Sample Listing URL"] = cand.sample_listing_url
+    row["Profile URL"] = PROFILE_URL_TEMPLATE.format(id=cand.owner_id)
+    row["Market"] = market
+    row["Scraped At"] = scraped_at
+
+    if profile is not None:
+        row["Host Name"] = profile.host_name
+        row["Business Name"] = profile.business_name
+        row["Host Type"] = profile.host_type
+        row["Dealer"] = "true" if profile.dealer else "false"
+        row["Pro"] = "true" if profile.pro else "false"
+        row["Superhost"] = "true" if profile.is_superhost else "false"
+        row["Owner Score"] = f"{profile.owner_score:.2f}" if profile.owner_score is not None else ""
+        row["Owner Score Count"] = profile.owner_score_count or ""
+        row["Accept %"] = f"{int(profile.accept_percent * 100)}" if profile.accept_percent is not None else ""
+        row["Response Time (hrs)"] = profile.response_time_hours if profile.response_time_hours is not None else ""
+        row["Website"] = profile.business_website or extra_website
+        row["Phone"] = profile.business_phone
+        row["Email"] = extra_email  # bio-mined or firecrawl-mined
+        row["Social Media"] = " | ".join(extra_socials or [])
+        row["Avatar URL"] = profile.avatar_url
+        row["Bio Excerpt"] = profile.bio[:280].replace("\n", " ").strip()
+    return row
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-def main():
-    print("=" * 60)
-    print("Outdoorsy San Diego Fleet Owner Lead Generator")
-    print("=" * 60)
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--address", default="San Diego, CA",
+                        help="Free-text address for search.outdoorsy.com (default: 'San Diego, CA')")
+    parser.add_argument("--market", default=None,
+                        help="Market slug to stamp in the CSV (default: derived from --address)")
+    parser.add_argument("--min-listings", type=int, default=2,
+                        help="Minimum listings in market to qualify as a fleet host (default: 2)")
+    parser.add_argument("--output", default=None,
+                        help="CSV output path (default: outdoorsy_<market>_leads.csv)")
+    parser.add_argument("--firecrawl-fallback", action="store_true",
+                        help="Use Firecrawl search to find websites for hosts with no business.website")
+    parser.add_argument("--no-bio-mine", action="store_true",
+                        help="Skip mining the bio for website/email/social hints")
+    args = parser.parse_args()
 
-    # Step 1: Collect listing URLs from search pages
-    print(f"\n[1/4] Scanning search results (up to {MAX_PAGES} pages)...")
-    all_listing_urls = set()
+    market = args.market or _slugify(args.address)
+    output = args.output or f"outdoorsy_{market}_leads.csv"
 
-    for page_num in range(1, MAX_PAGES + 1):
-        page_url = SEARCH_BASE if page_num == 1 else f"{SEARCH_BASE}&page={page_num}"
-        print(f"  Page {page_num}: {page_url}")
+    print("=" * 64)
+    print(f"Outdoorsy fleet-host lead generator (v2)")
+    print(f"  address       : {args.address}")
+    print(f"  market slug   : {market}")
+    print(f"  min listings  : {args.min_listings}")
+    print(f"  firecrawl     : {'on (fallback)' if args.firecrawl_fallback else 'off'}")
+    print(f"  output        : {output}")
+    print("=" * 64)
 
-        doc = scrape(page_url)
-        if not doc:
-            break
+    # ── Stage 1: full-market sweep via search.outdoorsy.com ───────────────────
+    t0 = time.time()
+    print(f"\n[1/3] Sweeping {len(CLASS_CODES)} class codes from search.outdoorsy.com...")
+    by_owner = sweep_market(args.address)
+    sweep_secs = time.time() - t0
+    total_rentals = sum(c.listing_count for c in by_owner.values())
+    print(f"\n  → {len(by_owner)} unique owners across {total_rentals} rentals "
+          f"in {sweep_secs:.1f}s")
 
-        urls = extract_listing_urls(doc)
-        print(f"    → {len(urls)} listing URLs found")
-        all_listing_urls.update(urls)
-        time.sleep(REQUEST_DELAY)
+    fleet_owners = sorted(
+        (c for c in by_owner.values() if c.listing_count >= args.min_listings),
+        key=lambda c: (-c.listing_count, -c.total_reviews),
+    )
+    print(f"  → {len(fleet_owners)} owners with ≥{args.min_listings} listings (fleet candidates)")
 
-        if len(urls) < 3 and page_num > 1:
-            print("  Appears to be last page.")
-            break
-
-    print(f"\n  Total unique listings: {len(all_listing_urls)}")
-
-    # Step 2: Visit each listing to get host profile URL
-    print(f"\n[2/4] Extracting host profiles from {len(all_listing_urls)} listings...")
-    all_host_urls = set()
-
-    for i, listing_url in enumerate(sorted(all_listing_urls), 1):
-        print(f"  [{i}/{len(all_listing_urls)}] {listing_url.split('/')[-1]}")
-        doc = scrape(listing_url)
-        if not doc:
-            time.sleep(REQUEST_DELAY)
-            continue
-
-        host_url = extract_host_profile_url(doc)
-        if host_url:
-            all_host_urls.add(host_url)
-            print(f"    → host: {host_url}")
+    # ── Stage 2: enrich via api.outdoorsy.com/v0/users/<id> ───────────────────
+    print(f"\n[2/3] Fetching host profiles from api.outdoorsy.com...")
+    profiles: dict[str, Optional[HostProfile]] = {}
+    bio_mined: dict[str, tuple[str, str, list[str]]] = {}
+    for i, cand in enumerate(fleet_owners, 1):
+        prof = fetch_host_profile(cand.owner_id)
+        profiles[cand.owner_id] = prof
+        if prof is None:
+            print(f"  [{i}/{len(fleet_owners)}] {cand.owner_id}: profile unavailable")
         else:
-            print(f"    → no host URL found")
-        time.sleep(REQUEST_DELAY)
+            tag = "DEALER" if prof.dealer else ("PRO" if prof.pro else ("SUPERHOST" if prof.is_superhost else "host"))
+            print(f"  [{i}/{len(fleet_owners)}] {cand.owner_id} {tag} | "
+                  f"{prof.host_name or '(no name)'} | "
+                  f"{cand.listing_count} listings | "
+                  f"web={'Y' if prof.business_website else '·'} "
+                  f"phone={'Y' if prof.business_phone else '·'}")
+            if not args.no_bio_mine:
+                bio_mined[cand.owner_id] = mine_bio(prof)
+        time.sleep(USER_DELAY_SEC)
 
-    print(f"\n  Unique host profiles: {len(all_host_urls)}")
+    # ── Stage 3: optional Firecrawl fallback for missing websites ─────────────
+    firecrawl_app = None
+    fc_websites: dict[str, str] = {}
+    if args.firecrawl_fallback:
+        firecrawl_app = _maybe_load_firecrawl()
+    if firecrawl_app is not None:
+        market_label = args.address
+        targets = [
+            cand for cand in fleet_owners
+            if (profiles.get(cand.owner_id)
+                and not (profiles[cand.owner_id].business_website or
+                         (bio_mined.get(cand.owner_id, ("", "", []))[0])))
+        ]
+        print(f"\n[3/3] Firecrawl fallback for {len(targets)} hosts with no website...")
+        for i, cand in enumerate(targets, 1):
+            prof = profiles[cand.owner_id]
+            assert prof is not None
+            name = prof.business_name or prof.host_name
+            if not name:
+                continue
+            url = firecrawl_enrich_website(firecrawl_app, name, market_label)
+            if url:
+                fc_websites[cand.owner_id] = url
+                print(f"  [{i}/{len(targets)}] {name} → {url}")
+            time.sleep(1.0)
+    else:
+        print(f"\n[3/3] Skipping Firecrawl fallback.")
 
-    # Step 3: Visit each host profile
-    print(f"\n[3/4] Scraping {len(all_host_urls)} host profiles...")
-    all_hosts = []
+    # ── Emit CSV ──────────────────────────────────────────────────────────────
+    scraped_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    rows: list[dict[str, Any]] = []
+    for cand in fleet_owners:
+        prof = profiles.get(cand.owner_id)
+        bio_web, bio_email, bio_socials = bio_mined.get(cand.owner_id, ("", "", []))
+        extra_website = bio_web or fc_websites.get(cand.owner_id, "")
+        rows.append(to_row(
+            cand, prof,
+            market=market, scraped_at=scraped_at,
+            extra_website=extra_website,
+            extra_email=bio_email,
+            extra_socials=bio_socials,
+        ))
 
-    for i, profile_url in enumerate(sorted(all_host_urls), 1):
-        print(f"  [{i}/{len(all_host_urls)}] {profile_url}")
-        doc = scrape(profile_url)
-        if not doc:
-            time.sleep(REQUEST_DELAY)
-            continue
-
-        host = parse_host_profile(doc, profile_url)
-        all_hosts.append(host)
-        print(f"    → {host['Host Name'] or '(unnamed)'} | "
-              f"{host['Listing Count']} listings | "
-              f"{host['Review Count']} reviews | "
-              f"★ {host['Rating']}")
-        time.sleep(REQUEST_DELAY)
-
-    # Filter fleet owners
-    fleet_owners = [h for h in all_hosts if h["Listing Count"] >= MIN_LISTINGS]
-    print(f"\n  Fleet owners (≥{MIN_LISTINGS} listings): {len(fleet_owners)} of {len(all_hosts)}")
-
-    # Step 4: Google enrich fleet owners
-    print(f"\n[4/4] Enriching {len(fleet_owners)} fleet owners via Google search...")
-    for i, host in enumerate(fleet_owners, 1):
-        name = host["Business Name"] or host["Host Name"] or "?"
-        print(f"  [{i}/{len(fleet_owners)}] {name}")
-        firecrawl_search_enrich(host)
-        time.sleep(REQUEST_DELAY)
-
-    # Write CSV
-    print(f"\nWriting results to {OUTPUT_FILE}...")
-    with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
+    print(f"\nWriting {len(rows)} rows → {output}")
+    with open(output, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
         writer.writeheader()
-        writer.writerows(fleet_owners)
+        writer.writerows(rows)
 
-    print("\n" + "=" * 60)
+    # ── Summary ───────────────────────────────────────────────────────────────
+    have_website = sum(1 for r in rows if r["Website"])
+    have_phone = sum(1 for r in rows if r["Phone"])
+    have_email = sum(1 for r in rows if r["Email"])
+    dealers = sum(1 for r in rows if r["Dealer"] == "true")
+    pros = sum(1 for r in rows if r["Pro"] == "true")
+    superhosts = sum(1 for r in rows if r["Superhost"] == "true")
+
+    print()
+    print("=" * 64)
     print("SUMMARY")
-    print("=" * 60)
-    print(f"  Listings scraped:           {len(all_listing_urls)}")
-    print(f"  Total hosts found:          {len(all_hosts)}")
-    print(f"  Fleet owners (≥{MIN_LISTINGS} listings):  {len(fleet_owners)}")
-    print(f"  With website found:         {sum(1 for h in fleet_owners if h['Website'])}")
-    print(f"  With email found:           {sum(1 for h in fleet_owners if h['Email'])}")
-    print(f"  With social media found:    {sum(1 for h in fleet_owners if h['Social Media'])}")
-    print(f"\n  Output: {OUTPUT_FILE}")
-    print("=" * 60)
+    print("=" * 64)
+    print(f"  Rentals scanned          : {total_rentals}")
+    print(f"  Unique owners            : {len(by_owner)}")
+    print(f"  Fleet candidates (≥{args.min_listings})    : {len(fleet_owners)}")
+    print(f"  Profiles fetched         : {sum(1 for p in profiles.values() if p)}")
+    print(f"  Dealers                  : {dealers}")
+    print(f"  Outdoorsy Pro            : {pros}")
+    print(f"  Superhosts               : {superhosts}")
+    print(f"  With website             : {have_website}/{len(rows)}")
+    print(f"  With phone               : {have_phone}/{len(rows)}")
+    print(f"  With email               : {have_email}/{len(rows)}")
+    print(f"  Output                   : {output}")
+    print("=" * 64)
+    return 0
+
+
+def _slugify(s: str) -> str:
+    s = s.lower().strip()
+    s = re.sub(r"[,\s]+", "-", s)
+    s = re.sub(r"[^a-z0-9-]", "", s)
+    s = re.sub(r"-+", "-", s).strip("-")
+    return s or "market"
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
