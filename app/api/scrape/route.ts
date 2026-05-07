@@ -52,6 +52,16 @@ const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=pop-up" },
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=truck-camper" },
   ],
+  "riverside-county-ca": [
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=class-a" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=class-b" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=class-c" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=travel-trailer" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=fifth-wheel" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=toy-hauler" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=pop-up" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=truck-camper" },
+  ],
 };
 
 // RVshare direct-API targets. One entry per market — the backend returns the
@@ -59,6 +69,7 @@ const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
 type RvshareApiTarget = { location: string };
 const RVSHARE_API_TARGETS: Record<string, RvshareApiTarget> = {
   "san-diego-ca": { location: "san diego ca" },
+  "riverside-county-ca": { location: "riverside county ca" },
 };
 
 // ─── Outdoorsy direct-API targets (active as of 2026-04-22) ──────────────────
@@ -81,6 +92,15 @@ const OUTDOORSY_API_TARGETS: Record<string, OutdoorsyApiTarget[]> = {
     { address: "San Diego, CA", classCode: "trailer", group: "2" },
     { address: "San Diego, CA", classCode: "fifth-wheel", group: "2" },
   ],
+  "riverside-county-ca": [
+    // Group 1 — smaller classes.
+    { address: "Riverside County, CA", classCode: "a", group: "1" },
+    { address: "Riverside County, CA", classCode: "b", group: "1" },
+    // Group 2 — larger classes.
+    { address: "Riverside County, CA", classCode: "c", group: "2" },
+    { address: "Riverside County, CA", classCode: "trailer", group: "2" },
+    { address: "Riverside County, CA", classCode: "fifth-wheel", group: "2" },
+  ],
 };
 
 // Dormant fallback: used only when OUTDOORSY_SCRAPER=firecrawl. Same shape as
@@ -98,6 +118,12 @@ const OUTDOORSY_FIRECRAWL_TARGETS: Record<string, ScrapeTarget[]> = {
     // `trailer` UI URL, but we accept the stale fallback in exchange for not
     // actively maintaining two codepaths.
     { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
+  ],
+  "riverside-county-ca": [
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
   ],
 };
 
@@ -1055,8 +1081,11 @@ export async function GET(req: NextRequest) {
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  // Vercel Cron calls GET — pass platform from query param if present
-  const platform = new URL(req.url).searchParams.get("platform") ?? undefined;
-  const body = JSON.stringify({ market: "san-diego-ca", ...(platform ? { platform } : {}) });
+  // Vercel Cron calls GET — pass market and platform from query params if present.
+  // market defaults to "san-diego-ca" for backward compatibility with existing SD cron URLs.
+  const url = new URL(req.url);
+  const market = url.searchParams.get("market") ?? "san-diego-ca";
+  const platform = url.searchParams.get("platform") ?? undefined;
+  const body = JSON.stringify({ market, ...(platform ? { platform } : {}) });
   return POST(new Request(req.url, { method: "POST", headers: req.headers, body }) as NextRequest);
 }

@@ -91,10 +91,7 @@ export default function DashboardPage() {
               <SelectTrigger className="w-44 h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="san-diego-ca">San Diego, CA</SelectItem>
-                <SelectItem value="los-angeles-ca">Los Angeles, CA</SelectItem>
-                <SelectItem value="denver-co">Denver, CO</SelectItem>
-                <SelectItem value="austin-tx">Austin, TX</SelectItem>
-                <SelectItem value="miami-fl">Miami, FL</SelectItem>
+                <SelectItem value="riverside-county-ca">Riverside County, CA</SelectItem>
               </SelectContent>
             </Select>
           </div>
