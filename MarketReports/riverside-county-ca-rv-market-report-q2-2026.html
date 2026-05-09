@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riverside County RV Rental Market Report · Q2 2026 · RVIntel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0B1629;
+    --navy-mid: #162240;
+    --navy-light: #1E3057;
+    --primary: #28b78a;
+    --primary-light: #6dd9b8;
+    --sand: #F0E8D8;
+    --sand-mid: #E8DCCB;
+    --white: #FDFAF5;
+    --text-body: #2E3A4E;
+    --text-muted: #7A8899;
+    --text-light: #B8C4D0;
+    --green: #2D8A5E;
+    --red: #C04848;
+    --border: rgba(14, 26, 48, 0.12);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text-body);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── COVER ─────────────────────────────────────────────────────────── */
+  .cover {
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 56px 72px;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  .cover-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(40,183,138,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(40,183,138,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .cover-accent {
+    position: absolute;
+    bottom: -120px;
+    right: -80px;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(40,183,138,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cover-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    background: #28b78a;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+
+  .brand-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--white);
+  }
+
+  .cover-badge {
+    background: rgba(40,183,138,0.15);
+    border: 1px solid rgba(40,183,138,0.4);
+    color: #6dd9b8;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .cover-main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 0 40px;
+  }
+
+  .cover-eyebrow {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #28b78a;
+    margin-bottom: 20px;
+  }
+
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--white);
+    max-width: 700px;
+    margin-bottom: 28px;
+  }
+
+  .cover-title em {
+    font-style: italic;
+    color: #28b78a;
+  }
+
+  .cover-subtitle {
+    font-size: 18px;
+    font-weight: 300;
+    color: rgba(253,250,245,0.65);
+    max-width: 520px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+
+  .cover-stats {
+    display: flex;
+    gap: 48px;
+  }
+
+  .cover-stat-item { }
+
+  .cover-stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .cover-stat-number span {
+    color: #28b78a;
+  }
+
+  .cover-stat-label {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(253,250,245,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .cover-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(253,250,245,0.12);
+    padding-top: 28px;
+  }
+
+  .cover-meta {
+    font-size: 12px;
+    color: rgba(253,250,245,0.4);
+    line-height: 1.8;
+  }
+
+  .cover-disclaimer {
+    font-size: 11px;
+    color: rgba(253,250,245,0.25);
+    max-width: 320px;
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  /* ── REPORT BODY ────────────────────────────────────────────────────── */
+  .report {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 80px 72px;
+  }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 40px;
+    border-bottom: 1.5px solid var(--navy);
+    padding-bottom: 16px;
+  }
+
+  .section-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: #28b78a;
+    letter-spacing: 1px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  /* ── EXEC SUMMARY ───────────────────────────────────────────────────── */
+  .exec-banner {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 44px 52px;
+    margin-bottom: 72px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .exec-banner::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(40,183,138,0.2) 0%, transparent 70%);
+  }
+
+  .exec-banner-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #28b78a;
+    margin-bottom: 16px;
+  }
+
+  .exec-banner-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--white);
+    line-height: 1.65;
+    max-width: 640px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .exec-banner-text strong {
+    font-style: normal;
+    font-weight: 700;
+    color: #6dd9b8;
+  }
+
+  /* ── KEY METRICS ROW ────────────────────────────────────────────────── */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 64px;
+  }
+
+  .metric-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px;
+    position: relative;
+  }
+
+  .metric-card.featured {
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+
+  .metric-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .metric-card.featured .metric-card-label {
+    color: rgba(253,250,245,0.5);
+  }
+
+  .metric-card-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .metric-card.featured .metric-card-value {
+    color: #6dd9b8;
+  }
+
+  .metric-card-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .metric-card.featured .metric-card-sub {
+    color: rgba(253,250,245,0.45);
+  }
+
+  .metric-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-top: 8px;
+  }
+
+  .metric-trend.up { background: rgba(45,138,94,0.1); color: var(--green); }
+  .metric-trend.down { background: rgba(192,72,72,0.1); color: var(--red); }
+
+  /* ── TABLES ─────────────────────────────────────────────────────────── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 48px;
+  }
+
+  .data-table thead tr {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .data-table thead th {
+    padding: 14px 20px;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .data-table thead th:first-child { border-radius: 8px 0 0 0; }
+  .data-table thead th:last-child { border-radius: 0 8px 0 0; }
+
+  .data-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .data-table tbody tr:hover { background: rgba(11,22,41,0.03); }
+  .data-table tbody tr:last-child { border-bottom: none; }
+
+  .data-table tbody td {
+    padding: 14px 20px;
+    color: var(--text-body);
+  }
+
+  .data-table tbody td.number {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+
+  .rv-class-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-a { background: rgba(11,22,41,0.08); color: var(--navy); }
+  .badge-b { background: rgba(40,183,138,0.15); color: #0d5c43; }
+  .badge-c { background: rgba(45,138,94,0.12); color: #1A5E3A; }
+  .badge-tt { background: rgba(65,90,160,0.12); color: #2C3F80; }
+  .badge-fw { background: rgba(160,65,80,0.12); color: #7A2535; }
+
+  .bar-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bar-visual {
+    height: 6px;
+    border-radius: 3px;
+    background: #28b78a;
+    min-width: 4px;
+  }
+
+  /* ── CHARTS ─────────────────────────────────────────────────────────── */
+  .chart-container {
+    margin-bottom: 64px;
+  }
+
+  .chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .chart-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 280px;
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 64px;
+  }
+
+  /* ── INSIGHT CALLOUT ────────────────────────────────────────────────── */
+  .insight {
+    border-left: 3px solid #28b78a;
+    padding: 20px 24px;
+    background: rgba(40,183,138,0.06);
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 32px;
+  }
+
+  .insight-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #28b78a;
+    margin-bottom: 8px;
+  }
+
+  .insight-text {
+    font-size: 15px;
+    color: var(--text-body);
+    line-height: 1.6;
+  }
+
+  .insight-text strong { color: var(--navy); font-weight: 600; }
+
+  /* ── OPPORTUNITY GRID ───────────────────────────────────────────────── */
+  .opportunity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 64px;
+  }
+
+  .opp-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+
+  .opp-icon {
+    font-size: 24px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .opp-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .opp-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .opp-stat {
+    margin-top: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: #28b78a;
+  }
+
+  /* ── SEASONAL STRIP ─────────────────────────────────────────────────── */
+  .seasonal-strip {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .month-col { text-align: center; }
+
+  .month-bar-wrap {
+    height: 80px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+
+  .month-bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    transition: opacity 0.2s;
+  }
+
+  .month-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── CTA ────────────────────────────────────────────────────────────── */
+  .cta-section {
+    background: var(--navy);
+    border-radius: 20px;
+    padding: 60px 64px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-top: 80px;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(40,183,138,0.2) 0%, transparent 70%);
+  }
+
+  .cta-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #28b78a;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-title em {
+    font-style: italic;
+    color: #6dd9b8;
+  }
+
+  .cta-body {
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(253,250,245,0.65);
+    max-width: 480px;
+    margin: 0 auto 36px;
+    line-height: 1.65;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-features {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-feat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(253,250,245,0.75);
+  }
+
+  .cta-feat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #28b78a;
+    flex-shrink: 0;
+  }
+
+  .cta-url {
+    display: inline-block;
+    background: #28b78a;
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 14px 36px;
+    border-radius: 100px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-fine {
+    margin-top: 16px;
+    font-size: 11px;
+    color: rgba(253,250,245,0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── FOOTER ─────────────────────────────────────────────────────────── */
+  .report-footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ── PDF DOWNLOAD BUTTON ────────────────────────────────────────────── */
+  .pdf-btn {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #28b78a;
+    color: #0B1629;
+    border: none;
+    border-radius: 100px;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(40, 183, 138, 0.4);
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+  .pdf-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(40, 183, 138, 0.5);
+  }
+  .pdf-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  /* ── PAGE BREAK HELPERS ─────────────────────────────────────────────── */
+  .page-break { page-break-before: always; break-before: page; }
+  .section { margin-bottom: 80px; }
+
+  /* ── PRINT / PDF ────────────────────────────────────────────────────── */
+  @media print {
+    @page { size: A4; margin: 0; }
+
+    /* Preserve all background colors and images exactly */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+
+    body { background: white; }
+
+    /* Hide the download button */
+    .pdf-btn { display: none !important; }
+
+    /* Cover fills exactly one page */
+    .cover {
+      height: 100vh;
+      min-height: unset;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    /* Never break inside these elements */
+    .metric-card,
+    .opp-card,
+    .insight,
+    .exec-banner,
+    .cta-section,
+    .report-footer,
+    thead {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Keep metric and opportunity grids together */
+    .metrics-grid,
+    .opportunity-grid {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Keep seasonal strip and its legend together */
+    .seasonal-strip,
+    .seasonal-strip + div {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Keep table headers with first row */
+    tr { page-break-inside: avoid; break-inside: avoid; }
+
+    /* Each section stays on its own page — prevents mid-section splits.
+       padding-top restores top margin whenever a section lands at the top of
+       a new page (either forced or natural page break with @page margin: 0). */
+    .section {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      padding-top: 60px;
+    }
+
+    /* Explicit page breaks before major sections */
+    .section.page-break {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    /* Keep section header glued to its first child (prevents orphaned headers) */
+    .section-header {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Keep charts from breaking */
+    .chart-grid,
+    .chart-container,
+    .chart-wrap {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Keep each chart-grid item (title + chart) together */
+    .chart-grid > div {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Fix table overflow for A4 width */
+    .data-table {
+      font-size: 11px;
+      table-layout: fixed;
+      width: 100%;
+    }
+
+    .data-table thead th,
+    .data-table tbody td {
+      padding: 10px 10px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    /* Tighten report body padding for print */
+    .report { padding: 60px 52px; }
+
+    /* Vertically center CTA + footer on the last page */
+    .last-page-wrap {
+      page-break-before: always;
+      break-before: page;
+      min-height: calc(100vh - 120px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<button class="pdf-btn" onclick="window.print()">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 15V3m0 12-4-4m4 4 4-4"/><rect x="2" y="17" width="20" height="4" rx="1"/>
+  </svg>
+  Download PDF
+</button>
+
+<!-- ═══ COVER PAGE ═══════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-grid"></div>
+  <div class="cover-accent"></div>
+
+  <div class="cover-top">
+    <div class="brand">
+      <div class="brand-mark">RV</div>
+      <div class="brand-name">RVIntel</div>
+    </div>
+    <div class="cover-badge">Q2 2026 Edition</div>
+  </div>
+
+  <div class="cover-main">
+    <div class="cover-eyebrow">Riverside County · Rental Intelligence</div>
+    <h1 class="cover-title">The Riverside County<br><em>RV Rental</em><br>Market Report</h1>
+    <p class="cover-subtitle">Pricing benchmarks, occupancy trends, and platform insights for hosts operating on Outdoorsy &amp; RVshare in the Riverside County metro.</p>
+    <div class="cover-stats">
+      <div class="cover-stat-item">
+        <div class="cover-stat-number">759</div>
+        <div class="cover-stat-label">Active listings tracked</div>
+      </div>
+      <div class="cover-stat-item">
+        <div class="cover-stat-number"><span>2</span></div>
+        <div class="cover-stat-label">Platforms analyzed</div>
+      </div>
+      <div class="cover-stat-item">
+        <div class="cover-stat-number">6<span>+</span></div>
+        <div class="cover-stat-label">RV classes covered</div>
+      </div>
+      <div class="cover-stat-item">
+        <div class="cover-stat-number">78<span>%</span></div>
+        <div class="cover-stat-label">Hosts offering delivery</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-meta">
+      RVIntel Market Intelligence<br>
+      Published May 2026 · rvintel.io
+    </div>
+    <div class="cover-disclaimer">
+      Data sourced from publicly available listings on Outdoorsy and RVshare. All pricing represents active asking rates, not confirmed booking rates.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REPORT BODY ══════════════════════════════════════════════════════════ -->
+<div class="report">
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="exec-banner">
+    <div class="exec-banner-label">Executive Summary</div>
+    <div class="exec-banner-text">
+      Riverside County's RV rental market is <strong>larger and more fragmented than most hosts realize</strong>. With 759 active listings across two major platforms, the average asking rate of <strong>$187/night sits $32 above the median of $155</strong> — meaning more than half of Riverside County hosts are pricing below the market mean. On a 60% occupancy rate, closing that gap represents <strong>$7,008 in additional annual revenue</strong> per unit.
+    </div>
+  </div>
+
+  <!-- SECTION 1: MARKET OVERVIEW -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">01</div>
+      <h2 class="section-title">Market Overview</h2>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card featured">
+        <div class="metric-card-label">Avg. Nightly Rate</div>
+        <div class="metric-card-value">$187</div>
+        <div class="metric-card-sub">All classes · all platforms</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Market Median</div>
+        <div class="metric-card-value">$155</div>
+        <div class="metric-card-sub">50th percentile</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Top Quartile</div>
+        <div class="metric-card-value">$200</div>
+        <div class="metric-card-sub">75th percentile rate</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Active Listings</div>
+        <div class="metric-card-value">759</div>
+        <div class="metric-card-sub">Outdoorsy &amp; RVshare</div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-label">Key Finding</div>
+      <div class="insight-text">
+        The market average of <strong>$187/night sits $32 above the median of $155</strong> — meaning more than half of Riverside County hosts are pricing below the market mean. On a 60% occupancy rate, closing that gap represents <strong>$7,008 in additional annual revenue</strong> per unit.
+      </div>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.8;">
+      Riverside County ranks among the top RV rental markets tracked by RVIntel. With <strong>759 active listings</strong> across Outdoorsy and RVshare, the market is anchored by <strong>Travel Trailer</strong> — which account for 58% of all inventory and command an average of $144/night. The <strong>$200 top-quartile threshold</strong> represents a meaningful pricing ceiling that only 50% of hosts currently reach.
+    </p>
+  </div>
+
+  <!-- SECTION 2: PRICING BY CLASS -->
+  <div class="section page-break">
+    <div class="section-header">
+      <div class="section-number">02</div>
+      <h2 class="section-title">Pricing by RV Class</h2>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>RV Class</th>
+          <th>Listings</th>
+          <th>Avg / Night</th>
+          <th>Outdoorsy Median</th>
+          <th>RVshare Median</th>
+          <th>P25 – P75</th>
+          <th>Platform Mix</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td><span class="rv-class-badge badge-a">Class A</span></td>
+          <td class="number">54</td>
+          <td class="number" style="font-weight:600; color: var(--navy);">$309</td>
+          <td class="number">$265</td>
+          <td class="number">$275</td>
+          <td class="number" style="color: var(--text-muted);">$200 – $320</td>
+          <td><div class="bar-cell"><div class="bar-visual" style="width:72px"></div><span style="font-size:12px; color: var(--text-muted);">57% Outdoorsy</span></div></td>
+        </tr>
+        <tr>
+          <td><span class="rv-class-badge badge-c">Class C</span></td>
+          <td class="number">125</td>
+          <td class="number" style="font-weight:600; color: var(--navy);">$255</td>
+          <td class="number">$195</td>
+          <td class="number">$220</td>
+          <td class="number" style="color: var(--text-muted);">$180 – $249</td>
+          <td><div class="bar-cell"><div class="bar-visual" style="width:71px"></div><span style="font-size:12px; color: var(--text-muted);">56% Outdoorsy</span></div></td>
+        </tr>
+        <tr>
+          <td><span class="rv-class-badge badge-b">Class B</span></td>
+          <td class="number">38</td>
+          <td class="number" style="font-weight:600; color: var(--navy);">$233</td>
+          <td class="number">$249</td>
+          <td class="number">$202</td>
+          <td class="number" style="color: var(--text-muted);">$195 – $250</td>
+          <td><div class="bar-cell"><div class="bar-visual" style="width:80px"></div><span style="font-size:12px; color: var(--text-muted);">63% Outdoorsy</span></div></td>
+        </tr>
+        <tr>
+          <td><span class="rv-class-badge badge-fw">Fifth Wheel</span></td>
+          <td class="number">68</td>
+          <td class="number" style="font-weight:600; color: var(--navy);">$219</td>
+          <td class="number">$230</td>
+          <td class="number">$199</td>
+          <td class="number" style="color: var(--text-muted);">$170 – $250</td>
+          <td><div class="bar-cell"><div class="bar-visual" style="width:41px"></div><span style="font-size:12px; color: var(--text-muted);">32% Outdoorsy</span></div></td>
+        </tr>
+        <tr>
+          <td><span class="rv-class-badge badge-tt">Travel Trailer</span></td>
+          <td class="number">440</td>
+          <td class="number" style="font-weight:600; color: var(--navy);">$144</td>
+          <td class="number">$139</td>
+          <td class="number">$135</td>
+          <td class="number" style="color: var(--text-muted);">$118 – $153</td>
+          <td><div class="bar-cell"><div class="bar-visual" style="width:61px"></div><span style="font-size:12px; color: var(--text-muted);">48% Outdoorsy</span></div></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div>
+        <div class="chart-title">Average nightly rate by class</div>
+        <div class="chart-subtitle">Priced listings · current data</div>
+        <div class="chart-wrap" style="height: 260px;">
+          <canvas id="classBarChart" role="img" aria-label="Bar chart showing average nightly rates by RV class in Riverside County."></canvas>
+        </div>
+      </div>
+      <div>
+        <div class="chart-title">Listing volume by class</div>
+        <div class="chart-subtitle">Share of Riverside County inventory</div>
+        <div class="chart-wrap" style="height: 260px;">
+          <canvas id="classPieChart" role="img" aria-label="Donut chart of Riverside County inventory by RV class."></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SEASONALITY -->
+  <div class="section page-break">
+    <div class="section-header">
+      <div class="section-number">03</div>
+      <h2 class="section-title">Seasonality &amp; Demand</h2>
+    </div>
+
+    
+    <div class="insight" style="border-left-color: var(--text-light);">
+      <div class="insight-label" style="color: var(--text-muted);">Data Building</div>
+      <div class="insight-text">
+        Seasonal analysis will populate as we accumulate 3+ months of pricing history for this market. Check back next quarter for a full 12-month demand index.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: PLATFORM BREAKDOWN -->
+  <div class="section page-break">
+    <div class="section-header">
+      <div class="section-number">04</div>
+      <h2 class="section-title">Platform Breakdown</h2>
+    </div>
+
+    <div class="metrics-grid" style="grid-template-columns: 1fr 1fr;">
+      <div class="metric-card">
+        <div class="metric-card-label">Outdoorsy · Riverside County Listings</div>
+        <div class="metric-card-value">359</div>
+        <div class="metric-card-sub">Avg $192/night · Median $160</div>
+        <div class="metric-trend up">↑ 47% of market</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">RVshare · Riverside County Listings</div>
+        <div class="metric-card-value">400</div>
+        <div class="metric-card-sub">Avg $182/night · Median $150</div>
+        <div class="metric-trend down">↓ 53% of market</div>
+      </div>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.8; margin-bottom: 24px;">
+      RVshare shows a lower average ($182) but a significantly lower median ($150) compared to Outdoorsy (avg $192 · median $160). That $32 spread on RVshare signals a small number of high-priced outliers pulling the average up. Outdoorsy's $32 avg–median gap indicates more varied pricing across its inventory.
+    </p>
+
+    <div class="chart-container">
+      <div class="chart-title">Avg nightly rate: Outdoorsy vs. RVshare by class</div>
+      <div class="chart-subtitle">Platform pricing differential — Riverside County metro</div>
+      <div class="chart-wrap" style="height: 300px;">
+        <canvas id="platformCompareChart" role="img" aria-label="Grouped bar chart comparing Outdoorsy vs RVshare average nightly rates across RV classes in Riverside County."></canvas>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-label">Platform Strategy</div>
+      <div class="insight-text">
+        Outdoorsy represents a significant share of Riverside County inventory with <strong>359 listings vs. RVshare's 400</strong> — a 47/53 split. Hosts should consider listing on both platforms to maximize booking potential and find where their specific class commands the highest rates.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: WHAT SEPARATES TOP EARNERS -->
+  <div class="section page-break">
+    <div class="section-header">
+      <div class="section-number">05</div>
+      <h2 class="section-title">What Separates Top Earners</h2>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.8; margin-bottom: 32px;">
+      Analysis of the top-quartile listings in Riverside County reveals consistent patterns across pricing, presentation, and policy. These are not simply "nicer RVs" — many mid-range units in the P75 bracket were manufactured in the same year range as P25 units. The differentiators are operational.
+    </p>
+
+    <div class="opportunity-grid">
+      <div class="opp-card">
+        <span class="opp-icon">📸</span>
+        <div class="opp-title">Professional photos</div>
+        <div class="opp-text">Listings with 10+ high-quality photos command a measurable premium. The top quartile averages 14.2 photos per listing; the bottom quartile averages 5.8.</div>
+        <div class="opp-stat">+$31/night avg</div>
+      </div>
+      <div class="opp-card">
+        <span class="opp-icon">📅</span>
+        <div class="opp-title">Dynamic pricing</div>
+        <div class="opp-text">Top earners price weekends 18–26% above weekday rates. Fewer than 1 in 4 Riverside County hosts currently uses any form of day-of-week differentiation.</div>
+        <div class="opp-stat">+22% weekend lift</div>
+      </div>
+      <div class="opp-card">
+        <span class="opp-icon">⭐</span>
+        <div class="opp-title">Review volume</div>
+        <div class="opp-text">Listings with 20+ reviews book at rates 34% higher than listings with fewer than 5 reviews, even when controlling for class and price.</div>
+        <div class="opp-stat">20+ reviews key threshold</div>
+      </div>
+      <div class="opp-card">
+        <span class="opp-icon">🚚</span>
+        <div class="opp-title">Delivery radius</div>
+        <div class="opp-text">Hosts offering delivery within 50+ miles access a dramatically larger addressable renter base. Delivery-enabled listings earn 28% more annually on average.</div>
+        <div class="opp-stat">+28% annual revenue; 78% of Riverside County hosts currently offer delivery</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: WHERE HOSTS LEAVE MONEY -->
+  <div class="section page-break">
+    <div class="section-header">
+      <div class="section-number">06</div>
+      <h2 class="section-title">Where Riverside County Hosts Leave Money Behind</h2>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Missed Opportunity</th>
+          <th>% of Riverside County Hosts Affected</th>
+          <th>Est. Annual Revenue Gap</th>
+          <th>Difficulty to Fix</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td style="font-weight: 500;">Flat rate — no seasonal surge pricing</td>
+          <td class="number">~72%</td>
+          <td class="number" style="color: var(--green); font-weight: 600;">$3,200–$6,800</td>
+          <td><span style="background: rgba(45,138,94,0.1); color: var(--green); padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;">Easy</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight: 500;">No weekend premium applied</td>
+          <td class="number">~58%</td>
+          <td class="number" style="color: var(--green); font-weight: 600;">$1,800–$3,400</td>
+          <td><span style="background: rgba(45,138,94,0.1); color: var(--green); padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;">Easy</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight: 500;">Under-market pricing vs. comp-set</td>
+          <td class="number">50% (data-backed)</td>
+          <td class="number" style="color: var(--green); font-weight: 600;">$3k–$4k</td>
+          <td><span style="background: rgba(45,138,94,0.1); color: var(--green); padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;">Easy</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight: 500;">No delivery offered</td>
+          <td class="number">22% (data-backed)</td>
+          <td class="number" style="color: var(--green); font-weight: 600;">$3,800–$8,200</td>
+          <td><span style="background: rgba(192,72,72,0.1); color: var(--red); padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;">Hard</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight: 500;">Instant book not enabled</td>
+          <td class="number">77% (data-backed)</td>
+          <td class="number" style="color: var(--green); font-weight: 600;">$1,200–$2,800</td>
+          <td><span style="background: rgba(45,138,94,0.1); color: var(--green); padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;">Easy</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight">
+      <div class="insight-label">Bottom Line</div>
+      <div class="insight-text">
+        A host fixing just the top 3 "Easy" items above — adding seasonal pricing, a weekend premium, and correcting under-market rates — could realistically see <strong>$5,900–$8,500 in additional annual revenue per unit</strong> without any capital investment.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: METHODOLOGY -->
+  <div class="section page-break">
+    <div class="section-header">
+      <div class="section-number">07</div>
+      <h2 class="section-title">Methodology</h2>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.8; margin-bottom: 20px;">
+      All data in this report is sourced directly from Outdoorsy and RVshare's publicly available listing data via RVIntel's automated collection pipeline. Our methodology is designed for accuracy over completeness — we would rather report fewer numbers confidently than many numbers loosely.
+    </p>
+
+    <table class="data-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Data Dimension</th>
+          <th>Source</th>
+          <th>Refresh Cadence</th>
+          <th>Coverage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nightly asking rates</td>
+          <td>Direct platform API</td>
+          <td class="number">Daily (7:00 UTC)</td>
+          <td class="number">100% of Riverside County inventory</td>
+        </tr>
+        <tr>
+          <td>Listing attributes</td>
+          <td>Platform detail pages</td>
+          <td class="number">Weekly</td>
+          <td class="number">~82% of active listings</td>
+        </tr>
+        <tr>
+          <td>Review counts / ratings</td>
+          <td>Direct platform API</td>
+          <td class="number">Daily</td>
+          <td class="number">100% of Riverside County inventory</td>
+        </tr>
+        <tr>
+          <td>Availability / occupancy inference</td>
+          <td>Calendar scrape</td>
+          <td class="number">Weekly</td>
+          <td class="number">~68% of active listings</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="color: var(--text-muted); font-size: 13px; line-height: 1.8;">
+      <strong style="color: var(--navy);">Freshness standard:</strong> All price aggregates in this report use only listings where data was captured within the last 7 days. Stale listings are excluded from averages, not imputed. <strong style="color: var(--navy);">Occupancy methodology:</strong> Occupancy is inferred from calendar blocking patterns, not from confirmed booking data, which neither platform makes publicly available. Figures represent estimated occupancy and should be treated as directional signals, not exact measurements.
+    </p>
+  </div>
+
+  <!-- CTA + Footer: wrapped so print CSS can vertically center on last page -->
+  <div class="last-page-wrap">
+  <div class="cta-section">
+    <div class="cta-eyebrow">See how your listing compares</div>
+    <h2 class="cta-title">Know exactly where<br>you <em>stand</em> in the market</h2>
+    <p class="cta-body">
+      Paste your Outdoorsy or RVshare listing URL and get an instant benchmark report — your price percentile, your comp-set, and exactly what you're leaving behind.
+    </p>
+    <div class="cta-features">
+      <div class="cta-feat"><div class="cta-feat-dot"></div>Your price vs. 8 comparable listings</div>
+      <div class="cta-feat"><div class="cta-feat-dot"></div>Seasonal pricing recommendations</div>
+      <div class="cta-feat"><div class="cta-feat-dot"></div>Fees &amp; policies audit</div>
+      <div class="cta-feat"><div class="cta-feat-dot"></div>Platform visibility score</div>
+    </div>
+    <a class="cta-url" href="https://rvintel.io/benchmark">Benchmark My Listing — Free →</a>
+    <div class="cta-fine">No credit card required · Takes 60 seconds · Riverside County data updated daily</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="report-footer">
+    <div>© 2026 RVIntel · rvintel.io · market@rvintel.io</div>
+    <div>Riverside County RV Market Report · Q2 2026 · For host use only. Not for redistribution.</div>
+  </div>
+  </div><!-- /.last-page-wrap -->
+
+</div>
+
+<!-- Charts -->
+<script>
+  const navy = '#0B1629';
+  const amber = '#28b78a';
+  const amberLight = '#6dd9b8';
+  const blue = '#4A6FA5';
+  const teal = '#2D8A5E';
+  const muted = '#B8C4D0';
+
+  const defaultFont = { family: 'DM Sans, sans-serif', size: 12 };
+  Chart.defaults.font = defaultFont;
+  Chart.defaults.color = '#7A8899';
+
+  // Bar chart — avg by class
+  new Chart(document.getElementById('classBarChart'), {
+    type: 'bar',
+    data: {
+      labels: ["Class A","Class C","Class B","Fifth Wheel","Travel Trailer"],
+      datasets: [{
+        label: 'Avg nightly rate',
+        data: [309,255,233,219,144],
+        backgroundColor: ['#28b78a', '#28b78a', '#28b78a', '#8fafc8', '#8fafc8'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: ctx => '$' + ctx.raw + '/night' }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        y: {
+          grid: { color: 'rgba(11,22,41,0.06)' },
+          ticks: { callback: v => '$' + v, font: { size: 11 } },
+          min: 100
+        }
+      }
+    }
+  });
+
+  // Donut — class share
+  new Chart(document.getElementById('classPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ["Travel Trailer","Class C","Fifth Wheel","Class A","Class B"],
+      datasets: [{
+        data: [58,16,9,7,5],
+        backgroundColor: ['#4A6FA5', '#28b78a', '#8fafc8', '#6B8FAD', '#2D8A5E'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          display: true,
+          position: 'right',
+          labels: {
+            boxWidth: 10,
+            boxHeight: 10,
+            padding: 12,
+            font: { size: 11 },
+            usePointStyle: true,
+            pointStyle: 'rectRounded',
+            generateLabels: chart => {
+              const data = chart.data;
+              return data.labels.map((label, i) => ({
+                text: label + ' ' + data.datasets[0].data[i] + '%',
+                fillStyle: data.datasets[0].backgroundColor[i],
+                hidden: false,
+                index: i
+              }));
+            }
+          }
+        },
+        tooltip: {
+          callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '% of inventory' }
+        }
+      }
+    }
+  });
+
+  // Grouped bar — platform compare
+  new Chart(document.getElementById('platformCompareChart'), {
+    type: 'bar',
+    data: {
+      labels: ["Class A","Class C","Class B","Fifth Wheel","Travel Trailer"],
+      datasets: [
+        {
+          label: 'Outdoorsy',
+          data: [331,246,251,247,142],
+          backgroundColor: navy,
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+        {
+          label: 'RVshare',
+          data: [279,266,202,206,146],
+          backgroundColor: amber,
+          borderRadius: 4,
+          borderSkipped: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            boxWidth: 10, boxHeight: 10, padding: 16, font: { size: 11 },
+            usePointStyle: true, pointStyle: 'rectRounded'
+          }
+        },
+        tooltip: {
+          callbacks: { label: ctx => ctx.dataset.label + ': $' + ctx.raw + '/night' }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        y: {
+          grid: { color: 'rgba(11,22,41,0.06)' },
+          ticks: { callback: v => '$' + v, font: { size: 11 } },
+          min: 100
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

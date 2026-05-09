@@ -1,18 +1,19 @@
 # How RVIntel Works (Behind the Scenes)
 
-This guide explains what happens when someone uses the site or when data updates—written for readers who are new to web apps.
+This guide explains what happens when someone uses the site or when data updates — written for readers who are new to web apps.
 
 ---
 
 ## The big picture
 
-**RVIntel** is a **Next.js** web application. Next.js is a framework that runs **React** (a library for building interactive pages) on the server and in the browser. The app has three main “moving parts”:
+**RVIntel** is a **Next.js** web application. Next.js is a framework that runs **React** (a library for building interactive pages) on the server and in the browser. The app has four main "moving parts":
 
 1. **The marketing home page** (`/`) — collects waitlist emails.
-2. **The market dashboard** (`/dashboard`) — shows rental listings and simple charts from a database.
-3. **A background data pipeline** — periodically pulls listing data from rental sites and saves it to the database.
+2. **The public market pages** (`/markets`, `/markets/san-diego`, `/markets/riverside-county`, …) — display PDF market reports, no login required.
+3. **The market dashboard** (`/dashboard`) — shows live rental listings and charts from the database; requires a magic-link login.
+4. **A background data pipeline** — nine scheduled jobs that pull listing data from Outdoorsy and RVshare and save it to the database.
 
-Think of it as: **browser ↔ your app on Vercel ↔ Supabase (database)**, plus **scheduled jobs** that call a special API route to refresh listing data using **Firecrawl** (a service that can load web pages and extract structured information).
+Think of it as: **browser ↔ your app on Vercel ↔ Supabase (database)**, plus **scheduled jobs** that call special API routes to refresh listing data by hitting Outdoorsy and RVshare's internal JSON APIs directly.
 
 ---
 
@@ -20,11 +21,13 @@ Think of it as: **browser ↔ your app on Vercel ↔ Supabase (database)**, plus
 
 | Piece | Where it runs | Role |
 |--------|----------------|------|
-| Home page & dashboard UI | In the visitor’s **browser** | Buttons, forms, charts, navigation |
-| **Supabase client** (anon key) | In the **browser** | Read listings; insert waitlist rows (subject to your Supabase security rules) |
-| **`/api/scrape`** | On **Vercel** (server) | Scrape listing sites, then write to the database with elevated permissions |
-| **`/api/rate-history`** | On **Vercel** (server) | Aggregate historical snapshots into a daily avg-rate series; reads `listing_snapshots` with the service role because that table is RLS-protected |
-| **Cron jobs** | **Vercel** triggers HTTP GETs on a schedule | Kick off scraping in chunks so each run finishes within time limits |
+| Home page & marketing UI | In the visitor's **browser** | Buttons, forms, navigation |
+| **Supabase client** (anon key) | In the **browser** | Read listings; insert waitlist rows (subject to Supabase security rules) |
+| **`/api/scrape`** | On **Vercel** (server) | Fetch listings from Outdoorsy and RVshare JSON APIs, write to DB with elevated permissions |
+| **`/api/sweeper`** | On **Vercel** (server) | Mark listings as inactive when they haven't been seen in 14 days |
+| **`/api/detect-duplicates`** | On **Vercel** (server) | Find RVs listed on both platforms (same RV, two rows) and queue them for merging |
+| **`/api/rate-history`** | On **Vercel** (server) | Aggregate historical snapshots into a daily avg-rate series |
+| **Cron jobs** | **Vercel** triggers HTTP GETs on a schedule | Kick off each pipeline job automatically |
 | **Vercel Analytics** | In **production** only | Anonymous usage metrics |
 
 ---
@@ -34,104 +37,171 @@ Think of it as: **browser ↔ your app on Vercel ↔ Supabase (database)**, plus
 When someone enters an email and submits:
 
 1. The page runs JavaScript in the browser (the file is a **client component** — it starts with `"use client"`).
-2. It calls **Supabase** using the **public (anon) key**. That key is safe to ship in the browser; what it can do is controlled by **Row Level Security** policies you set in Supabase.
+2. It calls **Supabase** using the **public (anon) key**. That key is safe to ship in the browser; what it can do is controlled by **Row Level Security** policies set in Supabase.
 3. The code inserts a row into the **`waitlist`** table with that email.
-
-If Supabase isn’t configured (missing environment variables), the app will error when it tries to connect—so local development needs a `.env.local` file modeled on `.env.local.example`.
 
 ---
 
 ## 2. Dashboard — reading market data
 
-The dashboard is also a client page. When you pick a **market** and **RV class**:
+The dashboard requires a Supabase magic-link login (`/login`). Once authenticated:
 
-1. The browser uses the same Supabase client (anon key).
-2. It **selects** rows from the **`listings`** table filtered by `market` and `rv_class`, sorted by nightly rate.
-3. It computes summaries in the browser (average rate, min/max, distribution buckets for the bar chart, etc.).
-4. In parallel, it calls **`/api/rate-history`** — a server route that queries the `listing_snapshots` time-series table and returns a daily **avg nightly rate** series for the chosen market, class, and window. The snapshots table is RLS-protected, so the browser cannot read it directly; the route uses the Supabase service-role key on the server.
+1. The browser uses the Supabase client (anon key) to **select** rows from **`listings`** filtered by `market` and `rv_class`, sorted by nightly rate.
+2. Before displaying metrics, the client deduplicates rows that share the same `canonical_vehicle_id` — these are RVs listed on both Outdoorsy and RVshare that the dedup pipeline has confirmed are the same physical vehicle. The honest-aggregate badge shows both the raw and deduped count: *"312 unique RVs (324 raw listings, 12 cross-platform dupes merged)."*
+3. In parallel, it calls **`/api/rate-history`** — a server route that reads `listing_snapshots` with the service-role key (the snapshots table is RLS-protected so the browser can't read it directly) and returns a daily avg-rate series for the chosen market, class, and time window.
 
-**The time “window” control** (7 / 30 / 90 days) drives the rate-history query — pick a wider window and the area chart redraws with more points. The listing table and current-state summaries are still driven by the latest scraped snapshot for that market/class, not by the window.
+The **Market** dropdown currently shows **San Diego, CA** and **Riverside County, CA** — the two markets with live data pipelines.
 
 ---
 
 ## 3. Where listing data comes from — `/api/scrape`
 
-This is a **Route Handler** in Next.js: a file under `app/api/…/route.ts` that responds to HTTP requests like a small API.
+### The direct JSON:API approach (current, zero cost)
 
-### What it does (simplified)
+Both Outdoorsy and RVshare expose internal JSON endpoints that return structured listing data without any scraping:
 
-1. **Authorization**  
-   In production you should set `CRON_SECRET`. The route accepts requests only if the caller sends the right header (or Vercel Cron’s header). If `CRON_SECRET` is unset (typical in local dev), the route is open—useful for testing, risky if exposed publicly without a secret.
+- **Outdoorsy:** `search.outdoorsy.com/rentals?address=…&filter[type]=…&page[limit]=24&page[offset]=N` — returns full JSON:API responses with 140 attributes per listing (price in cents, length, sleeps, cancel policy, delivery radius, GPS coordinates, platform ranking scores, etc.)
+- **RVshare:** `rvshare.com/rv-rental.json?location=…&page=N` — returns a complete paginated listing universe with 27 attributes per listing plus five market-wide histograms (nightly rate, length, generator, water tank, mileage)
 
-2. **Firecrawl**  
-   The server uses your `FIRECRAWL_API_KEY` to ask Firecrawl to open specific **search URLs** on **Outdoorsy** and **RVshare** (configured per “market,” e.g. San Diego). Firecrawl can render pages like a real browser and return **markdown** plus **JSON** shaped by a schema.
+A full sweep of both platforms across both markets is ~135 HTTP requests and completes in under 90 seconds total, at zero external API cost.
 
-3. **Structured extraction**  
-   A **Zod** schema defines the shape of each listing (URL, rates, ratings, amenities, RV class, etc.). Firecrawl’s extraction is guided by a long prompt so listings are classified consistently (Class A/B/C, trailers, etc.).
+### What happens each cron run
 
-4. **Cleanup and rules**  
-   After extraction, the code may **override** the model’s RV class using **deterministic rules** (e.g. matching known model names) to reduce mistakes.
+1. **Authorization** — the route checks `CRON_SECRET`. If the header matches (or if no secret is set in dev), it proceeds.
+2. **Fetch** — it paginates through all pages for each market/class combination, collecting every listing.
+3. **Normalize** — prices, booleans, timestamps, and class labels are cleaned. Outdoorsy prices are in cents and divided by 100. RVshare's `attributes.type` string is mapped to a standard class label (Class A, Class B, Travel Trailer, etc.).
+4. **Classify** — a deterministic lookup table of known make/model → class overrides the platform's label where the platform is inconsistent (e.g. "Four Winds" is always Class C regardless of how the platform tagged it).
+5. **Upsert** — rows are written to **`listings`** on `listing_url` so re-running updates prices rather than creating duplicates.
+6. **Snapshots** — a `listing_snapshots` row is appended for every upserted listing, recording the rate at that point in time. This append-only time series is the core historical dataset and cannot be backfilled retroactively.
+7. **Market snapshot** — one `search_snapshots` row is written per cron run per (platform, market, class), capturing platform-reported totals and price statistics. This is the source for market-size trend cards.
+8. **Log** — a `cron_runs` row records the run outcome, duration, and error count.
 
-5. **Database write**  
-   The route uses the **Supabase service role key** (`SUPABASE_SERVICE_ROLE_KEY`). That key bypasses normal user rules and is **only for trusted server code**—never put it in the browser or commit it to git.
+### The Firecrawl fallback (dormant)
 
-6. **Upsert**  
-   Rows are **upserted** into **`listings`** on `listing_url` so re-scraping updates existing listings instead of duplicating them. Invalid URLs or non-RV rows may be skipped.
+Before April 22, 2026, both platforms were scraped using **Firecrawl** (a service that renders pages like a browser) combined with an LLM extraction step. This was expensive (~40 Firecrawl credits/day, 60–180 seconds per run) and required a `FIRECRAWL_API_KEY`.
 
-### Why three cron schedules?
-
-Scraping many pages can take longer than a single serverless function is allowed to run on some plans. `vercel.json` defines **three cron jobs** that call `/api/scrape` with different `platform` query parameters (e.g. RVshare vs two batches of Outdoorsy). That splits work into smaller chunks.
-
-Note: the route file also sets a long `maxDuration` for the function, while `vercel.json` may set a different cap—**the stricter or platform-specific limit wins** in practice. If scrapes time out, this is the first place to check.
+The Firecrawl path is still in the codebase behind two environment flags (`OUTDOORSY_SCRAPER=firecrawl`, `RVSHARE_SCRAPER=firecrawl`) as an emergency fallback in case either direct API gets gated. Under normal operation neither flag is set and Firecrawl is never called. `FIRECRAWL_API_KEY` only needs to be set if you deliberately flip a fallback on.
 
 ---
 
-## 4. Configuration secrets (`.env.local`)
+## 4. Keeping data fresh — `/api/sweeper`
 
-Typical variables (see `.env.local.example`):
+Listings that disappear from the platform (delisted, removed, or taken private) are not returned by the scrape APIs, so their `last_seen_at` timestamp stops updating. The sweeper runs daily at 10:00 UTC and flips `is_active = false` on any listing whose `last_seen_at` is more than 14 days old.
 
-- **`NEXT_PUBLIC_SUPABASE_URL`** / **`NEXT_PUBLIC_SUPABASE_ANON_KEY`** — used by the browser and server for normal reads/writes allowed by RLS.
-- **`SUPABASE_SERVICE_ROLE_KEY`** — server-only; used by `/api/scrape` to upsert listings.
-- **`FIRECRAWL_API_KEY`** — server-only; scraping.
-- **`CRON_SECRET`** — shared secret so only Vercel Cron (or you, with the header) can trigger scrapes in production.
-
-Variables prefixed with `NEXT_PUBLIC_` are embedded in client bundles—never put the service role key there.
+The dashboard filters on `is_active = true`, so stale listings drop out of all averages and charts automatically. The sweeper covers all markets in one pass — no changes needed when a new market is added.
 
 ---
 
-## 5. Other files you might notice
+## 5. Cross-platform deduplication — `/api/detect-duplicates`
 
-- **`components/dashboard-preview.tsx`** and hero imagery on `/` are **marketing mockups**—they illustrate the product; they are not wired to live data.
-- **`lib/supabase.ts`** — creates the Supabase client and documents TypeScript shapes for `listings`, `listing_snapshots`, `availability_snapshots`, `cron_runs`, and `waitlist`. Not every table may be used by the UI yet.
-- **`scripts/`** — optional local scripts (e.g. lead exports); they are not part of the Next.js request path unless you run them yourself.
+An RV listed on both Outdoorsy and RVshare exists as two rows in `listings` with no shared identifier. Without deduplication:
+- Market-size counts are inflated
+- Price distributions are skewed (the same RV contributes two data points)
+- A host's comp-set could surface their own listing from the other platform as a "competitor"
+
+The detection pipeline runs weekly (Sundays) and calls a Postgres stored procedure (`detect_duplicate_candidates`) that compares cross-platform pairs using GPS distance, year, make/model text similarity, sleeps count, and rate difference. Pairs that pass the HIGH-confidence threshold (within 0.5 miles, same year, make/model similarity ≥ 0.60, sleeps within 1) are auto-linked into `canonical_vehicles`. Lower-confidence pairs queue for manual review.
+
+The dashboard deduplicates against `canonical_vehicle_id` at query time, so the merged view is always current.
 
 ---
 
-## 6. End-to-end flow (mental model)
+## 6. The nine scheduled jobs
+
+| Job | Time (UTC) | Market | What it does |
+|-----|-----------|--------|--------------|
+| RVshare scrape | 06:00 daily | San Diego | Full RVshare universe sweep (~65 pages) |
+| Outdoorsy scrape (group 1) | 06:20 daily | San Diego | Classes A + B |
+| Outdoorsy scrape (group 2) | 07:00 daily | San Diego | Classes C + Travel Trailer + Fifth Wheel |
+| RVshare scrape | 08:00 daily | Riverside County | Full RVshare universe sweep |
+| Outdoorsy scrape (group 1) | 08:20 daily | Riverside County | Classes A + B |
+| Outdoorsy scrape (group 2) | 09:00 daily | Riverside County | Classes C + Travel Trailer + Fifth Wheel |
+| Sweeper | 10:00 daily | all markets | Flip stale listings to `is_active = false` |
+| Detect duplicates | 11:00 Sundays | San Diego | Cross-platform dedup candidates |
+| Detect duplicates | 11:30 Sundays | Riverside County | Cross-platform dedup candidates |
+
+All nine are defined in `vercel.json`. The scrape crons call `GET /api/scrape?platform=…&market=…`; the sweeper calls `GET /api/sweeper`; the detect-duplicates crons call `GET /api/detect-duplicates?market=…`.
+
+---
+
+## 7. Bootstrapping a new market
+
+When a new market is added, the daily crons will start collecting data going forward — but the registry starts empty. To populate it immediately, run the two backfill scripts locally (they mirror the cron logic but run outside Vercel's 300s time cap):
+
+```bash
+node scripts/backfill_rvshare_<market>.mjs
+node scripts/backfill_outdoorsy_<market>.mjs
+```
+
+Each script paginates the full universe, upserts all listings, writes initial snapshots, and logs to `cron_runs`. Typical runtime: 50–90 seconds.
+
+---
+
+## 8. Configuration secrets (`.env.local`)
+
+| Variable | Used by | Notes |
+|----------|---------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Browser + server | Safe to be public |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser | Safe to be public; what it can read is controlled by RLS |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server only | Bypasses RLS — never put in client code or commit to git |
+| `CRON_SECRET` | Server only | Prevents unauthorized scrape triggers in production |
+| `FIRECRAWL_API_KEY` | Server only | Only needed if a fallback flag is flipped; not required in normal operation |
+
+Variables prefixed with `NEXT_PUBLIC_` are embedded in client bundles — never put the service role key or cron secret there.
+
+---
+
+## 9. Other files you might notice
+
+- **`components/dashboard-preview.tsx`** and hero imagery on `/` are **marketing mockups** — not wired to live data.
+- **`lib/outdoorsy-api.ts`** / **`lib/rvshare-api.ts`** — the typed API clients that handle pagination, normalization, and the cents-to-dollars conversion for Outdoorsy prices.
+- **`lib/supabase.ts`** — creates the Supabase client and documents TypeScript shapes for `listings`, `listing_snapshots`, `search_snapshots`, `cron_runs`, `canonical_vehicles`, `candidate_duplicates`, and `waitlist`.
+- **`scripts/`** — local one-off scripts: backfills, duplicate review tooling, lead exports. Not part of the Next.js request path.
+- **`supabase/migrations/`** — SQL migration files (001–010) that define the schema evolution. Run these in order against a fresh Supabase project to recreate the full schema.
+
+---
+
+## 10. End-to-end flow (mental model)
 
 ```text
 Visitor opens /
     → Browser loads React UI
     → Submit email → Supabase waitlist (anon key + RLS)
 
-Visitor opens /dashboard
-    → Browser queries Supabase listings (anon key + RLS)
-    → Browser calls /api/rate-history → server reads listing_snapshots (service role)
-      → returns daily avg-rate series → avg-rate-over-time chart renders
+Visitor opens /markets/san-diego
+    → Static page serves PDF market report (no DB involved)
 
-Every other day (cron) on Vercel
-    → GET /api/scrape?platform=...
-    → Server: Firecrawl pages → extract JSON → upsert listings (service role)
-    → Dashboard shows updated rows on next refresh
+Authenticated user opens /dashboard
+    → Browser queries Supabase listings (anon key + RLS)
+    → Client deduplicates rows by canonical_vehicle_id
+    → Browser calls /api/rate-history → server reads listing_snapshots (service role)
+      → returns daily avg-rate series → chart renders
+
+Daily (06:00 – 09:00 UTC) on Vercel — per market
+    → GET /api/scrape?platform=…&market=…
+    → Server: fetch Outdoorsy/RVshare JSON:API → normalize → upsert listings (service role)
+    → Append listing_snapshots (time-series moat)
+    → Write search_snapshots (market-size + price stats)
+    → Log cron_runs row
+
+Daily (10:00 UTC) on Vercel
+    → GET /api/sweeper
+    → Server: flip is_active=false where last_seen_at < now() - 14d (all markets)
+
+Weekly (Sundays 11:00 / 11:30 UTC) on Vercel
+    → GET /api/detect-duplicates?market=…
+    → Server: run detect_duplicate_candidates SPI → write candidate_duplicates
+    → High-confidence pairs → canonical_vehicles (auto-linked)
+    → Medium pairs → reviewer queue
 ```
 
 ---
 
 ## Summary
 
-- **Frontend:** Next.js + React; home and dashboard talk to Supabase from the browser for waitlist and listing reads.
-- **Backend (lightweight):** One API route scrapes competitor sites via Firecrawl and writes to Supabase with a privileged key.
-- **Scheduling:** Vercel Cron hits that route in slices so scraping stays within execution limits.
-- **Safety:** Keep the service role key and Firecrawl key on the server; use RLS in Supabase to protect public data appropriately.
+- **Frontend:** Next.js + React; home page and dashboard talk to Supabase from the browser. Dashboard requires Supabase magic-link auth.
+- **Data pipeline:** Two direct JSON:APIs (Outdoorsy + RVshare) fetched at zero credit cost. Firecrawl is a dormant fallback, not the primary path.
+- **Scheduling:** Nine Vercel Cron jobs — six daily scrapes (two markets × three platform chunks), one daily sweeper, two weekly dedup runs.
+- **Data integrity:** Append-only snapshots build the time-series moat; `is_active` lifecycle tracking keeps aggregates honest; cross-platform dedup prevents double-counting.
+- **Safety:** Keep the service role key and cron secret on the server; RLS in Supabase controls what the browser key can read.
 
-If you change markets, URLs, or table shapes, update `app/api/scrape/route.ts`, Supabase schema, and any dashboard filters together so they stay in sync.
+Adding a new market means: adding entries to four config maps in `/api/scrape/route.ts`, three cron entries in `vercel.json`, a page under `app/markets/`, a card on the markets index, a sitemap entry, and running the two backfill scripts. No schema changes, no new routes.

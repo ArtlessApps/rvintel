@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.6 · 2026-04-23
+**Status:** Draft v1.7 · 2026-05-08
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -154,17 +154,23 @@ JSON extraction dominated cost **and latency** pre-pivot. After the 2026-04-22 d
 - Outdoorsy: direct API calls, **0 credits/day** (~70 HTTPS requests totaling ~15s end-to-end)
 - Total: **0 credits/month** (Firecrawl credits only consumed if a fallback flag is flipped)
 
-The Hobby 3,000/month allowance is now entirely reserved for enrichment (Phase 3) and future market expansion. San Diego at daily cadence costs zero credits across both platforms — a 97% reduction from the pre-pivot 1,200/mo projection.
+The Hobby 3,000/month allowance is now entirely reserved for enrichment (Phase 3) and future market expansion. Two markets (San Diego + Riverside County) at daily cadence cost zero Firecrawl credits — both platforms on direct JSON:API.
 
 ### Vercel (Pro, 300s function cap)
 
-| Cron | Target count | Worst-case duration | Status |
-|---|---|---|---|
-| `rvshare` | 1 unified sweep | ~60s (65 pages × ~300ms) | Fits |
-| `outdoorsy-1` (classes `b`, `a`) | 2 classes → ~23 API pages | ~30s | Fits |
-| `outdoorsy-2` (classes `c`, `trailer`) | 2 classes → ~47 API pages | ~60s | Fits |
+| Cron | Schedule (UTC) | Market | Worst-case duration | Status |
+|---|---|---|---|---|
+| `rvshare` | 06:00 daily | San Diego | ~60s | Fits |
+| `outdoorsy-1` (classes `b`, `a`) | 06:20 daily | San Diego | ~30s | Fits |
+| `outdoorsy-2` (classes `c`, `trailer`, `fifth-wheel`) | 07:00 daily | San Diego | ~60s | Fits |
+| `rvshare` | 08:00 daily | Riverside County | ~60s est. | Fits |
+| `outdoorsy-1` (classes `b`, `a`) | 08:20 daily | Riverside County | ~30s est. | Fits |
+| `outdoorsy-2` (classes `c`, `trailer`, `fifth-wheel`) | 09:00 daily | Riverside County | ~60s est. | Fits |
+| `sweeper` | 10:00 daily | all markets | <10s | Fits |
+| `detect-duplicates` | 11:00 Sundays | San Diego | <60s | Fits |
+| `detect-duplicates` | 11:30 Sundays | Riverside County | <60s | Fits |
 
-Three staggered crons at 6:00, 6:20, 7:00 UTC. The Outdoorsy split (2026-04-21) originally spaced Firecrawl batches ~40 min apart to dodge stealth-proxy IP reuse; after the 2026-04-22 pivot to direct JSON:API, the split is retained for durability (one failure does not tank the whole platform) rather than for bot-defense reasons. Both platform paths are now I/O-bound, not LLM-bound, so `CALL_TIMEOUT_MS` is irrelevant — a per-request 15s fetch timeout is all that's needed. The RVshare cron was collapsed from 2 cron jobs × 4 per-type URLs into a single unified sweep on 2026-04-22 after discovering the `type=` URL parameter was cosmetic (see §11).
+Nine crons total. The 06:00–09:00 window is I/O-bound scraping; 10:00 sweeper runs after all scrape crons have had time to complete so `last_seen_at` is fresh before the `< now() - 14d` cutoff is evaluated. Duplicate detection runs weekly (Sundays) rather than daily — the cross-platform pair universe grows slowly and a weekly cadence is sufficient to keep the review queue drained. The `GET /api/scrape` handler was fixed on 2026-05-07 to read `market` from the URL query string (previously hardcoded to `san-diego-ca`), which is what makes market-specific cron URLs work correctly.
 
 ---
 
@@ -251,7 +257,7 @@ Strategy revision (2026-04-22): the coverage problem is *solved* on **both** pla
 **Days 6–7 — Fan-out**
 - [x] **Coverage denominator now live** — `search_snapshots.total_results` gives us the ground-truth platform-reported universe on every cron run; 7-day coverage confirmation is now a SQL query against `search_snapshots`, not an estimate. Outdoorsy SD: 1,703 active listings confirmed. RVshare SD: 1,286 confirmed.
 - [x] **Credit consumption confirmed at zero** for SD — both platforms running on direct JSON:API; Firecrawl credits entirely reserved for Phase 3 enrichment and multi-market expansion.
-- [ ] Retire both backfill scripts (`backfill_outdoorsy_sd.mjs`, `backfill_rvshare_sd.mjs`) once the daily direct-API crons have run ≥3 consecutive full sweeps without regressions. (Retain as the canonical pattern for bootstrapping new markets.)
+- [ ] Retire both SD backfill scripts (`backfill_outdoorsy_sd.mjs`, `backfill_rvshare_sd.mjs`) once the daily direct-API crons have run ≥3 consecutive full sweeps without regressions. **Pattern preserved** — `backfill_rvshare_riverside_county.mjs` and `backfill_outdoorsy_riverside_county.mjs` were created on 2026-05-07 using the SD scripts as the template.
 
 ### Phase 2.5 — Cross-Platform De-duplication (Week 1, tail-end — IN PROGRESS 2026-04-23)
 
@@ -259,7 +265,7 @@ An RV listed on both Outdoorsy and RVshare currently produces two rows in `listi
 
 - [x] **Migration 007 — detection infrastructure (2026-04-23)** — `pg_trgm` extension; `haversine_miles()` distance function; `rv_make_aliases` lookup table seeded with the common series↔chassis shuffles (Four Winds ↔ Thor, Travato ↔ Winnebago, etc.) that cause the two platforms to label the same RV differently; `normalize_make()` SQL function; `candidate_duplicates` audit table; `detect_duplicate_candidates(market, geo_threshold)` SPI that emits cross-platform pairs with `distance_miles`, `rate_diff_pct`, `mm_sim`, `sleeps_match`, `year_match`, and an initial confidence tier.
 - [x] **Manual review tooling (2026-04-23)** — `scripts/detect_duplicates.mjs` runs the SPI and prints tier counts; `scripts/review_duplicates.mjs` renders each candidate pair with listing URLs, primary image URLs, and every signal used by the confidence scorer. Verdicts recorded via the same script (`--verdict match --id N`) into `candidate_duplicates.reviewer_verdict`.
-- [x] **API route `/api/detect-duplicates` (2026-04-23)** — thin wrapper around the detection SPI using the same `CRON_SECRET` auth pattern as `/api/scrape`. Not wired to Vercel Cron yet — manual invocation while thresholds stabilize.
+- [x] **API route `/api/detect-duplicates` (2026-04-23)** — thin wrapper around the detection SPI using the same `CRON_SECRET` auth pattern as `/api/scrape`. Wired to Vercel Cron on 2026-05-07 (weekly Sundays 11:00 UTC for SD, 11:30 UTC for RC) after the SD confidence thresholds were validated across 33 manually-reviewed pairs.
 - [x] **Migration 008 — first HIGH retune (2026-04-23)** — after reviewing 31 pairs (21 HIGH auto-classified, 10 MEDIUM sample) on the initial thresholds, relaxed `sleeps_match` strict-equality to `abs(diff) ≤ 1` and added an `OR` clause so `distance ≤ 0.5 mi OR rate_diff ≤ 5%` qualifies. Promoted 8 validated MEDIUM matches to HIGH.
 - [x] **Migration 009 — geography-only HIGH (2026-04-23)** — spot-check on the 15 newly-promoted HIGH pairs from 008 surfaced one false positive: two 2025 Coleman 17B travel trailers in Menifee with identical year/make/model/rate/sleeps/length but different physical RVs. The rate-identity clause was insufficient to discriminate commoditized inventory in fleet cities. Reverted to AND-gated geography: HIGH now requires `distance_miles ≤ 0.5`. Trade-off: one confirmed match (#2113, a 38-mile-apart same-owner pair) drops back to MEDIUM where reviewer verdict can promote it; zero auto-linked false positives in exchange. After the re-scoring pass, 4 additional rate-only-at-2mi HIGH rows dropped to LOW (one Coleman 17B + three Jayco/Durango at identical $99–$125 nightly in the same 2.13mi privacy-fuzz cluster), collapsing HIGH from 36 to 32 and dissolving one 3-way canonical component into two clean 2-ways.
 - [x] **Migration 010 — canonical vehicles schema + promotion SPI (2026-04-23)** — `canonical_vehicles` table (market, primary_listing_id, denormalized year/make/model/class/length/sleeps, platforms[], listing_count, listing_ids[], source), `listings.canonical_vehicle_id` FK, and `promote_candidates_to_canonical(market)` SPI that runs connected-components over `(confidence='high' AND reviewer_verdict != 'not_match') OR reviewer_verdict = 'match'` edges via a recursive-CTE BFS. Handles N:M merges (one owner's two Outdoorsy listings matching one RVshare listing collapse to one canonical vehicle) via the cross-platform bridge — detection only emits `outdoorsy ↔ rvshare` pairs, so same-platform duplicates surface through transitive closure. Re-runnable: canonicals are re-derived from the audit table on every call. First SD run produced 30 canonicals from 32 HIGH edges (2 three-listing components, 28 two-listing).
@@ -326,15 +332,18 @@ A public-facing "paste your listing URL → get a benchmark report" tool, modele
 
 Top-of-funnel content surfaces that support the waitlist funnel without depending on core data pipeline milestones.
 
-- [x] **Markets page** (`/markets`) — regional market reports hub; 6 region cards (Southwest, Mountain West, Pacific Coast, Southeast, Midwest, Northeast) with "Coming soon" state; CTA strip to waitlist. Ready to wire to real report pages as regional data accumulates. **(2026-04-23)**
+- [x] **Markets page** (`/markets`) — regional market reports hub; 6 region cards (Southwest, Mountain West, Pacific Coast, Southeast, Midwest, Northeast) with "Coming soon" state; CTA strip to waitlist. **(2026-04-23)**
+- [x] **San Diego market report page** (`/markets/san-diego`) — live PDF viewer + fallback card. PDF served from `/public/reports/`. **(2026-04-23)**
+- [x] **Riverside County market report page** (`/markets/riverside-county`) — live page wired to Outdoorsy + RVshare data pipeline (2026-05-07); PDF placeholder path set, report to be published once initial cron data accumulates.
+- [x] **Dashboard market selector updated (2026-05-07)** — San Diego and Riverside County are the two selectable markets; placeholder markets (LA, Denver, Austin, Miami) removed until data is live.
 - [x] **Learn page** (`/learn`) — blog-style host education hub; 6 placeholder posts seeded (Pricing Strategy, Seasonal Trends, Market Analysis, Host Growth); category filter bar ready for client-side filtering once posts exist; newsletter CTA to waitlist. **(2026-04-23)**
 - [ ] Publish first real Learn post (dynamic pricing 101) once Phase 2.5 dedup metrics are presentable as an external case study
-- [ ] Wire Markets region cards to real per-market report pages as Phase 6 markets come online
+- [ ] Wire remaining Markets region cards to per-market report pages as Phase 6 markets come online
 
 ### Phase 5 — Sweeper & Cleanup (Ongoing)
-- [ ] Daily sweeper cron flips `is_active = false` when `last_seen_at < now() - 14d`
+- [x] **Daily sweeper cron (2026-05-07)** — `/api/sweeper` route flips `is_active = false` when `last_seen_at < now() - 14d`. Runs at 10:00 UTC across **all markets** with no config changes required when new markets are added. Logs to `cron_runs` under `platform=sweeper`. Optional `market` query param for single-market manual runs.
 - [ ] Env var hygiene: re-set Supabase URL/anon key cleanly (currently has literal `\n` inside stored values)
-- [ ] Move to Firecrawl Growth tier once expanding beyond San Diego
+- [ ] Move to Firecrawl Growth tier — now beyond San Diego, this should be evaluated before adding a third market
 
 ### Access gating (progressive, cross-phase)
 
@@ -387,10 +396,14 @@ Only when we're charging money or when a feature needs user-scoped data (saved f
 
 Why not earlier: Tier 3's RLS model depends on knowing what users actually do. Designing user-scoped policies before the product has user-scoped features produces speculative RLS that gets rewritten when real features ship — with production user data in the middle of the migration.
 
-### Phase 6 — Multi-Market Expansion (Weeks 7+)
+### Phase 6 — Multi-Market Expansion (Weeks 7+, STARTED 2026-05-07)
+
+- [x] **Riverside County, CA (2026-05-07)** — scrape targets, 3 daily crons, backfill scripts, public market page, dashboard selector, weekly duplicate detection. All infrastructure mirrors San Diego exactly; the pattern is now repeatable in <1 hour per new market. First cron data expected 2026-05-08.
+- [ ] Run `detect_duplicates --tier medium --sample 50` on Riverside County after first week of data — harvest `normalize_make` alias candidates for inland/desert fleet operators not present in SD inventory
+- [ ] Publish Riverside County market report PDF once ≥14 days of cron data confirms listing counts and pricing bands
 - [ ] Add LA, Phoenix, Denver, Austin, Seattle, Miami, Nashville, Portland, Vegas
 - [ ] Add **RVezy** and **RVnGO** as P2P scrape targets (deferred from Phases 1–5)
-- [ ] Upgrade Firecrawl to Growth (20k credits/mo) — needed once scraping ≥3 markets
+- [ ] Upgrade Firecrawl to Growth (20k credits/mo) — evaluate before adding a third market (Phase 5 dependency)
 
 ---
 
@@ -398,8 +411,8 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 
 | Metric | Week 1 target | Week 1 actual (2026-04-23) | Week 4 target | Quarter 1 target |
 |---|---|---|---|---|
-| Markets covered | 1 | **1** | 1 | 10 |
-| Unique listings in registry | 300+ | **~2,980 active** (~3,356 total incl. stale) | 3,000+ | 40,000+ |
+| Markets covered | 1 | **2** (SD live since 2026-04-23; RC pipeline started 2026-05-07) | 2 | 10 |
+| Unique listings in registry | 300+ | **~2,980 active SD** + RC bootstrapping | 5,000+ | 40,000+ |
 | % listings priced in last 7d | 70% | **100%** (full-universe daily sweep, both platforms) | 100% | 99% |
 | % active listings with core comp-set attrs | 0% | **~99%** (length, sleeps, delivery, location from search APIs) | 100% | 99% |
 | % listings with detail-page enrichment | 0% | **0%** (Phase 3 not yet started) | 60% | 90% |
@@ -423,7 +436,7 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 - **Config hygiene.** `.env.local` currently stores some values with literal `\n` inside the quoted strings; Next.js's built-in dotenv tolerates this, but hand-rolled parsers (e.g. the backfill scripts' env loaders) must expand-and-trim or every DB write silently 204s into the void. Tracked in Phase 5.
 - **Occupancy inference accuracy.** Calendar diffs assume "available → booked" means "booked" — but hosts also block dates manually. Need to validate against 1-2 known-booked listings.
 - **Canonical-vehicle false negatives in fleet cities.** The current HIGH-tier geography-only rule (`distance ≤ 0.5 mi`) will miss same-owner pairs where the two platforms expose different coordinates — typically home vs. storage yard, or one platform's privacy-fuzzed centroid vs. the other's true pin. Mitigation today is reviewer verdict; long-term mitigation is the deferred pHash backstop. Monitor MEDIUM queue growth: if it accumulates >500 unreviewed pairs across all markets, escalate the pHash work before launching more markets.
-- **`normalize_make` alias coverage.** The `rv_make_aliases` seed list covers the dozen-ish series↔chassis shuffles observed on SD inventory. New markets will surface new aliases (especially regional fleet operators who brand their units), and an un-aliased make pair drags `mm_sim` below 0.60 and drops real matches out of detection entirely. When adding a market, run `detect_duplicates --tier medium --sample 50` and harvest alias candidates from mismatched-make rows before promoting.
+- **`normalize_make` alias coverage.** The `rv_make_aliases` seed list covers the dozen-ish series↔chassis shuffles observed on SD inventory. New markets will surface new aliases (especially regional fleet operators who brand their units), and an un-aliased make pair drags `mm_sim` below 0.60 and drops real matches out of detection entirely. **Riverside County action item:** run `detect_duplicates --tier medium --sample 50` after the first week of RC data and harvest alias candidates before running `promote_candidates_to_canonical` for the first time. Inland/desert inventory (Joshua Tree, Big Bear, Coachella Valley corridors) likely has different fleet operator branding than the SD coastal market.
 - **Outdoorsy sentinel timestamps.** The Outdoorsy API returns `"0000-12-31T16:07:02-07:52"` for `first_published` / `last_published` on some listings where those fields are unset. Postgres `timestamptz` rejects year-0000 values as out-of-range. Mitigated in `lib/outdoorsy-api.ts` (`asTimestamp` helper rejects pre-epoch strings) and in the backfill script (`asTs` helper). Any future consumer of these columns must be aware the field is nullable for this reason.
 - **RVshare decimal-valued spec fields.** Fields like `fresh_water_tank`, `electric_service`, `generator_usage_included`, and `nightly_mileage_included` are returned as floats (e.g. `"40.5"` gallons) despite appearing integer in most documentation. Migration 006 relaxed these columns to `numeric`. Do not assume integer semantics when doing arithmetic on these.
 
@@ -472,3 +485,7 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 - **2026-04-23:** **Shipped Tier 2 magic-link auth ahead of Phase 4.** The original plan deferred magic-link auth to Phase 4's start, gating on "comp-sets are the first feature where logged-in state matters." Pulled forward because: (1) the waitlist is actively growing and a real identity layer — even without data gating — lets us associate dashboard sessions with waitlist email addresses, which is table-stakes for the Phase 4.5 Benchmark funnel; (2) `@supabase/ssr` is a clean install with no migration cost since we were already on `@supabase/supabase-js`; (3) passcode rotation (`DASHBOARD_ACCESS_SIGNATURE`) was becoming operational friction as more users were onboarded. The dashboard still queries Supabase with the anon key from the browser — Tier 2 is a visibility gate, not a data gate. The Tier 2.5 RSC refactor (service-role server queries + anon policy drop) remains Phase 4-triggered.
 - **2026-04-23:** **Added `/markets` and `/learn` to the marketing site nav.** Both are placeholder pages (region cards with "Coming soon" state; seeded blog posts) built ahead of content to: (1) establish URL permanence before any external link or SEO index; (2) give the waitlist CTA a context-appropriate hook on each page ("get notified when reports launch" / "get new guides in your inbox"); (3) define the information architecture before content volume forces a structural rewrite. Pages follow the "Pristine Curator" design system with the signature gradient CTA strip. Active nav state highlights the current page.
 - **2026-04-23:** **Dashboard dedup rewire lives in the client, not in a view.** Option A was a Postgres view (`active_listings_deduped` or similar) that pre-joins `listings` ↔ `canonical_vehicles` and picks a representative per canonical, so the dashboard could keep its current single-table query. Option B (chosen) does the grouping client-side in a `useMemo` after fetching the raw `listings` rows with `canonical_vehicle_id` added to the SELECT. Chose B because: (1) the dashboard fetches ≤1k rows per market/class; grouping 1k rows into ~300–900 units is sub-millisecond JS and keeps the DB path unchanged; (2) a view locks in one "pick representative" rule (e.g. `primary_listing_id`), but the dashboard wants a different rule than analytics queries will want — most-reviewed listing as the comp-table face, vs. rate-mean across members for the metric cards, vs. whichever-is-cheaper for the future Benchmark feature. Each consumer can pick its own rule without fighting a shared view; (3) the cross-listing UI (both platform badges, `×N cross-listed` indicator, per-member external links) needs the full member array per group, which a view can only deliver via `array_agg`, which is awkward to type through PostgREST. A view becomes worthwhile the day two independent pages (Benchmark, public market pages) both need the same dedup shape; until then the client-side helper stays colocated with the one consumer.
+- **2026-05-07:** **Riverside County, CA added as market 2.** First Phase 6 market. Chose Riverside County over LA, Phoenix, or Vegas as the second market because of a high-value interested user in the area. The same repeatable pattern from SD applied wholesale: 3 scrape cron entries in `vercel.json`, entries in all 4 target maps in `/api/scrape`, new `app/markets/riverside-county/page.tsx`, Riverside County card on the markets index, `/markets/riverside-county` in the sitemap, two backfill scripts, and the dashboard market selector. Total implementation time confirms the bootstrapping pattern is genuinely reusable — a new market is a config-level change, not an engineering task.
+- **2026-05-07:** **Fixed silent bug in `GET /api/scrape` — market was hardcoded to `san-diego-ca`.** The Vercel Cron GET handler was building its forwarded POST body with `market: "san-diego-ca"` regardless of what the cron URL's `?market=` param said. This was invisible while SD was the only market but would have caused every new-market cron to silently re-scrape San Diego instead of the intended market. Fixed to read `market` from `url.searchParams`, falling back to `"san-diego-ca"` for backward compatibility with the existing SD cron URLs that omit the param.
+- **2026-05-07:** **Shipped the `is_active` sweeper cron.** The PRD had this as a pending Phase 5 item since 2026-04-20. Pulled forward because adding a second market makes stale-listing inflation more visible — a listing that goes dark in SD and another in RC would both inflate active-count denominators until the sweeper ran. Designed as a single endpoint that covers all markets with no per-market config, so it scales to 10 markets without touching `vercel.json` again.
+- **2026-05-07:** **Wired `detect-duplicates` to a weekly Vercel Cron.** Previously manual-only while thresholds were being tuned. After 33 reviewed pairs and 3 migrations tightening the HIGH tier to zero false positives, the SD thresholds are stable enough to run unattended. Scheduled weekly (Sundays) rather than daily — the cross-platform pair universe grows by a handful of new listings per day and a 7-day accumulation gives a meaningful batch to review. Riverside County wired immediately on the same schedule, 30 minutes after SD to avoid concurrent function execution.
