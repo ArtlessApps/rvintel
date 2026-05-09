@@ -32,3 +32,6 @@ yarn-error.log*
 
 # Testing
 coverage
+
+# Generated market reports
+MarketReports/
