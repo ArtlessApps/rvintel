@@ -338,7 +338,18 @@ function computeSeasonalStats(snapshots) {
     demandIndex[m] = Math.round((monthAvgs[m] / overallAvg) * 100);
   }
 
-  return { hasSeasonalData: true, demandIndex, months };
+  // Compute actual observed peak/off premiums from the index
+  const idxValues = Object.values(demandIndex);
+  const peakPct = Math.max(...idxValues.filter((v) => v >= 90).map((v) => v - 100), 0) || null;
+  const offPct  = Math.max(...idxValues.filter((v) => v < 70).map((v) => 100 - v), 0) || null;
+
+  return {
+    hasSeasonalData: true,
+    demandIndex,
+    months,
+    maxPeakPct: peakPct > 0 ? Math.round(peakPct) : null,
+    maxOffPct:  offPct  > 0 ? Math.round(offPct)  : null,
+  };
 }
 
 // ── badge helpers ──────────────────────────────────────────────────────────────
@@ -386,16 +397,17 @@ function generateHTML({ market, stats, seasonal, now }) {
     MAJOR_CLASSES.has(cls) || v.count / (stats.totalListings || 1) >= 0.05
   );
 
-  // Under-median gap calculations
-  const underMedianListings = classEntries.map(([, v]) => v);
-  // avgGap for under-median: approximate as (medianRate - medianRate * 0.85) ~ 15% below
-  const avgGapApprox = stats.medianRate != null ? stats.medianRate * 0.15 : 20;
-  const annualGapLow = Math.round((avgGapApprox * 365 * 0.3) / 1000);
-  const annualGapHigh = Math.round((avgGapApprox * 365 * 0.5) / 1000);
+  // ── Section 5 revenue-opportunity estimates (60% occupancy assumption) ────────
+  // Under-market gap: average under-median host assumed at the P25–median midpoint.
+  // The 60% occupancy figure is an industry-standard assumption, not measured.
+  const OCCUPANCY = 0.6;
 
-  // Opportunity table
-  const minRevGain = Math.round(((3200 + 1800) / 2 + avgGapApprox * 365 * 0.4) / 100) * 100;
-  const maxRevGain = Math.round(((6800 + 3400) / 2 + avgGapApprox * 365 * 0.4) / 100) * 100;
+  const underMarketGapPerNight = stats.medianRate != null && stats.p25Rate != null
+    ? (stats.medianRate - stats.p25Rate) / 2
+    : null;
+  const underMarketAnnual = underMarketGapPerNight != null
+    ? Math.round(underMarketGapPerNight * 365 * OCCUPANCY)
+    : null;
 
   // Platform insight
   const odsAvg = stats.byPlatform.outdoorsy.avgRate;
@@ -458,7 +470,7 @@ function generateHTML({ market, stats, seasonal, now }) {
     <div style="display: flex; gap: 24px; margin-bottom: 36px; margin-top: 16px; flex-wrap: wrap;">
       <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted);">
         <div style="width: 12px; height: 12px; background: #28b78a; border-radius: 2px;"></div>
-        Peak season${peakMonths.length > 0 ? ` (${peakLabel})` : ""} — avg +38% premium
+        Peak season${peakMonths.length > 0 ? ` (${peakLabel})` : ""}${seasonal.maxPeakPct != null ? ` — avg +${seasonal.maxPeakPct}% above baseline` : ""}
       </div>
       <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted);">
         <div style="width: 12px; height: 12px; background: #6a95b8; border-radius: 2px;"></div>
@@ -473,7 +485,7 @@ function generateHTML({ market, stats, seasonal, now }) {
     <div class="insight">
       <div class="insight-label">Seasonal Opportunity</div>
       <div class="insight-text">
-        Most hosts use <strong>flat-rate pricing year-round</strong>. Top-performing hosts in the market apply a <strong>28–42% peak premium</strong>${peakMonths.length > 0 ? ` in ${peakLabel}` : ""} and a <strong>10–15% shoulder discount</strong> in slower months to maintain occupancy.
+        Most hosts use <strong>flat-rate pricing year-round</strong>. Observed pricing in ${city} shows${seasonal.maxPeakPct != null ? ` a <strong>+${seasonal.maxPeakPct}% peak premium</strong>${peakMonths.length > 0 ? ` in ${peakLabel}` : ""}` : " elevated pricing during peak months"}${seasonal.maxOffPct != null ? ` and a <strong>-${seasonal.maxOffPct}% off-season dip</strong>` : ""} — hosts using flat-rate pricing forfeit this natural spread.
       </div>
     </div>`;
   } else {
@@ -566,42 +578,28 @@ function generateHTML({ market, stats, seasonal, now }) {
   const rvsharePct = 100 - outdoorsyPct;
 
   // Market insight text
-  const marketInsightText = `The market average of <strong>${avgStr}/night sits ${gapStr} ${gap != null && gap > 0 ? "above" : "below"} the median of ${medStr}</strong> — meaning more than half of ${city} hosts are pricing below the market mean. On a 60% occupancy rate, closing that gap represents <strong>${annualGapOpportunity != null ? fmtMoney(annualGapOpportunity) + " in additional annual revenue" : "meaningful additional annual revenue"}</strong> per unit.`;
+  const marketInsightText = `The market average of <strong>${avgStr}/night sits ${gapStr} ${gap != null && gap > 0 ? "above" : "below"} the median of ${medStr}</strong> — meaning more than half of ${city} hosts are pricing below the market mean. At an assumed 60% occupancy, closing that gap represents <strong>${annualGapOpportunity != null ? fmtMoney(annualGapOpportunity) + " in estimated additional annual revenue" : "meaningful estimated additional annual revenue"}</strong> per unit.`;
 
-  // Section 6 table rows
+  // Section 6 table rows — only rows with data-backed percentages and real-derived gaps
   const sec6Rows = [
     {
-      label: "Flat rate — no seasonal surge pricing",
-      pct: "~72%",
-      gap: "$3,200–$6,800",
-      diff: "Easy",
-      diffStyle: "background: rgba(45,138,94,0.1); color: var(--green);",
-    },
-    {
-      label: "No weekend premium applied",
-      pct: "~58%",
-      gap: "$1,800–$3,400",
-      diff: "Easy",
-      diffStyle: "background: rgba(45,138,94,0.1); color: var(--green);",
-    },
-    {
       label: "Under-market pricing vs. comp-set",
-      pct: stats.underMedianPct != null ? stats.underMedianPct + "% (data-backed)" : "~52%",
-      gap: `$${annualGapLow}k–$${annualGapHigh}k`,
+      pct: stats.underMedianPct != null ? stats.underMedianPct + "% (data-backed)" : "—",
+      gap: underMarketAnnual != null ? fmtMoney(underMarketAnnual) + " (est.)" : "—",
       diff: "Easy",
       diffStyle: "background: rgba(45,138,94,0.1); color: var(--green);",
     },
     {
       label: "No delivery offered",
-      pct: stats.noDeliveryPct != null ? stats.noDeliveryPct + "% (data-backed)" : "~40%",
-      gap: "$3,800–$8,200",
+      pct: stats.noDeliveryPct != null ? stats.noDeliveryPct + "% (data-backed)" : "—",
+      gap: "—",
       diff: "Hard",
       diffStyle: "background: rgba(192,72,72,0.1); color: var(--red);",
     },
     {
-      label: "Instant book not enabled",
-      pct: stats.noInstantBookPct != null ? stats.noInstantBookPct + "% (data-backed)" : "~45%",
-      gap: "$1,200–$2,800",
+      label: "Instant Book not enabled",
+      pct: stats.noInstantBookPct != null ? stats.noInstantBookPct + "% (data-backed)" : "—",
+      gap: "—",
       diff: "Easy",
       diffStyle: "background: rgba(45,138,94,0.1); color: var(--green);",
     },
@@ -617,13 +615,8 @@ function generateHTML({ market, stats, seasonal, now }) {
 
   // Executive summary text
   const execText = gap != null && stats.avgRate != null && stats.medianRate != null
-    ? `${city}'s RV rental market is <strong>larger and more fragmented than most hosts realize</strong>. With ${fmtNum(stats.totalListings)} active listings across two major platforms, the average asking rate of <strong>${avgStr}/night sits ${gapStr} above the median of ${medStr}</strong> — meaning more than half of ${city} hosts are pricing below the market mean. On a 60% occupancy rate, closing that gap represents <strong>${fmtMoney(annualGapOpportunity)} in additional annual revenue</strong> per unit.`
+    ? `${city}'s RV rental market is <strong>larger and more fragmented than most hosts realize</strong>. With ${fmtNum(stats.totalListings)} active listings across two major platforms, the average asking rate of <strong>${avgStr}/night sits ${gapStr} above the median of ${medStr}</strong> — meaning more than half of ${city} hosts are pricing below the market mean. At an assumed 60% occupancy, closing that gap represents <strong>${fmtMoney(annualGapOpportunity)} in estimated additional annual revenue</strong> per unit.`
     : `${city}'s RV rental market spans <strong>${fmtNum(stats.totalListings)} active listings</strong> across two major platforms. Analysis reveals consistent patterns where top-performing hosts outprice the median through dynamic pricing, professional presentation, and platform optimization.`;
-
-  // Delivery stat for opp card
-  const deliveryOppStat = stats.deliveryPct != null
-    ? `+28% annual revenue; ${stats.deliveryPct}% of ${city} hosts currently offer delivery`
-    : "+28% annual revenue for delivery-enabled listings";
 
   // Cover stat: classes count (how many have > 0 listings)
   const activeClassCount = classEntries.length;
@@ -1581,7 +1574,7 @@ function generateHTML({ market, stats, seasonal, now }) {
     </div>
 
     <p style="color: var(--text-muted); font-size: 14px; line-height: 1.8;">
-      ${city} ranks among the top RV rental markets tracked by RVIntel. With <strong>${fmtNum(stats.totalListings)} active listings</strong> across Outdoorsy and RVshare, the market is anchored by <strong>${dominantClass}</strong> — which account for ${dominantClassPct} of all inventory and command an average of ${dominantClassAvg}. The <strong>${p75Str} top-quartile threshold</strong> represents a meaningful pricing ceiling that only ${100 - (stats.underMedianPct || 50)}% of hosts currently reach.
+      ${city} ranks among the top RV rental markets tracked by RVIntel. With <strong>${fmtNum(stats.totalListings)} active listings</strong> across Outdoorsy and RVshare, the market is anchored by <strong>${dominantClass}</strong> — which account for ${dominantClassPct} of all inventory and command an average of ${dominantClassAvg}. The <strong>${p75Str} top-quartile threshold</strong> is the 75th percentile rate — only 25% of ${city} hosts price at or above this level.
     </p>
   </div>
 
@@ -1679,49 +1672,10 @@ function generateHTML({ market, stats, seasonal, now }) {
     </div>
   </div>
 
-  <!-- SECTION 5: WHAT SEPARATES TOP EARNERS -->
+  <!-- SECTION 5: WHERE HOSTS LEAVE MONEY -->
   <div class="section page-break">
     <div class="section-header">
       <div class="section-number">05</div>
-      <h2 class="section-title">What Separates Top Earners</h2>
-    </div>
-
-    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.8; margin-bottom: 32px;">
-      Analysis of the top-quartile listings in ${city} reveals consistent patterns across pricing, presentation, and policy. These are not simply "nicer RVs" — many mid-range units in the P75 bracket were manufactured in the same year range as P25 units. The differentiators are operational.
-    </p>
-
-    <div class="opportunity-grid">
-      <div class="opp-card">
-        <span class="opp-icon">📸</span>
-        <div class="opp-title">Professional photos</div>
-        <div class="opp-text">Listings with 10+ high-quality photos command a measurable premium. The top quartile averages 14.2 photos per listing; the bottom quartile averages 5.8.</div>
-        <div class="opp-stat">+$31/night avg</div>
-      </div>
-      <div class="opp-card">
-        <span class="opp-icon">📅</span>
-        <div class="opp-title">Dynamic pricing</div>
-        <div class="opp-text">Top earners price weekends 18–26% above weekday rates. Fewer than 1 in 4 ${city} hosts currently uses any form of day-of-week differentiation.</div>
-        <div class="opp-stat">+22% weekend lift</div>
-      </div>
-      <div class="opp-card">
-        <span class="opp-icon">⭐</span>
-        <div class="opp-title">Review volume</div>
-        <div class="opp-text">Listings with 20+ reviews book at rates 34% higher than listings with fewer than 5 reviews, even when controlling for class and price.</div>
-        <div class="opp-stat">20+ reviews key threshold</div>
-      </div>
-      <div class="opp-card">
-        <span class="opp-icon">🚚</span>
-        <div class="opp-title">Delivery radius</div>
-        <div class="opp-text">Hosts offering delivery within 50+ miles access a dramatically larger addressable renter base. Delivery-enabled listings earn 28% more annually on average.</div>
-        <div class="opp-stat">${deliveryOppStat}</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECTION 6: WHERE HOSTS LEAVE MONEY -->
-  <div class="section page-break">
-    <div class="section-header">
-      <div class="section-number">06</div>
       <h2 class="section-title">Where ${city} Hosts Leave Money Behind</h2>
     </div>
 
@@ -1730,7 +1684,7 @@ function generateHTML({ market, stats, seasonal, now }) {
         <tr>
           <th>Missed Opportunity</th>
           <th>% of ${city} Hosts Affected</th>
-          <th>Est. Annual Revenue Gap</th>
+          <th>Est. Annual Opportunity*</th>
           <th>Difficulty to Fix</th>
         </tr>
       </thead>
@@ -1742,15 +1696,15 @@ function generateHTML({ market, stats, seasonal, now }) {
     <div class="insight">
       <div class="insight-label">Bottom Line</div>
       <div class="insight-text">
-        A host fixing just the top 3 "Easy" items above — adding seasonal pricing, a weekend premium, and correcting under-market rates — could realistically see <strong>${fmtMoney(minRevGain)}–${fmtMoney(maxRevGain)} in additional annual revenue per unit</strong> without any capital investment.
+        A host correcting under-market pricing alone — moving from the P25–median midpoint up to the market median — could see <strong>${underMarketAnnual != null ? fmtMoney(underMarketAnnual) + " in estimated additional annual revenue per unit" : "meaningful estimated additional annual revenue per unit"}</strong> at assumed 60% occupancy. *Estimates use real pricing data from ${city} listings; 60% occupancy is an industry-standard assumption, not measured.
       </div>
     </div>
   </div>
 
-  <!-- SECTION 7: METHODOLOGY -->
+  <!-- SECTION 6: METHODOLOGY -->
   <div class="section page-break">
     <div class="section-header">
-      <div class="section-number">07</div>
+      <div class="section-number">06</div>
       <h2 class="section-title">Methodology</h2>
     </div>
 
@@ -1776,9 +1730,9 @@ function generateHTML({ market, stats, seasonal, now }) {
         </tr>
         <tr>
           <td>Listing attributes</td>
-          <td>Platform detail pages</td>
-          <td class="number">Weekly</td>
-          <td class="number">~82% of active listings</td>
+          <td>Platform search API</td>
+          <td class="number">Daily</td>
+          <td class="number">100% of ${city} inventory</td>
         </tr>
         <tr>
           <td>Review counts / ratings</td>
@@ -1789,8 +1743,8 @@ function generateHTML({ market, stats, seasonal, now }) {
         <tr>
           <td>Availability / occupancy inference</td>
           <td>Calendar scrape</td>
-          <td class="number">Weekly</td>
-          <td class="number">~68% of active listings</td>
+          <td class="number">Not yet collected</td>
+          <td class="number">—</td>
         </tr>
       </tbody>
     </table>
