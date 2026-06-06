@@ -72,6 +72,16 @@ const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=pop-up" },
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=truck-camper" },
   ],
+  "arklatex": [
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=class-a" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=class-b" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=class-c" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=travel-trailer" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=fifth-wheel" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=toy-hauler" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=pop-up" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=truck-camper" },
+  ],
 };
 
 // RVshare direct-API targets. One entry per market — the backend returns the
@@ -81,6 +91,7 @@ const RVSHARE_API_TARGETS: Record<string, RvshareApiTarget> = {
   "san-diego-ca": { location: "san diego ca" },
   "riverside-county-ca": { location: "riverside county ca" },
   "portland-or": { location: "portland or" },
+  "arklatex": { location: "shreveport la" },
 };
 
 // ─── Outdoorsy direct-API targets (active as of 2026-04-22) ──────────────────
@@ -121,6 +132,14 @@ const OUTDOORSY_API_TARGETS: Record<string, OutdoorsyApiTarget[]> = {
     { address: "Portland, OR", classCode: "trailer", group: "2" },
     { address: "Portland, OR", classCode: "fifth-wheel", group: "2" },
   ],
+  "arklatex": [
+    // Shreveport metro anchor — covers the LA/TX core of ArkLaTex on both APIs.
+    { address: "Shreveport, LA", classCode: "a", group: "1" },
+    { address: "Shreveport, LA", classCode: "b", group: "1" },
+    { address: "Shreveport, LA", classCode: "c", group: "2" },
+    { address: "Shreveport, LA", classCode: "trailer", group: "2" },
+    { address: "Shreveport, LA", classCode: "fifth-wheel", group: "2" },
+  ],
 };
 
 // Dormant fallback: used only when OUTDOORSY_SCRAPER=firecrawl. Same shape as
@@ -150,6 +169,12 @@ const OUTDOORSY_FIRECRAWL_TARGETS: Record<string, ScrapeTarget[]> = {
     { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
     { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
     { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
+  ],
+  "arklatex": [
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
   ],
 };
 

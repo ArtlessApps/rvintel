@@ -88,11 +88,12 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">Market</label>
             <Select value={market} onValueChange={setMarket}>
-              <SelectTrigger className="w-44 h-9 text-sm"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-48 h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="san-diego-ca">San Diego, CA</SelectItem>
                 <SelectItem value="riverside-county-ca">Riverside County, CA</SelectItem>
                 <SelectItem value="portland-or">Portland, OR</SelectItem>
+                <SelectItem value="arklatex">ArkLaTex</SelectItem>
               </SelectContent>
             </Select>
           </div>
