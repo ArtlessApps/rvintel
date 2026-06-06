@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/logo";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
+import { liveMarkets } from "@/lib/markets";
 import {
   TrendingUp,
   DollarSign,
@@ -14,7 +16,11 @@ import {
   CheckCircle2,
   ArrowRight,
   Sparkles,
+  MapPin,
 } from "lucide-react";
+
+const LIVE_MARKET_COUNT = liveMarkets().length;
+const REGION_COUNT = new Set(liveMarkets().map((m) => m.region)).size;
 
 function BrowserWindow({
   url,
@@ -113,11 +119,11 @@ export default function WaitlistPage() {
 
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 mx-auto lg:mx-0 w-fit">
                   <Sparkles className="w-4 h-4 shrink-0" aria-hidden />
-                  <span>Early Access Opening Soon</span>
+                  <span>{LIVE_MARKET_COUNT} Markets Live Nationwide</span>
                 </div>
 
                 <p className="text-base sm:text-lg text-muted-foreground leading-relaxed text-pretty max-w-xl mx-auto lg:mx-0 mb-8">
-                  The average RV owner underprices by 18% on peak weekends. RVIntel tracks local supply, demand, and competitor rates so you never guess again.
+                  The average RV owner underprices by 18% on peak weekends. RVIntel tracks supply, demand, and competitor rates across {REGION_COUNT} US regions — from San Diego to Seattle — so you never guess again.
                 </p>
 
                 <div id="waitlist" className="max-w-md mx-auto lg:mx-0 w-full">
@@ -167,6 +173,65 @@ export default function WaitlistPage() {
               <div className="order-1 lg:order-2 min-w-0">
                 <HeroProductVisual />
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Coverage */}
+        <section
+          aria-labelledby="coverage-heading"
+          className="py-14 px-4 sm:px-6 lg:px-8 bg-muted/40"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-10">
+              <h2
+                id="coverage-heading"
+                className="text-2xl sm:text-3xl font-bold text-foreground mb-3"
+              >
+                Coast-to-Coast Market Intelligence
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Live pricing data across California, the Mountain West, Southwest, Southeast,
+                Midwest, Northeast, and Pacific Northwest.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto mb-10">
+              {[
+                { icon: MapPin, label: "Live markets", value: String(LIVE_MARKET_COUNT) },
+                { icon: BarChart3, label: "Regions", value: String(REGION_COUNT) },
+                { icon: TrendingUp, label: "Listings tracked", value: "26,000+" },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="text-center p-6 bg-background/60 rounded-sm">
+                  <div className="w-10 h-10 bg-primary/10 rounded-sm flex items-center justify-center mx-auto mb-3">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground font-medium mb-1">
+                    {label}
+                  </div>
+                  <div className="text-2xl font-semibold tracking-tight">{value}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-sm"
+              >
+                <Link href="/markets">Browse all markets</Link>
+              </Button>
+              <Button
+                asChild
+                className="rounded-sm"
+                style={{ background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }}
+              >
+                <Link href="/dashboard">
+                  Open dashboard
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -282,7 +347,8 @@ export default function WaitlistPage() {
               Ready to Maximize Your RV Revenue?
             </h2>
             <p className="text-lg text-muted-foreground mb-10">
-              Join the waitlist today and be first in line when we launch.
+              The dashboard is live across {LIVE_MARKET_COUNT} markets. Join the waitlist for full
+              access and benchmark reports as we roll out.
             </p>
 
             {!submitted ? (

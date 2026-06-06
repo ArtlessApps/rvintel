@@ -8,7 +8,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'RVIntel - Stop Leaving Money on the Table',
-  description: 'RV rental owners fly blind on pricing. RVIntel gives you the market intelligence to know exactly what your rig should earn.',
+  description: 'RV rental market intelligence across 33 US markets. RVIntel tracks competitor rates, occupancy signals, and pricing trends so hosts know exactly what their rig should earn.',
   generator: 'v0.app',
   icons: {
     icon: [

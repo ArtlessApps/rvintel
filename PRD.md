@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.7 · 2026-05-08
+**Status:** Draft v1.8 · 2026-06-06
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -21,7 +21,7 @@ The opportunity is a **"AirDNA for RVs"** — a subscription product that gives 
 ## 2. Goals & Non-Goals
 
 ### Goals
-- Provide **current, unbiased** market pricing for every major RV rental market in the US, starting with San Diego.
+- Provide **current, unbiased** market pricing for every major RV rental market in the US — **33 live geo markets** across 7 regions as of 2026-06-06, bootstrapped from San Diego.
 - Enable **host-level comp-sets** — "show me 8 listings like mine and what they're charging."
 - Expose **price trend and occupancy data** derived from time-series scraping.
 - Offer a **"Benchmark My Listing" self-serve report** — host pastes their Outdoorsy/RVshare URL and gets an instant head-to-head vs. the market (class, price percentile, comp-set, occupancy gap).
@@ -149,28 +149,24 @@ Every listing has:
 
 JSON extraction dominated cost **and latency** pre-pivot. After the 2026-04-22 dual pivot (Outdoorsy + RVshare both onto direct JSON:APIs), Firecrawl is a dormant fallback on both platforms — the two-tier scrape architecture is moot for SD. The Firecrawl budget below applies only when `OUTDOORSY_SCRAPER` or `RVSHARE_SCRAPER` is flipped to `firecrawl`.
 
-**Steady-state budget at daily cadence (San Diego only), post-2026-04-22 pivot:**
-- RVshare: direct API calls, **0 credits/day** (~65 HTTPS requests totaling ~50s end-to-end)
-- Outdoorsy: direct API calls, **0 credits/day** (~70 HTTPS requests totaling ~15s end-to-end)
-- Total: **0 credits/month** (Firecrawl credits only consumed if a fallback flag is flipped)
+**Steady-state budget at daily cadence (33 markets), post-2026-06-06 geo expansion:**
+- RVshare: direct API calls, **0 credits/day per discovery anchor** (~30–90s per market depending on inventory size)
+- Outdoorsy: direct API calls, **0 credits/day per discovery anchor** (~30–120s per market across 5 class sweeps)
+- Total: **0 Firecrawl credits/month** at steady state (credits only consumed if a fallback flag is flipped)
 
-The Hobby 3,000/month allowance is now entirely reserved for enrichment (Phase 3) and future market expansion. Two markets (San Diego + Riverside County) at daily cadence cost zero Firecrawl credits — both platforms on direct JSON:API.
+The Hobby 3,000/month allowance remains reserved for Phase 3 enrichment only. All 31 discovery anchors run on direct JSON:API — zero Firecrawl cost regardless of market count.
 
-### Vercel (Pro, 300s function cap)
+### Vercel (Pro, 300s function cap, 100-cron/project limit)
 
-| Cron | Schedule (UTC) | Market | Worst-case duration | Status |
-|---|---|---|---|---|
-| `rvshare` | 06:00 daily | San Diego | ~60s | Fits |
-| `outdoorsy-1` (classes `b`, `a`) | 06:20 daily | San Diego | ~30s | Fits |
-| `outdoorsy-2` (classes `c`, `trailer`, `fifth-wheel`) | 07:00 daily | San Diego | ~60s | Fits |
-| `rvshare` | 08:00 daily | Riverside County | ~60s est. | Fits |
-| `outdoorsy-1` (classes `b`, `a`) | 08:20 daily | Riverside County | ~30s est. | Fits |
-| `outdoorsy-2` (classes `c`, `trailer`, `fifth-wheel`) | 09:00 daily | Riverside County | ~60s est. | Fits |
-| `sweeper` | 10:00 daily | all markets | <10s | Fits |
-| `detect-duplicates` | 11:00 Sundays | San Diego | <60s | Fits |
-| `detect-duplicates` | 11:30 Sundays | Riverside County | <60s | Fits |
+`vercel.json` is generated from `lib/markets.ts` via `scripts/generate_vercel_crons.mjs`. Steady-state schedule (2026-06-06):
 
-Nine crons total. The 06:00–09:00 window is I/O-bound scraping; 10:00 sweeper runs after all scrape crons have had time to complete so `last_seen_at` is fresh before the `< now() - 14d` cutoff is evaluated. Duplicate detection runs weekly (Sundays) rather than daily — the cross-platform pair universe grows slowly and a weekly cadence is sufficient to keep the review queue drained. The `GET /api/scrape` handler was fixed on 2026-05-07 to read `market` from the URL query string (previously hardcoded to `san-diego-ca`), which is what makes market-specific cron URLs work correctly.
+| Cron type | Count | Schedule (UTC) | Notes |
+|---|---|---|---|
+| `rvshare` + `outdoorsy-1` + `outdoorsy-2` | **93** (31 anchors × 3) | 06:00–13:09 daily, staggered 10 min apart | San Diego uses legacy no-param URLs; all others pass `?market=<slug>` |
+| `sweeper` | **1** | 13:09 daily | Global; optional `?market=` for debugging |
+| `detect-duplicates?all=true` | **1** | 11:00 Sundays | Loops all 33 live markets in one invocation |
+
+**95 crons total** — under Vercel's 100/project cap. Discovery crons are I/O-bound; the sweeper runs after the last scrape completes so `last_seen_at` is fresh before the `< now() - 14d` cutoff. Duplicate detection consolidated from per-market crons into a single weekly all-markets pass to stay within the cron budget as market count scaled past 4.
 
 ---
 
@@ -332,18 +328,20 @@ A public-facing "paste your listing URL → get a benchmark report" tool, modele
 
 Top-of-funnel content surfaces that support the waitlist funnel without depending on core data pipeline milestones.
 
-- [x] **Markets page** (`/markets`) — regional market reports hub; 6 region cards (Southwest, Mountain West, Pacific Coast, Southeast, Midwest, Northeast) with "Coming soon" state; CTA strip to waitlist. **(2026-04-23)**
-- [x] **San Diego market report page** (`/markets/san-diego`) — live PDF viewer + fallback card. PDF served from `/public/reports/`. **(2026-04-23)**
-- [x] **Riverside County market report page** (`/markets/riverside-county`) — live page wired to Outdoorsy + RVshare data pipeline (2026-05-07); PDF placeholder path set, report to be published once initial cron data accumulates.
-- [x] **Dashboard market selector updated (2026-05-07)** — San Diego and Riverside County are the two selectable markets; placeholder markets (LA, Denver, Austin, Miami) removed until data is live.
-- [x] **Learn page** (`/learn`) — blog-style host education hub; 6 placeholder posts seeded (Pricing Strategy, Seasonal Trends, Market Analysis, Host Growth); category filter bar ready for client-side filtering once posts exist; newsletter CTA to waitlist. **(2026-04-23)**
+- [x] **Markets page** (`/markets`) — region-grouped hub for all **33 live markets** across 7 regions; each card links to `/markets/<slug>` with live/pending report state. **(2026-06-06 refresh)**
+- [x] **Dynamic market pages** (`/markets/[slug]`) — server-rendered landing with geo-scoped listing stats + dashboard deep link; PDF/HTML reports auto-served when present in `/public/reports/`. **(2026-06-06)**
+- [x] **San Diego market report** — live PDF at `/markets/san-diego-ca` (legacy `/markets/san-diego` route retained). **(2026-04-23)**
+- [x] **Dashboard market selector** — region-grouped dropdown over all 33 live markets; `?market=<slug>` deep link supported. **(2026-06-06)**
+- [x] **Landing page coverage section** — hero + stats bar reflecting 33 markets, 7 regions, 26k+ listing pool. **(2026-06-06)**
+- [x] **Sitemap** — all `/markets/<slug>` URLs emitted dynamically from `liveMarkets()`. **(2026-06-06)**
+- [x] **Learn page** (`/learn`) — blog-style host education hub; 6 placeholder posts seeded; newsletter CTA to waitlist. **(2026-04-23)**
 - [ ] Publish first real Learn post (dynamic pricing 101) once Phase 2.5 dedup metrics are presentable as an external case study
-- [ ] Wire remaining Markets region cards to per-market report pages as Phase 6 markets come online
+- [ ] Generate and publish quarterly HTML/PDF reports for expansion markets (`scripts/generate_all_market_reports.mjs`)
 
 ### Phase 5 — Sweeper & Cleanup (Ongoing)
 - [x] **Daily sweeper cron (2026-05-07)** — `/api/sweeper` route flips `is_active = false` when `last_seen_at < now() - 14d`. Runs at 10:00 UTC across **all markets** with no config changes required when new markets are added. Logs to `cron_runs` under `platform=sweeper`. Optional `market` query param for single-market manual runs.
 - [ ] Env var hygiene: re-set Supabase URL/anon key cleanly (currently has literal `\n` inside stored values)
-- [ ] Move to Firecrawl Growth tier — now beyond San Diego, this should be evaluated before adding a third market
+- [x] Firecrawl Growth tier **not needed** for market expansion — all 31 discovery anchors run on direct JSON:API at zero credits (confirmed at 33-market scale, 2026-06-06)
 
 ### Access gating (progressive, cross-phase)
 
@@ -396,14 +394,32 @@ Only when we're charging money or when a feature needs user-scoped data (saved f
 
 Why not earlier: Tier 3's RLS model depends on knowing what users actually do. Designing user-scoped policies before the product has user-scoped features produces speculative RLS that gets rewritten when real features ship — with production user data in the middle of the migration.
 
-### Phase 6 — Multi-Market Expansion (Weeks 7+, STARTED 2026-05-07)
+### Phase 6 — Multi-Market Expansion (STARTED 2026-05-07 · BULK COMPLETE 2026-06-06)
 
-- [x] **Riverside County, CA (2026-05-07)** — scrape targets, 3 daily crons, backfill scripts, public market page, dashboard selector, weekly duplicate detection. All infrastructure mirrors San Diego exactly; the pattern is now repeatable in <1 hour per new market. First cron data expected 2026-05-08.
-- [ ] Run `detect_duplicates --tier medium --sample 50` on Riverside County after first week of data — harvest `normalize_make` alias candidates for inland/desert fleet operators not present in SD inventory
-- [ ] Publish Riverside County market report PDF once ≥14 days of cron data confirms listing counts and pricing bands
-- [ ] Add LA, Phoenix, Denver, Austin, Seattle, Miami, Nashville, Portland, Vegas
-- [ ] Add **RVezy** and **RVnGO** as P2P scrape targets (deferred from Phases 1–5)
-- [ ] Upgrade Firecrawl to Growth (20k credits/mo) — evaluate before adding a third market (Phase 5 dependency)
+**Architecture pivot (2026-06-06):** Markets are geo queries (`listings_in_market` RPC + `haversine_miles`), not stored ownership on `listings`. Discovery crons write `discovery_source` for observability only; overlapping metros (LA / Long Beach / Riverside) share listing rows without overwrite bugs. Registry: `lib/markets.ts` (33 definitions) mirrored in `public.markets` (migration 012).
+
+**Live markets (33):**
+
+| Region | Markets |
+|---|---|
+| California (7) | San Diego, Riverside County, Los Angeles, Long Beach†, Sacramento, San Francisco, San Jose† |
+| Mountain West (4) | Denver, Salt Lake City, Reno, Cheyenne |
+| Southwest (5) | Phoenix, Austin, San Antonio, Dallas / Fort Worth, ArkLaTex |
+| Southeast (4) | Orlando, Tampa, Atlanta, Chattanooga |
+| Midwest (6) | Columbus, Cincinnati, Detroit, Grand Rapids, Madison, Milwaukee |
+| Northeast (5) | Philadelphia, Baltimore, New York, Washington DC, Harrisburg |
+| Pacific Northwest (2) | Portland, Seattle |
+
+† Display-only — no dedicated discovery cron; fed by overlapping anchor sweeps (LA for Long Beach, SF for San Jose).
+
+- [x] **Riverside County, CA (2026-05-07)** — first repeatable expansion market
+- [x] **Portland, OR + ArkLaTex (2026-06)** — markets 3–4 before geo refactor
+- [x] **Geo markets refactor (2026-06-06)** — migrations 012–013, `discovery_source`, spatial dedup SPI, 95-cron `vercel.json`
+- [x] **Bulk expansion bootstrap (2026-06-06)** — 27 new discovery anchors backfilled (Outdoorsy + RVshare); all 29 expansion geo windows have live listing data; global pool ~26k active rows
+- [x] **Parameterized backfill tooling** — `backfill_outdoorsy_market.mjs`, `backfill_rvshare_market.mjs`, `bootstrap_expansion_markets.mjs`
+- [ ] Run `detect_duplicates` MEDIUM-tier review sampling on inland/desert markets — harvest `normalize_make` alias candidates
+- [ ] Publish quarterly market reports (HTML → `/public/reports/`) for top expansion markets
+- [ ] Add **RVezy** and **RVnGO** as P2P scrape targets (deferred)
 
 ---
 
@@ -411,8 +427,8 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 
 | Metric | Week 1 target | Week 1 actual (2026-04-23) | Week 4 target | Quarter 1 target |
 |---|---|---|---|---|
-| Markets covered | 1 | **2** (SD live since 2026-04-23; RC pipeline started 2026-05-07) | 2 | 10 |
-| Unique listings in registry | 300+ | **~2,980 active SD** + RC bootstrapping | 5,000+ | 40,000+ |
+| Markets covered | 1 | **33 live** (geo windows; 31 discovery anchors) | 33 | 40+ |
+| Unique listings in registry | 300+ | **~26,000 active** (global pool; geo-scoped per market) | 30,000+ | 100,000+ |
 | % listings priced in last 7d | 70% | **100%** (full-universe daily sweep, both platforms) | 100% | 99% |
 | % active listings with core comp-set attrs | 0% | **~99%** (length, sleeps, delivery, location from search APIs) | 100% | 99% |
 | % listings with detail-page enrichment | 0% | **0%** (Phase 3 not yet started) | 60% | 90% |
@@ -489,3 +505,5 @@ Why not earlier: Tier 3's RLS model depends on knowing what users actually do. D
 - **2026-05-07:** **Fixed silent bug in `GET /api/scrape` — market was hardcoded to `san-diego-ca`.** The Vercel Cron GET handler was building its forwarded POST body with `market: "san-diego-ca"` regardless of what the cron URL's `?market=` param said. This was invisible while SD was the only market but would have caused every new-market cron to silently re-scrape San Diego instead of the intended market. Fixed to read `market` from `url.searchParams`, falling back to `"san-diego-ca"` for backward compatibility with the existing SD cron URLs that omit the param.
 - **2026-05-07:** **Shipped the `is_active` sweeper cron.** The PRD had this as a pending Phase 5 item since 2026-04-20. Pulled forward because adding a second market makes stale-listing inflation more visible — a listing that goes dark in SD and another in RC would both inflate active-count denominators until the sweeper ran. Designed as a single endpoint that covers all markets with no per-market config, so it scales to 10 markets without touching `vercel.json` again.
 - **2026-05-07:** **Wired `detect-duplicates` to a weekly Vercel Cron.** Previously manual-only while thresholds were being tuned. After 33 reviewed pairs and 3 migrations tightening the HIGH tier to zero false positives, the SD thresholds are stable enough to run unattended. Scheduled weekly (Sundays) rather than daily — the cross-platform pair universe grows by a handful of new listings per day and a 7-day accumulation gives a meaningful batch to review. Riverside County wired immediately on the same schedule, 30 minutes after SD to avoid concurrent function execution.
+- **2026-06-06:** **Geo-based markets shipped (migrations 012–013).** Replaced stored `listings.market` ownership with `discovery_source` (observability) + `listings_in_market()` spatial RPC. Enables overlapping display markets without last-cron-wins overwrite — critical for SoCal (Riverside / LA / Long Beach share ~60–80% URL overlap by design). Duplicate-detection SPI updated to pair within geo windows, not `discovery_source` equality.
+- **2026-06-06:** **Bulk US expansion to 33 live markets.** Seeded all planned regions from `lib/markets.ts`; regenerated `vercel.json` (95 crons: 31×3 discovery + sweeper + all-markets dedup). Bootstrapped 27 new discovery anchors via parameterized backfill scripts (~28 min, 0 failures). Landing page, markets hub, dashboard selector, and sitemap updated to reflect nationwide coverage. Firecrawl Growth tier confirmed unnecessary at this scale.
