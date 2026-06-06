@@ -35,17 +35,20 @@ export async function GET(req: NextRequest) {
 
   // 1. Find listing IDs matching the market + class filter (include inactive so
   //    history is preserved even after a listing is delisted).
-  const { data: listingRows, error: listingsErr } = await supabase
-    .from("listings")
-    .select("id")
-    .eq("market", market)
-    .eq("rv_class", rvClass);
+  const { data: listingRows, error: listingsErr } = await supabase.rpc(
+    "listings_in_market",
+    {
+      p_market_slug: market,
+      p_rv_class: rvClass,
+      p_active_only: false,
+    },
+  );
 
   if (listingsErr) {
     return NextResponse.json({ error: listingsErr.message }, { status: 500 });
   }
 
-  const listingIds = (listingRows ?? []).map((r) => r.id);
+  const listingIds = (listingRows ?? []).map((r: { id: string }) => r.id);
   if (listingIds.length === 0) {
     return NextResponse.json({ data: [] });
   }

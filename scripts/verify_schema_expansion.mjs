@@ -29,7 +29,7 @@ async function fillRate(platform, cols) {
     .from("listings")
     .select("id", { count: "exact", head: true })
     .eq("platform", platform)
-    .eq("market", "san-diego-ca");
+    .eq("discovery_source", "san-diego-ca");
 
   console.log(`\n── ${platform} (n=${total}) ──`);
   for (const col of cols) {
@@ -37,7 +37,7 @@ async function fillRate(platform, cols) {
       .from("listings")
       .select("id", { count: "exact", head: true })
       .eq("platform", platform)
-      .eq("market", "san-diego-ca")
+      .eq("discovery_source", "san-diego-ca")
       .not(col, "is", null);
     const pct = total ? ((filled / total) * 100).toFixed(1) : "0.0";
     console.log(`  ${col.padEnd(32)} ${String(filled).padStart(5)}/${total}  (${pct}%)`);

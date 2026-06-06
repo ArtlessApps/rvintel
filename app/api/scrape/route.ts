@@ -13,6 +13,13 @@ import {
   type OutdoorsyListing,
 } from "@/lib/outdoorsy-api";
 import { fetchRvshareMarket, type RvshareListing } from "@/lib/rvshare-api";
+import {
+  MARKET_TARGETS,
+  OUTDOORSY_API_TARGETS,
+  OUTDOORSY_FIRECRAWL_TARGETS,
+  RVSHARE_API_TARGETS,
+  type ScrapeTarget,
+} from "@/lib/markets-scrape";
 
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -31,152 +38,9 @@ function getServiceSupabase() {
 // path makes one location-scoped sweep and categorizes each listing from
 // `attributes.type`, eliminating 7 redundant cron calls per day.
 
-type ScrapeTarget = { platform: "outdoorsy" | "rvshare"; url: string; group?: string };
-
-// RVshare Firecrawl fallback targets. Only touched when RVSHARE_SCRAPER=firecrawl.
-// Kept at the pre-pivot 8 per-type URLs even though we now know the backend
-// ignored `type` — the Firecrawl path relies on the headless browser's
-// client-side JS to apply the `type` filter visually, so these URLs were
-// doing real work on that code path (via LLM-classified page output) even if
-// the underlying HTTP response was type-blind. If you ever flip back, be
-// aware you'll be paying 8× the Firecrawl credits for <2× the distinct
-// listings vs a single API sweep.
-const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
-  "san-diego-ca": [
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-a" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-b" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=class-c" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=travel-trailer" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=fifth-wheel" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=toy-hauler" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=pop-up" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=san+diego+ca&type=truck-camper" },
-  ],
-  "riverside-county-ca": [
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=class-a" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=class-b" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=class-c" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=travel-trailer" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=fifth-wheel" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=toy-hauler" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=pop-up" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=truck-camper" },
-  ],
-  "portland-or": [
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=class-a" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=class-b" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=class-c" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=travel-trailer" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=fifth-wheel" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=toy-hauler" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=pop-up" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=truck-camper" },
-  ],
-  "arklatex": [
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=class-a" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=class-b" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=class-c" },
-    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=travel-trailer" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=fifth-wheel" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=toy-hauler" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=pop-up" },
-    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=shreveport+la&type=truck-camper" },
-  ],
-};
-
-// RVshare direct-API targets. One entry per market — the backend returns the
-// full type-agnostic universe for a location in a single paginated sweep.
-type RvshareApiTarget = { location: string };
-const RVSHARE_API_TARGETS: Record<string, RvshareApiTarget> = {
-  "san-diego-ca": { location: "san diego ca" },
-  "riverside-county-ca": { location: "riverside county ca" },
-  "portland-or": { location: "portland or" },
-  "arklatex": { location: "shreveport la" },
-};
-
-// ─── Outdoorsy direct-API targets (active as of 2026-04-22) ──────────────────
-// Backend filter codes differ from UI codes. The UI-shaped URL is still used
-// for listing_snapshots.source_url to preserve historical join-compatibility.
-type OutdoorsyApiTarget = {
-  address: string;
-  classCode: OutdoorsyClassCode;
-  group: string;
-};
-
-const OUTDOORSY_API_TARGETS: Record<string, OutdoorsyApiTarget[]> = {
-  "san-diego-ca": [
-    // Group 1 — smaller classes paired for cron budget balance.
-    { address: "San Diego, CA", classCode: "a", group: "1" },
-    { address: "San Diego, CA", classCode: "b", group: "1" },
-    // Group 2 — larger classes. 411 Class C + 692 travel trailer + 56 fifth-wheel
-    // at ~300ms per page stays well under the 300s function cap.
-    { address: "San Diego, CA", classCode: "c", group: "2" },
-    { address: "San Diego, CA", classCode: "trailer", group: "2" },
-    { address: "San Diego, CA", classCode: "fifth-wheel", group: "2" },
-  ],
-  "riverside-county-ca": [
-    // Group 1 — smaller classes.
-    { address: "Riverside County, CA", classCode: "a", group: "1" },
-    { address: "Riverside County, CA", classCode: "b", group: "1" },
-    // Group 2 — larger classes.
-    { address: "Riverside County, CA", classCode: "c", group: "2" },
-    { address: "Riverside County, CA", classCode: "trailer", group: "2" },
-    { address: "Riverside County, CA", classCode: "fifth-wheel", group: "2" },
-  ],
-  "portland-or": [
-    // Group 1 — smaller classes.
-    { address: "Portland, OR", classCode: "a", group: "1" },
-    { address: "Portland, OR", classCode: "b", group: "1" },
-    // Group 2 — larger classes.
-    { address: "Portland, OR", classCode: "c", group: "2" },
-    { address: "Portland, OR", classCode: "trailer", group: "2" },
-    { address: "Portland, OR", classCode: "fifth-wheel", group: "2" },
-  ],
-  "arklatex": [
-    // Shreveport metro anchor — covers the LA/TX core of ArkLaTex on both APIs.
-    { address: "Shreveport, LA", classCode: "a", group: "1" },
-    { address: "Shreveport, LA", classCode: "b", group: "1" },
-    { address: "Shreveport, LA", classCode: "c", group: "2" },
-    { address: "Shreveport, LA", classCode: "trailer", group: "2" },
-    { address: "Shreveport, LA", classCode: "fifth-wheel", group: "2" },
-  ],
-};
-
-// Dormant fallback: used only when OUTDOORSY_SCRAPER=firecrawl. Same shape as
-// the pre-2026-04-22 config. Keeps the old code path alive as insurance against
-// the direct-API endpoint being shut down or gated.
-const OUTDOORSY_FIRECRAWL_TARGETS: Record<string, ScrapeTarget[]> = {
-  "san-diego-ca": [
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
-    // NB: filter[type]=tt silently returns 0 via the backend API (see PRD §11
-    // 2026-04-22). This UI URL is preserved verbatim from the pre-pivot config
-    // so the fallback remains byte-identical; if ever activated, it inherits
-    // the same under-counting bug it did before. Fix would be to add a
-    // `trailer` UI URL, but we accept the stale fallback in exchange for not
-    // actively maintaining two codepaths.
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=San+Diego%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
-  ],
-  "riverside-county-ca": [
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
-  ],
-  "portland-or": [
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
-  ],
-  "arklatex": [
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
-    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
-    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Shreveport%2C+LA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
-  ],
-};
+// Discovery targets are generated from lib/markets.ts via lib/markets-scrape.ts.
+// Listings are stored once globally; discovery_source records which cron last
+// touched a row. Dashboard queries use listings_in_market() geo RPC.
 
 // ─── Extraction schema ────────────────────────────────────────────────────────
 
@@ -377,7 +241,7 @@ async function scrapeOutdoorsyViaApi(
             OUTDOORSY_CODE_TO_RV_CLASS[target.classCode];
           return {
             platform: "outdoorsy" as const,
-            market,
+            discovery_source: market,
             rv_class: rvClass,
             listing_url: l.listing_url,
             host_name: null,
@@ -546,7 +410,7 @@ async function scrapeRvshareViaApi(
       })
       .map((l) => ({
         platform: "rvshare" as const,
-        market,
+        discovery_source: market,
         rv_class: l.rv_class,
         listing_url: l.listing_url,
         host_name: null,
@@ -831,7 +695,7 @@ async function scrapeMarket(
           const now = new Date().toISOString();
           return {
             platform,
-            market,
+            discovery_source: market,
             rv_class: finalClass(l.rv_class as RvClass | undefined, l.rv_title, l.rv_make, l.rv_model, l.listing_url),
             listing_url: l.listing_url,
             host_name: l.host_name ?? null,

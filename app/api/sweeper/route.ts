@@ -37,10 +37,10 @@ async function runSweep(marketFilter?: string) {
   // We do this before the update so we can log the before/after delta.
   let countQuery = supabase
     .from("listings")
-    .select("market", { count: "exact", head: false })
+    .select("discovery_source", { count: "exact", head: false })
     .eq("is_active", true)
     .lt("last_seen_at", cutoff);
-  if (marketFilter) countQuery = countQuery.eq("market", marketFilter);
+  if (marketFilter) countQuery = countQuery.eq("discovery_source", marketFilter);
 
   const { data: staleRows, error: countErr } = await countQuery;
   if (countErr) {
@@ -50,7 +50,7 @@ async function runSweep(marketFilter?: string) {
   // Tally stale count per market for the response summary.
   const staleByMarket: Record<string, number> = {};
   for (const row of staleRows ?? []) {
-    const m = (row as { market: string }).market;
+    const m = (row as { discovery_source: string | null }).discovery_source ?? "unknown";
     staleByMarket[m] = (staleByMarket[m] ?? 0) + 1;
   }
   const staleTotal = Object.values(staleByMarket).reduce((s, n) => s + n, 0);
@@ -62,7 +62,7 @@ async function runSweep(marketFilter?: string) {
     .update({ is_active: false })
     .eq("is_active", true)
     .lt("last_seen_at", cutoff);
-  if (marketFilter) updateQuery = updateQuery.eq("market", marketFilter);
+  if (marketFilter) updateQuery = updateQuery.eq("discovery_source", marketFilter);
 
   const { error: updateErr } = await updateQuery;
   if (updateErr) {

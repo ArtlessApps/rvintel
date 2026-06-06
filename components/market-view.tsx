@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getSupabase } from "@/lib/supabase";
+import { marketDisplayName } from "@/lib/markets";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,14 +97,6 @@ const TABLE_COLUMNS: Array<SortableColumn | StaticColumn> = [
   { key: "rating", label: "Rating", align: "right", defaultDir: "desc" },
   { key: null, label: "", align: "right" },
 ];
-
-const MARKET_LABELS: Record<string, string> = {
-  "san-diego-ca": "San Diego",
-  "los-angeles-ca": "Los Angeles",
-  "denver-co": "Denver",
-  "austin-tx": "Austin",
-  "miami-fl": "Miami",
-};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -325,15 +318,36 @@ export function MarketView({
   const fetchListings = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await getSupabase()
-        .from("listings")
-        .select("id, canonical_vehicle_id, platform, host_name, rv_year, rv_make, rv_model, nightly_rate, weekly_rate, review_count, avg_rating, listing_url, scraped_at")
-        .eq("market", market)
-        .eq("rv_class", rvClass)
-        .eq("is_active", true)
-        .order("nightly_rate", { ascending: false });
+      const { data, error } = await getSupabase().rpc("listings_in_market", {
+        p_market_slug: market,
+        p_rv_class: rvClass,
+        p_active_only: true,
+      });
 
-      setListings(data ?? []);
+      if (error) {
+        console.error("listings_in_market:", error.message);
+        setListings([]);
+        return;
+      }
+
+      const rows = (data ?? []) as Listing[];
+      setListings(
+        rows.map((r) => ({
+          id: r.id,
+          canonical_vehicle_id: r.canonical_vehicle_id,
+          platform: r.platform,
+          host_name: r.host_name,
+          rv_year: r.rv_year,
+          rv_make: r.rv_make,
+          rv_model: r.rv_model,
+          nightly_rate: r.nightly_rate,
+          weekly_rate: r.weekly_rate,
+          review_count: r.review_count,
+          avg_rating: r.avg_rating,
+          listing_url: r.listing_url,
+          scraped_at: r.scraped_at,
+        })),
+      );
     } finally {
       setLoading(false);
     }
@@ -414,7 +428,7 @@ export function MarketView({
 
   const rateDistribution = buildRateDistribution(units);
   const lastUpdated = formatLastUpdated(units);
-  const marketLabel = MARKET_LABELS[market] ?? market;
+  const marketLabel = marketDisplayName(market);
 
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const freshCount = units.filter(

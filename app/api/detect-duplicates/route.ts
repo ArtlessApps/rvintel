@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { liveMarkets } from "@/lib/markets";
 
 export const maxDuration = 60;
 
@@ -118,12 +119,25 @@ export async function GET(req: NextRequest) {
   }
   const url = new URL(req.url);
   const market = url.searchParams.get("market") ?? undefined;
+  const allMarkets = url.searchParams.get("all") === "true";
   const geoParam = url.searchParams.get("geoThresholdMiles");
   const yearExactParam = url.searchParams.get("yearExact");
 
-  return runDetection({
-    market,
+  const opts = {
     geoThresholdMiles: geoParam !== null ? Number(geoParam) : undefined,
     yearExact: yearExactParam !== null ? yearExactParam !== "false" : undefined,
-  });
+  };
+
+  if (allMarkets || !market) {
+    const slugs = liveMarkets().map((m) => m.slug);
+    const results = [];
+    for (const slug of slugs) {
+      const res = await runDetection({ market: slug, ...opts });
+      const body = await res.json();
+      results.push(body);
+    }
+    return NextResponse.json({ success: true, markets: results.length, results });
+  }
+
+  return runDetection({ market, ...opts });
 }

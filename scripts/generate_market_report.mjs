@@ -135,21 +135,23 @@ function prompt(question) {
 
 // ── data fetching ──────────────────────────────────────────────────────────────
 
-/** Fetch all active listings for a market, paginating 1000 at a time */
+/** Fetch all active listings for a geo market via listings_in_market RPC */
 async function fetchAllListings(market) {
   const PAGE = 1000;
   let allRows = [];
   let from = 0;
   while (true) {
     const { data, error } = await supabase
-      .from("listings")
+      .rpc("listings_in_market", {
+        p_market_slug: market,
+        p_rv_class: null,
+        p_active_only: true,
+      })
       .select("nightly_rate, rv_class, platform, delivery, instant_book, scraped_at, review_count, avg_rating")
-      .eq("market", market)
-      .eq("is_active", true)
       .not("nightly_rate", "is", null)
       .gt("nightly_rate", 0)
       .range(from, from + PAGE - 1);
-    if (error) throw new Error(`listings fetch failed: ${error.message}`);
+    if (error) throw new Error(`listings_in_market failed: ${error.message}`);
     if (!data || data.length === 0) break;
     allRows = allRows.concat(data);
     if (data.length < PAGE) break;
@@ -172,15 +174,15 @@ async function fetchSnapshots(market) {
   return data || [];
 }
 
-/** Fetch distinct markets from the listings table */
+/** Fetch live markets from the markets table */
 async function fetchMarkets() {
   const { data, error } = await supabase
-    .from("listings")
-    .select("market")
-    .eq("is_active", true);
+    .from("markets")
+    .select("market_slug, display_name")
+    .eq("is_live", true)
+    .order("sort_order", { ascending: true });
   if (error) throw new Error(`markets fetch failed: ${error.message}`);
-  const markets = [...new Set((data || []).map((r) => r.market))].filter(Boolean).sort();
-  return markets;
+  return (data || []).map((r) => r.market_slug);
 }
 
 // ── statistics computation ─────────────────────────────────────────────────────

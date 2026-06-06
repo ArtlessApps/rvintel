@@ -18,7 +18,7 @@ type ListingRow = {
   length_ft: number | null;
   delivery: boolean | null;
   instant_book: boolean | null;
-  market: string;
+  discovery_source: string | null;
   scraped_at: string;
 };
 
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     .select(
       "id, listing_url, rv_year, rv_make, rv_model, rv_class, nightly_rate, " +
       "primary_image_url, location_city, location_state, sleeps, length_ft, " +
-      "delivery, instant_book, market, scraped_at"
+      "delivery, instant_book, discovery_source, scraped_at"
     )
     .ilike("listing_url", url)
     .limit(1);
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     length_ft: row.length_ft,
     delivery: row.delivery,
     instant_book: row.instant_book,
-    market: row.market,
+    discovery_source: row.discovery_source,
     scraped_at: row.scraped_at,
   };
 
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     .from("search_snapshots")
     .select("price_median, captured_at")
     .eq("platform", "outdoorsy")
-    .eq("market", row.market)
+    .eq("market", row.discovery_source ?? "")
     .eq("rv_class", row.rv_class)
     .not("price_median", "is", null)
     .order("captured_at", { ascending: false })

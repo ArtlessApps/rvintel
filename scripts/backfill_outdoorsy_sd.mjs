@@ -258,7 +258,7 @@ async function sweepClass(classCfg) {
   if (latestMeta) {
     const { error: searchSnapErr } = await supabase.from("search_snapshots").insert({
       platform: PLATFORM,
-      market: MARKET,
+      discovery_source: MARKET,
       rv_class: classCfg.rv_class,
       source_url: sourceUrl,
       total_results: latestMeta.total,
@@ -292,7 +292,7 @@ async function sweepClass(classCfg) {
     .filter((l) => l.price_per_day_cents !== null && l.price_per_day_cents > 0)
     .map((l) => ({
       platform: PLATFORM,
-      market: MARKET,
+      discovery_source: MARKET,
       rv_class: classCfg.rv_class,
       listing_url: l.listing_url,
       host_name: null,
@@ -435,7 +435,7 @@ async function main() {
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
     duration_ms: durationMs,
-    market: MARKET,
+    discovery_source: MARKET,
     platform: "outdoorsy-backfill-api",
     status,
     listings_upserted: totals.upserted,

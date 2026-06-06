@@ -73,13 +73,15 @@ console.log("=".repeat(64));
 // simpler than a Postgres function and the row count is tiny per market
 // (~1,300 for SD).
 const { data: rows, error } = await supabase
-  .from("listings")
+  .rpc("listings_in_market", {
+    p_market_slug: market,
+    p_rv_class: null,
+    p_active_only: true,
+  })
   .select(
-    "owner_id, premier_owner, rv_class, listing_url, nightly_rate, review_count, avg_rating, location_state, primary_image_url, last_seen_at",
+    "owner_id, premier_owner, rv_class, listing_url, nightly_rate, review_count, avg_rating, location_state, primary_image_url, last_seen_at, platform",
   )
   .eq("platform", "rvshare")
-  .eq("market", market)
-  .eq("is_active", true)
   .not("owner_id", "is", null);
 
 if (error) {

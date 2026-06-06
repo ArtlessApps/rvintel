@@ -17,6 +17,10 @@ create index if not exists user_fleet_listing_idx on public.user_fleet (listing_
 
 alter table public.user_fleet enable row level security;
 
+drop policy if exists "session owner select" on public.user_fleet;
+drop policy if exists "session owner insert" on public.user_fleet;
+drop policy if exists "session owner delete" on public.user_fleet;
+
 create policy "session owner select" on public.user_fleet
   for select using (
     session_id = current_setting('request.headers', true)::json->>'x-fleet-session'
