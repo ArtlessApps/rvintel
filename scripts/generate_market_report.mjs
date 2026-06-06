@@ -1774,7 +1774,7 @@ function generateHTML({ market, stats, seasonal, now }) {
 
   <!-- FOOTER -->
   <div class="report-footer">
-    <div>© 2026 RVIntel · rvintel.io · market@rvintel.io</div>
+    <div>© 2026 RVIntel · rvintel.io · hello@artless.app</div>
     <div>${city} RV Market Report · ${quarter} · For host use only. Not for redistribution.</div>
   </div>
   </div><!-- /.last-page-wrap -->
