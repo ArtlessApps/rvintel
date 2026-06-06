@@ -1,34 +1,15 @@
 #!/usr/bin/env node
-// Outdoorsy San Diego backfill — direct JSON:API variant (2026-04-22 rewrite).
-//
-// Replaces the v2 neighborhood-sweep Firecrawl script. The Outdoorsy internal
-// API at search.outdoorsy.com/rentals returns the full paginated universe for
-// any (address, class) combination at zero external cost and no bot defense.
-//
-// Strategy:
-//   For each class in {a, b, c, trailer, fifth-wheel}, paginate page[offset]=0..N
-//   until the API stops returning full pages or `meta.total` is exhausted.
-//   Upsert every listing into public.listings; append a snapshot per listing
-//   into public.listing_snapshots. Log one row to cron_runs at the end.
-//
-// Output guarantees:
-//   - unique listing count == meta.total for each class (verified by the
-//     single-class test on 2026-04-22: 331 Class B fetched vs 331 reported).
-//   - No duplicate listing_urls across the run (API returns unique IDs per
-//     class query; cross-class overlap is impossible since display_vehicle_type
-//     is class-specific).
-//   - No Firecrawl calls, no LLM extraction, no bot-defense hazard.
+// Parameterized Outdoorsy market backfill — direct JSON:API.
 //
 // Usage:
-//   node scripts/backfill_outdoorsy_sd.mjs
-//
-// This script mirrors lib/outdoorsy-api.ts in pure JS so it runs outside
-// Vercel's 300s function cap if we ever want to bootstrap a huge market.
+//   node scripts/backfill_outdoorsy_market.mjs <market-slug>
+//   node scripts/backfill_outdoorsy_market.mjs denver-co
 
 import fs from "node:fs";
 import { createClient } from "@supabase/supabase-js";
+import { getMarket } from "./lib/markets-config.mjs";
 
-// ── env loader (same defensive parser — .env.local has literal \n in some values) ──
+// ── env loader ────────────────────────────────────────────────────────────────
 for (const line of fs.readFileSync(".env.local", "utf-8").split("\n")) {
   const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*"?([^"\r\n]*)"?\s*$/);
   if (m && !process.env[m[1]]) {
@@ -48,22 +29,30 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 }
 
 // ── config ────────────────────────────────────────────────────────────────────
-const MARKET = "san-diego-ca";
+const slug = process.argv[2];
+if (!slug) {
+  console.error("Usage: node scripts/backfill_outdoorsy_market.mjs <market-slug>");
+  process.exit(1);
+}
+const marketCfg = getMarket(slug);
+if (!marketCfg.outdoorsyAddress) {
+  console.error(`${slug} is display-only — no Outdoorsy discovery anchor.`);
+  process.exit(1);
+}
+const MARKET = slug;
 const PLATFORM = "outdoorsy";
-const ADDRESS = "San Diego, CA";
+const ADDRESS = marketCfg.outdoorsyAddress;
 const PAGE_SIZE = 24;
 const PAGE_DELAY_MS = 300;
 const FETCH_TIMEOUT_MS = 15_000;
 const UPSERT_CHUNK = 50;
 
-// Backend filter codes (see PRD §11 2026-04-22 for the tt→trailer bug that
-// masked ~692 SD travel trailers for months).
 const CLASSES = [
-  { code: "a",            rv_class: "Class A" },
-  { code: "b",            rv_class: "Class B" },
-  { code: "c",            rv_class: "Class C" },
-  { code: "trailer",      rv_class: "Travel Trailer" },
-  { code: "fifth-wheel",  rv_class: "Fifth Wheel" },
+  { code: "a",           rv_class: "Class A" },
+  { code: "b",           rv_class: "Class B" },
+  { code: "c",           rv_class: "Class C" },
+  { code: "trailer",     rv_class: "Travel Trailer" },
+  { code: "fifth-wheel", rv_class: "Fifth Wheel" },
 ];
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -113,17 +102,9 @@ async function fetchPage(url) {
 }
 
 // ── normalizer (mirror of lib/outdoorsy-api.ts#normalizeRental) ───────────────
-// Schema expansion (2026-04-23): capture every high-value field the JSON:API
-// returns. Keep this in sync with lib/outdoorsy-api.ts#normalizeRental and the
-// corresponding mapping in app/api/scrape/route.ts#scrapeOutdoorsyViaApi.
 const asNum = (v) => (typeof v === "number" && Number.isFinite(v) ? v : null);
 const asStr = (v) => (typeof v === "string" && v.trim() !== "" ? v : null);
 const asBool = (v) => (typeof v === "boolean" ? v : null);
-// Outdoorsy occasionally returns sentinel timestamps like
-// "0000-12-31T16:07:02-07:52" for un-set first_published / last_published.
-// Postgres `timestamptz` rejects year 0000 as "out of range", which was
-// failing entire 50-row upsert chunks on the first backfill pass (2026-04-23).
-// Treat pre-epoch and unparseable strings as null.
 const asTs = (v) => {
   const s = asStr(v);
   if (s === null) return null;
@@ -140,7 +121,6 @@ function normalizeRental(raw) {
     ? `https://www.outdoorsy.com${slug}`
     : `https://www.outdoorsy.com/rv-rental/listing/${raw.id}`;
 
-  // avg_rating lives in average_reviews.rental[0].score
   let avg_rating = null;
   if (Array.isArray(a.average_reviews?.rental) && a.average_reviews.rental.length > 0) {
     const s = Number(a.average_reviews.rental[0]?.score);
@@ -159,42 +139,31 @@ function normalizeRental(raw) {
     price_per_week_cents: asNum(a.price_per_week),
     avg_rating,
     review_count,
-    // Capacity / booking policy
     sleeps: asNum(a.sleeps),
     sleeps_adults: asNum(a.sleeps_adults),
     sleeps_kids: asNum(a.sleeps_kids),
     instant_book: asBool(a.instant_book),
     minimum_days: asNum(a.minimum_days),
     cancel_policy: asStr(a.cancel_policy),
-    // Delivery
     delivery: asBool(a.delivery),
     delivery_radius_miles: asNum(a.DeliveryRadiusMiles),
-    // Physical dimensions
     vehicle_length: asNum(a.vehicle_length),
     vehicle_height: asNum(a.vehicle_height),
     vehicle_dry_weight: asNum(a.vehicle_dry_weight),
     vehicle_gvwr: asNum(a.vehicle_gvwr),
-    // Media
     primary_image_url: asStr(a.primary_image_url),
-    // Location
     location_city: asStr(loc.city),
     location_state: asStr(loc.state),
     location_zip: asStr(loc.zip),
     location_lat: asNum(loc.lat),
     location_lng: asNum(loc.lng),
-    // Lifecycle
     first_published: asTs(a.first_published),
     last_published: asTs(a.last_published),
-    // Ranking signals
     rental_score: asNum(a.rental_score),
     sort_score: asNum(a.sort_score),
   };
 }
 
-// Outdoorsy `meta.price_*` fields are in cents (same as per-listing
-// `price_per_day`). Convert to dollars so search_snapshots matches the
-// `nightly_rate` (dollars) convention on listings. `price_histogram` is an
-// array of bucket counts, not prices — leave as-is.
 const centsToDollars = (v) => (v === null ? null : v / 100);
 
 function normalizeMeta(rawMeta) {
@@ -216,7 +185,6 @@ async function sweepClass(classCfg) {
   const log = (msg) => console.log(`[${classCfg.code}] ${msg}`);
   const sourceUrl = uiUrl(classCfg.code);
 
-  // 1) Fetch all pages
   const listings = [];
   const seenIds = new Set();
   let total = null;
@@ -252,9 +220,6 @@ async function sweepClass(classCfg) {
     await new Promise((r) => setTimeout(r, PAGE_DELAY_MS));
   }
 
-  // Market-wide meta snapshot — one row per class per run. Write even when
-  // listings.length === 0 so we capture the "this class was empty on this
-  // date" signal (e.g. RV fleet churn in a slow season).
   if (latestMeta) {
     const { error: searchSnapErr } = await supabase.from("search_snapshots").insert({
       platform: PLATFORM,
@@ -286,7 +251,6 @@ async function sweepClass(classCfg) {
     return { code: classCfg.code, total, unique: 0, upserted: 0, snapshots: 0, errors };
   }
 
-  // 2) Build rows — full expanded schema (migration 005).
   const now = new Date().toISOString();
   const rows = listings
     .filter((l) => l.price_per_day_cents !== null && l.price_per_day_cents > 0)
@@ -306,7 +270,6 @@ async function sweepClass(classCfg) {
       amenities: [],
       scraped_at: now,
       last_seen_at: now,
-      // Shared expansion columns
       sleeps: l.sleeps,
       length_ft: l.vehicle_length,
       instant_book: l.instant_book,
@@ -316,7 +279,6 @@ async function sweepClass(classCfg) {
       location_state: l.location_state,
       location_lat: l.location_lat,
       location_lng: l.location_lng,
-      // Outdoorsy-only expansion columns
       sleeps_adults: l.sleeps_adults,
       sleeps_kids: l.sleeps_kids,
       minimum_days: l.minimum_days,
@@ -332,7 +294,6 @@ async function sweepClass(classCfg) {
       sort_score: l.sort_score,
     }));
 
-  // 3) Upsert + snapshot in chunks
   let upserted = 0;
   let snapshots = 0;
   for (let i = 0; i < rows.length; i += UPSERT_CHUNK) {
@@ -347,9 +308,6 @@ async function sweepClass(classCfg) {
     }
     upserted += chunk.length;
 
-    // Separate SELECT is the reliable way to get IDs back under the local
-    // env-loaded supabase-js path (see prior backfill debugging notes — the
-    // .upsert().select() chain returned null data under the custom env).
     const urls = chunk.map((r) => r.listing_url);
     const { data: fetched, error: fetchErr } = await supabase
       .from("listings")
@@ -377,20 +335,13 @@ async function sweepClass(classCfg) {
   }
 
   log(`DONE — total=${total} unique=${listings.length} rows=${rows.length} upserted=${upserted} snapshots=${snapshots} errors=${errors.length} (${pagesFetched} pages)`);
-  return {
-    code: classCfg.code,
-    total: total ?? 0,
-    unique: listings.length,
-    upserted,
-    snapshots,
-    errors,
-  };
+  return { code: classCfg.code, total: total ?? 0, unique: listings.length, upserted, snapshots, errors };
 }
 
 // ── main ──────────────────────────────────────────────────────────────────────
 async function main() {
   const startedAt = new Date();
-  console.log(`Outdoorsy SD backfill (direct API) started ${startedAt.toISOString()}`);
+  console.log(`Outdoorsy ${MARKET} backfill (direct API) started ${startedAt.toISOString()}`);
   console.log(`Classes: ${CLASSES.map((c) => c.code).join(", ")}  Address: "${ADDRESS}"`);
 
   const results = [];

@@ -1933,35 +1933,40 @@ function generateHTML({ market, stats, seasonal, now }) {
 async function main() {
   console.log("RVIntel Market Report Generator");
   console.log("─────────────────────────────────");
-  console.log("Fetching available markets...\n");
 
-  let markets;
-  try {
-    markets = await fetchMarkets();
-  } catch (err) {
-    console.error("Failed to fetch markets:", err.message);
-    process.exit(1);
+  const cliMarket = process.argv.find((a, i) => process.argv[i - 1] === "--market");
+  let market = cliMarket;
+
+  if (!market) {
+    console.log("Fetching available markets...\n");
+    let markets;
+    try {
+      markets = await fetchMarkets();
+    } catch (err) {
+      console.error("Failed to fetch markets:", err.message);
+      process.exit(1);
+    }
+
+    if (markets.length === 0) {
+      console.error("No markets found in the database (no active listings).");
+      process.exit(1);
+    }
+
+    console.log("Available markets:");
+    markets.forEach((m, i) => {
+      console.log(`  ${i + 1}. ${marketDisplayName(m)} (${m})`);
+    });
+    console.log();
+
+    const answer = await prompt(`Enter market number (1–${markets.length}): `);
+    const idx = parseInt(answer, 10) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= markets.length) {
+      console.error(`Invalid selection. Please enter a number between 1 and ${markets.length}.`);
+      process.exit(1);
+    }
+
+    market = markets[idx];
   }
-
-  if (markets.length === 0) {
-    console.error("No markets found in the database (no active listings).");
-    process.exit(1);
-  }
-
-  console.log("Available markets:");
-  markets.forEach((m, i) => {
-    console.log(`  ${i + 1}. ${marketDisplayName(m)} (${m})`);
-  });
-  console.log();
-
-  const answer = await prompt(`Enter market number (1–${markets.length}): `);
-  const idx = parseInt(answer, 10) - 1;
-  if (isNaN(idx) || idx < 0 || idx >= markets.length) {
-    console.error(`Invalid selection. Please enter a number between 1 and ${markets.length}.`);
-    process.exit(1);
-  }
-
-  const market = markets[idx];
   console.log(`\nGenerating report for: ${marketDisplayName(market)}`);
   console.log("─────────────────────────────────");
 

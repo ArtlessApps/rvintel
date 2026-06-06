@@ -214,7 +214,7 @@ async function sweepClass(classCfg) {
   if (latestMeta) {
     const { error: searchSnapErr } = await supabase.from("search_snapshots").insert({
       platform: PLATFORM,
-      discovery_source: MARKET,
+      market: MARKET,
       rv_class: classCfg.rv_class,
       source_url: sourceUrl,
       total_results: latestMeta.total,
@@ -377,7 +377,7 @@ async function main() {
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
     duration_ms: durationMs,
-    discovery_source: MARKET,
+    market: MARKET,
     platform: "outdoorsy-backfill-api",
     status,
     listings_upserted: totals.upserted,

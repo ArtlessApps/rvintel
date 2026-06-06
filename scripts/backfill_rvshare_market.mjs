@@ -1,14 +1,13 @@
 #!/usr/bin/env node
-// RVshare Riverside County backfill — direct JSON:API (2026-05-07).
-//
-// Mirrors backfill_rvshare_sd.mjs exactly — only MARKET, LOCATION, and
-// MAX_PAGES differ. See that script for the full methodology notes.
+// Parameterized RVshare market backfill — direct JSON:API.
 //
 // Usage:
-//   node scripts/backfill_rvshare_riverside_county.mjs
+//   node scripts/backfill_rvshare_market.mjs <market-slug>
+//   node scripts/backfill_rvshare_market.mjs denver-co
 
 import fs from "node:fs";
 import { createClient } from "@supabase/supabase-js";
+import { getMarket } from "./lib/markets-config.mjs";
 
 // ── env loader ────────────────────────────────────────────────────────────────
 for (const line of fs.readFileSync(".env.local", "utf-8").split("\n")) {
@@ -30,14 +29,23 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 }
 
 // ── config ────────────────────────────────────────────────────────────────────
-const MARKET = "riverside-county-ca";
+const slug = process.argv[2];
+if (!slug) {
+  console.error("Usage: node scripts/backfill_rvshare_market.mjs <market-slug>");
+  process.exit(1);
+}
+const marketCfg = getMarket(slug);
+if (!marketCfg.rvshareLocation) {
+  console.error(`${slug} is display-only — no RVshare discovery anchor.`);
+  process.exit(1);
+}
+const MARKET = slug;
 const PLATFORM = "rvshare";
-const LOCATION = "riverside county ca";
+const LOCATION = marketCfg.rvshareLocation;
 const PAGE_DELAY_MS = 200;
 const FETCH_TIMEOUT_MS = 15_000;
 const UPSERT_CHUNK = 50;
-// RVshare SD reported ~65 pages; Riverside County is a large county — cap at
-// 80 to match SD. Increase if pagination.totalPages exceeds this on first run.
+// Cap at 80 pages; increase if pagination.totalPages exceeds this on first run.
 const MAX_PAGES = 80;
 
 // display-type → rv_class (mirror of lib/rvshare-api.ts — keep in sync).
@@ -369,7 +377,7 @@ async function sweepMarket() {
 // ── main ──────────────────────────────────────────────────────────────────────
 async function main() {
   const startedAt = new Date();
-  console.log(`RVshare Riverside County backfill (direct API) started ${startedAt.toISOString()}`);
+  console.log(`RVshare ${MARKET} backfill (direct API) started ${startedAt.toISOString()}`);
   console.log(`Location: "${LOCATION}"  Max pages: ${MAX_PAGES}`);
 
   const result = await sweepMarket();

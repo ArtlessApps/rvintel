@@ -15,6 +15,7 @@ type MarketReportViewerProps = {
   period: string;
   description: string;
   downloadFileName?: string;
+  format?: "pdf" | "html";
 };
 
 export function MarketReportViewer({
@@ -24,6 +25,7 @@ export function MarketReportViewer({
   period,
   description,
   downloadFileName,
+  format = "pdf",
 }: MarketReportViewerProps) {
   const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
@@ -47,6 +49,18 @@ export function MarketReportViewer({
     );
   }
 
+  if (format === "html") {
+    return (
+      <div className="fixed inset-0 bg-background">
+        <iframe
+          src={reportPath}
+          title={`${title} — ${period}`}
+          className="w-full h-full border-0"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-background">
       <object
@@ -62,6 +76,7 @@ export function MarketReportViewer({
           period={period}
           description={description}
           downloadFileName={downloadFileName}
+          format={format}
           embedded
         />
       </object>
@@ -76,6 +91,7 @@ function ReportFallback({
   period,
   description,
   downloadFileName,
+  format = "pdf",
   embedded = false,
 }: MarketReportViewerProps & { embedded?: boolean }) {
   return (
@@ -130,21 +146,23 @@ function ReportFallback({
                 </a>
               </Button>
 
-              <Button asChild variant="outline" size="lg" className="rounded-sm">
-                <a
-                  href={reportPath}
-                  download={downloadFileName}
-                  className="inline-flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Download PDF
-                </a>
-              </Button>
+              {format === "pdf" && downloadFileName && (
+                <Button asChild variant="outline" size="lg" className="rounded-sm">
+                  <a
+                    href={reportPath}
+                    download={downloadFileName}
+                    className="inline-flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download PDF
+                  </a>
+                </Button>
+              )}
             </div>
           </div>
 
           <p className="text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground font-medium text-center mt-8">
-            PDF · Optimized for desktop viewing
+            {format === "html" ? "HTML report" : "PDF · Optimized for desktop viewing"}
           </p>
         </div>
       </main>

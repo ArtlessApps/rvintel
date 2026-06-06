@@ -232,7 +232,7 @@ async function sweepMarket() {
   if (capturedMeta) {
     const { error: searchSnapErr } = await supabase.from("search_snapshots").insert({
       platform: PLATFORM,
-      discovery_source: MARKET,
+      market: MARKET,
       rv_class: null,
       source_url: sourceUrl,
       total_results: capturedMeta.total_results,
@@ -394,7 +394,7 @@ async function main() {
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
     duration_ms: durationMs,
-    discovery_source: MARKET,
+    market: MARKET,
     platform: "rvshare-backfill-api",
     status,
     listings_upserted: result.upserted,
