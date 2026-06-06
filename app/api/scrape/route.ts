@@ -62,6 +62,16 @@ const MARKET_TARGETS: Record<string, ScrapeTarget[]> = {
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=pop-up" },
     { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=riverside+county+ca&type=truck-camper" },
   ],
+  "portland-or": [
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=class-a" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=class-b" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=class-c" },
+    { platform: "rvshare", group: "1", url: "https://rvshare.com/rv-rental?location=portland+or&type=travel-trailer" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=fifth-wheel" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=toy-hauler" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=pop-up" },
+    { platform: "rvshare", group: "2", url: "https://rvshare.com/rv-rental?location=portland+or&type=truck-camper" },
+  ],
 };
 
 // RVshare direct-API targets. One entry per market — the backend returns the
@@ -70,6 +80,7 @@ type RvshareApiTarget = { location: string };
 const RVSHARE_API_TARGETS: Record<string, RvshareApiTarget> = {
   "san-diego-ca": { location: "san diego ca" },
   "riverside-county-ca": { location: "riverside county ca" },
+  "portland-or": { location: "portland or" },
 };
 
 // ─── Outdoorsy direct-API targets (active as of 2026-04-22) ──────────────────
@@ -101,6 +112,15 @@ const OUTDOORSY_API_TARGETS: Record<string, OutdoorsyApiTarget[]> = {
     { address: "Riverside County, CA", classCode: "trailer", group: "2" },
     { address: "Riverside County, CA", classCode: "fifth-wheel", group: "2" },
   ],
+  "portland-or": [
+    // Group 1 — smaller classes.
+    { address: "Portland, OR", classCode: "a", group: "1" },
+    { address: "Portland, OR", classCode: "b", group: "1" },
+    // Group 2 — larger classes.
+    { address: "Portland, OR", classCode: "c", group: "2" },
+    { address: "Portland, OR", classCode: "trailer", group: "2" },
+    { address: "Portland, OR", classCode: "fifth-wheel", group: "2" },
+  ],
 };
 
 // Dormant fallback: used only when OUTDOORSY_SCRAPER=firecrawl. Same shape as
@@ -124,6 +144,12 @@ const OUTDOORSY_FIRECRAWL_TARGETS: Record<string, ScrapeTarget[]> = {
     { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
     { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
     { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Riverside+County%2C+CA&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
+  ],
+  "portland-or": [
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=b" },
+    { platform: "outdoorsy", group: "1", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=a" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=c" },
+    { platform: "outdoorsy", group: "2", url: "https://www.outdoorsy.com/rv-search?address=Portland%2C+OR&manual_address_input=false&filter%5Brenter_age%5D=25&skip_defaults=true&filter%5Btype%5D=tt" },
   ],
 };
 

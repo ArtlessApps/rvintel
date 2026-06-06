@@ -11,8 +11,12 @@
     { "path": "/api/scrape?platform=rvshare&market=riverside-county-ca",             "schedule": "0 8 * * *"  },
     { "path": "/api/scrape?platform=outdoorsy-1&market=riverside-county-ca",         "schedule": "20 8 * * *" },
     { "path": "/api/scrape?platform=outdoorsy-2&market=riverside-county-ca",         "schedule": "0 9 * * *"  },
+    { "path": "/api/scrape?platform=rvshare&market=portland-or",                     "schedule": "10 9 * * *" },
+    { "path": "/api/scrape?platform=outdoorsy-1&market=portland-or",                 "schedule": "30 9 * * *" },
+    { "path": "/api/scrape?platform=outdoorsy-2&market=portland-or",                 "schedule": "50 9 * * *" },
     { "path": "/api/sweeper",                                                         "schedule": "0 10 * * *" },
     { "path": "/api/detect-duplicates?market=san-diego-ca",                          "schedule": "0 11 * * 0" },
-    { "path": "/api/detect-duplicates?market=riverside-county-ca",                   "schedule": "30 11 * * 0" }
+    { "path": "/api/detect-duplicates?market=riverside-county-ca",                   "schedule": "30 11 * * 0" },
+    { "path": "/api/detect-duplicates?market=portland-or",                           "schedule": "0 12 * * 0" }
   ]
 }

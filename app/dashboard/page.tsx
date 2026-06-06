@@ -92,6 +92,7 @@ export default function DashboardPage() {
               <SelectContent>
                 <SelectItem value="san-diego-ca">San Diego, CA</SelectItem>
                 <SelectItem value="riverside-county-ca">Riverside County, CA</SelectItem>
+                <SelectItem value="portland-or">Portland, OR</SelectItem>
               </SelectContent>
             </Select>
           </div>
