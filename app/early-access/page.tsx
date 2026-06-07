@@ -7,6 +7,7 @@ import { submitAccessCode } from "./actions";
 export const metadata = {
   title: "Early Access · RVIntel",
   description: "Enter your invite code to preview the RVIntel dashboard.",
+  robots: { index: false, follow: false },
 };
 
 type SearchParams = Promise<{ next?: string; error?: string }>;

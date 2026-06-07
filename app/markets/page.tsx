@@ -5,9 +5,12 @@ import { SiteHeader } from "@/components/site-header";
 import { liveMarkets } from "@/lib/markets";
 
 export const metadata = {
-  title: "Regional Markets · RVIntel",
+  title: "RV Rental Market Reports by City",
   description:
-    "Browse RV rental market intelligence reports by region — pricing trends, demand signals, and competitive benchmarks.",
+    "Browse RV rental market intelligence reports by region — pricing trends, demand signals, and competitive benchmarks across 33 US metros.",
+  alternates: {
+    canonical: "/markets",
+  },
 };
 
 export default function MarketsPage() {

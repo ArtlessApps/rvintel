@@ -1,30 +1,20 @@
-// app/sitemap.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// This file tells Google (and other search engines) every URL that exists
-// on your site. Next.js automatically serves it at /sitemap.xml.
-// Added all 6 /learn article URLs so they get crawled and indexed.
-// ─────────────────────────────────────────────────────────────────────────────
+import type { MetadataRoute } from "next";
+import { liveMarkets } from "@/lib/markets";
+import { POST_SITEMAP_ENTRIES } from "@/lib/post-slugs";
 
-import { MetadataRoute } from "next";
-import { POSTS } from "@/lib/posts";
+import { SITE_URL } from "@/lib/site";
 
-const baseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://rvintel.io";
+const baseUrl = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const markets = liveMarkets();
+
   return [
-    // ── Core pages ────────────────────────────────────────────────────────────
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,
-    },
-    {
-      url: `${baseUrl}/early-access`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
     },
     {
       url: `${baseUrl}/learn`,
@@ -38,23 +28,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/markets/san-diego`,
+    ...markets.map((market) => ({
+      url: `${baseUrl}/markets/${market.slug}`,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "daily" as const,
       priority: 0.85,
-    },
-    {
-      url: `${baseUrl}/markets/riverside-county`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.85,
-    },
-
-    // ── Learn articles ────────────────────────────────────────────────────────
-    ...POSTS.map((post) => ({
+    })),
+    ...POST_SITEMAP_ENTRIES.map((post) => ({
       url: `${baseUrl}/learn/${post.slug}`,
-      lastModified: new Date("2026-06-06"),
+      lastModified: new Date(post.lastModified),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),

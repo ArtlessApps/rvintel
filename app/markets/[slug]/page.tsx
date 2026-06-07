@@ -11,10 +11,13 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const market = MARKET_BY_SLUG[slug];
-  if (!market) return { title: "Market Not Found · RVIntel" };
+  if (!market) return { title: { absolute: "Market Not Found · RVIntel" } };
   return {
-    title: `${market.displayName} RV Rental Market · RVIntel`,
+    title: `${market.displayName} RV Rental Market`,
     description: `RV rental market intelligence for ${market.displayName} — pricing trends and competitive benchmarks.`,
+    alternates: {
+      canonical: `/markets/${slug}`,
+    },
   };
 }
 

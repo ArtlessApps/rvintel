@@ -12,7 +12,13 @@ import type { Metadata } from "next";
 import { ArrowLeft, Clock, Tag, CalendarDays } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
-import { POSTS, getPost } from "@/lib/posts";
+import { POSTS, getPost, type Post } from "@/lib/posts";
+import { JsonLd } from "@/lib/json-ld";
+import {
+  SITE_URL,
+  SITE_NAME,
+  DEFAULT_OG_IMAGE,
+} from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -29,23 +35,70 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) return { title: "Not Found · RVIntel" };
+  if (!post) return { title: { absolute: "Not Found · RVIntel" } };
+
+  const publishedTime = new Date(post.date).toISOString();
 
   return {
-    title: `${post.title} · RVIntel`,
+    title: post.title,
     description: post.description,
+    alternates: {
+      canonical: `/learn/${slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
       type: "article",
-      publishedTime: post.date,
-      siteName: "RVIntel",
+      publishedTime,
+      siteName: SITE_NAME,
+      url: `${SITE_URL}/learn/${slug}`,
+      images: [
+        {
+          url: DEFAULT_OG_IMAGE,
+          width: 1357,
+          height: 861,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description,
+      images: [DEFAULT_OG_IMAGE],
     },
+  };
+}
+
+function articleJsonLd(post: Post, slug: string) {
+  const publishedTime = new Date(post.date).toISOString();
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    datePublished: publishedTime,
+    dateModified: publishedTime,
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/apple-icon.png`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/learn/${slug}`,
+    },
+    image: `${SITE_URL}${DEFAULT_OG_IMAGE}`,
+    articleSection: post.category,
   };
 }
 
@@ -65,6 +118,7 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={articleJsonLd(post, slug)} />
       <SiteHeader />
 
       <main className="pt-16">
