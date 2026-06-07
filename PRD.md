@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.9 · 2026-06-06
+**Status:** Draft v1.10 · 2026-06-07
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -336,12 +336,16 @@ Top-of-funnel content surfaces that support the waitlist funnel without dependin
 
 - [x] **Markets page** (`/markets`) — region-grouped hub for all **33 live markets** across 7 regions; each card links to `/markets/<slug>` with live/pending report state. **(2026-06-06 refresh)**
 - [x] **Dynamic market pages** (`/markets/[slug]`) — server-rendered landing with geo-scoped listing stats + dashboard deep link; PDF/HTML reports auto-served when present in `/public/reports/`. **(2026-06-06)**
-- [x] **San Diego market report** — live PDF at `/markets/san-diego-ca` (legacy `/markets/san-diego` route retained). **(2026-04-23)**
+- [x] **San Diego market report** — live PDF at `/markets/san-diego-ca`; legacy `/markets/san-diego` 301 → canonical slug. **(2026-04-23; redirect 2026-06-07)**
 - [x] **Dashboard market selector** — region-grouped dropdown over all 33 live markets; `?market=<slug>` deep link supported. **(2026-06-06)**
 - [x] **Landing page coverage section** — hero + stats bar reflecting 33 markets, 7 regions, 26k+ listing pool. **(2026-06-06)**
-- [x] **Sitemap** — all `/markets/<slug>` URLs emitted dynamically from `liveMarkets()`. **(2026-06-06)**
-- [x] **Learn page** (`/learn`) — blog-style host education hub; 6 placeholder posts seeded; newsletter CTA to waitlist. **(2026-04-23)**
-- [ ] Publish first real Learn post (dynamic pricing 101) once Phase 2.5 dedup metrics are presentable as an external case study
+- [x] **Sitemap** — `app/sitemap.ts` emits home, `/learn`, `/markets`, all 33 market slugs, and 6 learn articles via `liveMarkets()` + `lib/post-slugs.ts` (avoids importing React article content). **(2026-06-07)**
+- [x] **robots.txt** — `app/robots.ts` allows public pages; disallows `/dashboard`, `/login`, `/early-access`, `/api/`; references sitemap. **(2026-06-07)**
+- [x] **Learn page** (`/learn`) — host education hub with 6 published articles at `/learn/[slug]`; Open Graph + Article JSON-LD per post. **(2026-04-23 content; SEO wiring 2026-06-07)**
+- [x] **SEO P0 — crawlability & indexation** — see §12.1. Shipped 2026-06-07 (commit `d49e0308`).
+- [x] **SEO P1 — on-page & structured data** — see §12.2. Shipped 2026-06-07.
+- [ ] **SEO P2 — content & programmatic growth** — market-page SEO copy, quarterly reports for top 10 metros, learn cross-links, income calculator. See §12.3.
+- [ ] **SEO P3 — measurement** — Google Search Console submission, GA4 organic segmentation, weekly rank tracking. See §12.4.
 - [ ] Generate and publish quarterly HTML/PDF reports for expansion markets (`scripts/generate_all_market_reports.mjs`)
 
 ### Phase 5 — Sweeper & Cleanup (Ongoing)
@@ -461,7 +465,7 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 | Waitlist signups | 50 | — | 200 | 1,000 |
 | Paid conversions | 0 | 0 | 10 | 50 |
 
-**Current state (2026-06-06, post-expansion):** 33 live geo markets · ~26k active listings in global pool · 95 Vercel crons · 100% lat/lng coverage on active rows · cross-platform dedup validated on SD (32 HIGH pairs → 30 canonicals); inland MEDIUM queue not yet sampled · only San Diego has a published quarterly PDF report.
+**Current state (2026-06-07, post-expansion + SEO P0/P1):** 33 live geo markets · ~26k active listings in global pool · 95 Vercel crons · 100% lat/lng coverage on active rows · cross-platform dedup validated on SD (32 HIGH pairs → 30 canonicals); inland MEDIUM queue not yet sampled · only San Diego has a published quarterly PDF report · SEO crawl/indexation foundation shipped (robots, 42-URL sitemap, JSON-LD, Open Graph); GSC submission and P2 content growth pending.
 
 ---
 
@@ -532,3 +536,113 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 - **2026-06-06:** **Geo-based markets shipped (migrations 012–013).** Replaced stored `listings.market` ownership with `discovery_source` (observability) + `listings_in_market()` spatial RPC. Enables overlapping display markets without last-cron-wins overwrite — critical for SoCal (Riverside / LA / Long Beach share ~60–80% URL overlap by design). Duplicate-detection SPI updated to pair within geo windows, not `discovery_source` equality.
 - **2026-06-06:** **Bulk US expansion to 33 live markets.** Seeded all planned regions from `lib/markets.ts`; regenerated `vercel.json` (95 crons: 31×3 discovery + sweeper + all-markets dedup). Bootstrapped 27 new discovery anchors via parameterized backfill scripts (~28 min, 0 failures). Landing page, markets hub, dashboard selector, and sitemap updated to reflect nationwide coverage. Firecrawl Growth tier confirmed unnecessary at this scale.
 - **2026-06-06:** **PRD v1.9 refresh.** Closed remaining pre-geo stale references (dashboard query pattern, sweeper schedule, per-market dedup crons, backfill script lineage). Documented bootstrap inventory ranges, audit scripts, and geo-aware rate-history/report tooling.
+- **2026-06-07:** **SEO P0 + P1 shipped.** Full audit run via `marketing-seo-specialist.md`; crawlability fixes (robots, sitemap rewrite, legacy market 301s, noindex on private routes) and on-page foundation (Organization/WebSite/Article JSON-LD, site-wide Open Graph, keyword-focused homepage metadata, `next/image` optimization). Removed duplicate static market routes in favor of `/markets/[slug]` only. Post-deploy: set `NEXT_PUBLIC_SITE_URL` in Vercel and submit sitemap in Search Console.
+
+---
+
+## 12. SEO Strategy
+
+**Audit date:** 2026-06-07 · **Specialist workflow:** `marketing-seo-specialist.md`
+**Baseline:** Near-zero organic presence (`site:rvintel.io` returned no results pre-fix; production `/sitemap.xml` was returning 500).
+
+RVIntel's organic moat is **geo-specific host intelligence** — quarterly market reports, live Outdoorsy/RVshare comp data, and the `/learn` hub. altCamp owns national camper-van research; no one owns `[city] RV rental market report for hosts` at scale across 33 metros. SEO compounds on top of that content layer once crawl/indexation is healthy.
+
+### 12.1 Phase P0 — Crawlability & indexation (COMPLETE 2026-06-07)
+
+| # | Item | Status |
+|---|---|---|
+| 1 | Fix `/sitemap.xml` production 500 — stop importing `lib/posts.tsx` (React content) in sitemap; use `lib/post-slugs.ts` | [x] |
+| 2 | Add `app/robots.ts` with sitemap reference | [x] |
+| 3 | Rewrite sitemap to include all **33** live markets via `liveMarkets()` | [x] |
+| 4 | Fix slug mismatches (`san-diego` → `san-diego-ca`, `riverside-county` → `riverside-county-ca`) | [x] |
+| 5 | 301 redirect legacy static routes; delete duplicate `app/markets/{san-diego,riverside-county,portland-or,arklatex}/page.tsx` | [x] |
+| 6 | `noindex` on `/dashboard`, `/dashboard/fleet`, `/login`, `/early-access` | [x] |
+| 7 | Document `NEXT_PUBLIC_SITE_URL=https://rvintel.io` in `.env.local.example` | [x] |
+| 8 | Submit sitemap in Google Search Console | [ ] post-deploy manual step |
+
+**Indexable surface after P0:** ~42 URLs (home + `/learn` + `/markets` + 33 market pages + 6 articles). Private app routes excluded from sitemap and robots-allowed paths.
+
+### 12.2 Phase P1 — On-page & structured data (COMPLETE 2026-06-07)
+
+| # | Item | Status |
+|---|---|---|
+| 9 | Organization + WebSite JSON-LD in root layout (`lib/json-ld.tsx`, `lib/site.ts`) | [x] |
+| 10 | Article JSON-LD on `/learn/[slug]` | [x] |
+| 11 | Site-wide Open Graph + default `og:image` (`/images/Dashboard.png`) via `metadataBase` | [x] |
+| 12 | Homepage server metadata export + keyword H1 ("RV Rental Market Intelligence"); client UI in `components/waitlist-page.tsx` | [x] |
+| 13 | Remove `generator: 'v0.app'` from metadata | [x] |
+| 14 | Enable Next.js image optimization; hero/fleet screenshots use `next/image` with `priority` on LCP | [x] |
+
+**Also shipped:** canonical URLs on home, markets hub, market slug pages, and learn articles; title template `%s · RVIntel`; improved `/markets` hub title.
+
+### 12.3 Phase P2 — Content & growth (NOT STARTED)
+
+Target: 3–6 months to meaningful non-branded long-tail rankings.
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| 15 | Quarterly HTML/PDF reports for top 10 expansion markets | High | `scripts/generate_all_market_reports.mjs` ready; linkable assets for digital PR |
+| 16 | 150-word SEO intro on each market landing page | High | Programmatic template across 33 `/markets/[slug]` pages |
+| 17 | Cross-link learn articles ↔ relevant market pages | Medium | Internal link equity between hub and geo pages |
+| 18 | 2 new `/learn` articles/month; seasonal push Feb–May (pre-summer search spike) | High | Existing cluster: dynamic pricing, peak season, platform comparison |
+| 19 | "RV Rental Income Calculator" linkable tool | High | Competitor gap; earns resource links |
+| 20 | Digital PR for San Diego Q2 2026 report | Medium | Pitch data stories to RV/travel press |
+
+### 12.4 Phase P3 — Measurement (NOT STARTED)
+
+| # | Item | Status |
+|---|---|---|
+| — | Google Search Console property + sitemap submission | [ ] |
+| — | GA4 organic channel segmentation (non-branded vs branded) | [ ] |
+| — | Weekly rank tracking for 20 target keywords (5 pillar + 15 geo-long-tail) | [ ] |
+| — | Re-crawl verification after each deploy; target 90%+ index coverage within 60 days of P0 | [ ] |
+
+### 12.5 Keyword strategy (reference)
+
+**Pillar cluster — RV rental pricing for hosts**
+
+| Keyword | Intent | Target URL | Content status |
+|---|---|---|---|
+| dynamic pricing rv rental | Informational | `/learn/dynamic-pricing-101` | Live |
+| rv rental peak season pricing | Informational | `/learn/peak-season-playbook` | Live |
+| outdoorsy vs rvshare | Commercial | `/learn/platform-comparison` | Live |
+| how to price rv rental | Informational | TBD pillar or expand dynamic-pricing-101 | Gap |
+| rv rental weekly vs nightly rates | Informational | `/learn/weekly-vs-nightly` | Live |
+
+**Programmatic cluster — geo market intelligence**
+
+| Pattern | Example | Target |
+|---|---|---|
+| `[city] rv rental market` | san diego rv rental market | `/markets/san-diego-ca` |
+| `[city] rv rental prices` | austin rv rental prices | `/markets/austin-tx` |
+| `[city] rv rental market report` | denver rv rental market report | `/markets/denver-co` (+ PDF when published) |
+
+**Competitive landscape**
+
+| Competitor | SEO strength | RVIntel differentiation |
+|---|---|---|
+| altCamp Research | Original market reports, data PR | P2P focus (Outdoorsy/RVshare), 33 metros, host tooling |
+| RV Management USA | Generic pricing optimization content | Live competitor rate data, not advice-only |
+| Outdoorsy / RVshare blogs | Platform authority | Platform-agnostic intelligence |
+| Guesty | Vacation-rental dynamic pricing | Own **"RV host dynamic pricing"** long-tail |
+
+### 12.6 Technical health checklist (post-P1)
+
+| Area | Status | Remaining risk |
+|---|---|---|
+| Crawlability | ✅ robots + sitemap | Confirm prod sitemap returns 200 after deploy |
+| Indexation | ⚠️ pending | Submit GSC; monitor coverage ratio |
+| Structured data | ✅ Org, WebSite, Article | FAQ schema on learn Q&A sections (P2) |
+| Core Web Vitals | ⚠️ improved | Validate LCP with PageSpeed after `next/image` deploy |
+| Mobile | ✅ responsive layout | — |
+| E-E-A-T signals | ⚠️ partial | Author bios, methodology drawer on reports (P2) |
+
+### 12.7 Success metrics (SEO)
+
+| Metric | Quarter 1 target | Current (2026-06-07) |
+|---|---|---|
+| Pages indexed | 90%+ of sitemap URLs | 0 (pre-GSC submission) |
+| Non-branded organic sessions | Baseline + 50% YoY (long-term) | ~0 |
+| Top-3 rankings (target keyword portfolio) | 30%+ of tracked terms | Not ranking |
+| Featured snippet capture | 20%+ of target PAA opportunities | 0% |
+| Referring domains (market reports + learn) | 10+ DR 40+ links | Minimal |
