@@ -88,10 +88,22 @@ export default async function RootLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  let initialProfile = null;
+  if (user) {
+    const { data } = await supabase
+      .from("user_profiles")
+      .select(
+        "subscription_tier, subscription_status, trial_ends_at, current_period_end"
+      )
+      .eq("id", user.id)
+      .maybeSingle();
+    initialProfile = data;
+  }
+
   return (
     <html lang="en" className="bg-background">
       <body className="font-sans antialiased">
-        <AuthProvider initialUser={user}>
+        <AuthProvider initialUser={user} initialProfile={initialProfile}>
           <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
           {children}
           {process.env.NODE_ENV === "production" && <Analytics />}

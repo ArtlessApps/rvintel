@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.13 · 2026-06-09
+**Status:** Draft v1.14 · 2026-06-08
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -345,6 +345,8 @@ Top-of-funnel content surfaces that support the waitlist funnel without dependin
 - [x] **Learn page** (`/learn`) — host education hub with 6 published articles at `/learn/[slug]`; Open Graph + Article JSON-LD per post. **(2026-04-23 content; SEO wiring 2026-06-07)**
 - [x] **SEO P0 — crawlability & indexation** — see §12.1. Shipped 2026-06-07 (commit `d49e0308`).
 - [x] **SEO P1 — on-page & structured data** — see §12.2. Shipped 2026-06-07.
+- [x] **State-dependent marketing CTAs** — `lib/product-cta.ts` + `StartTrialCta` / `SiteHeader` switch trial vs dashboard vs resubscribe based on SSR-hydrated subscription profile. **(2026-06-08)**
+- [ ] **Wire `/learn` article CTAs to `StartTrialCta`** — bottom-of-article trial buttons still hardcode `/login?next=/upgrade`.
 - [ ] **SEO P2 — content & programmatic growth** — market-page SEO copy, quarterly reports for top 10 metros, learn cross-links, income calculator. See §12.3.
 - [ ] **SEO P3 — measurement** — Google Search Console submission, GA4 organic segmentation, weekly rank tracking. See §12.4.
 - [ ] Generate and publish quarterly HTML/PDF reports for expansion markets (`scripts/generate_all_market_reports.mjs`)
@@ -374,7 +376,7 @@ Three tiers of protection for `/dashboard`. We ship only the tier the current ph
 - [x] `proxy.ts` — refreshes session on every non-static request; redirects `/dashboard/*` → `/login` when no session exists
 - [x] `app/login/page.tsx` — email input → `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })` → "check your email" confirmation state; shadcn/ui, design-system compliant
 - [x] `app/auth/callback/page.tsx` — client callback handles PKCE `?code=`, implicit `#access_token` hash, and `token_hash` verify; redirects to `/dashboard` (or `?next=` path) on success
-- [x] Marketing site header (`components/site-header.tsx`) — auth-aware Sign in / profile menu via root `AuthProvider` (SSR user + client `onAuthStateChange`)
+- [x] Marketing site header (`components/site-header.tsx`) — auth-aware Sign in / profile menu via root `AuthProvider` (SSR user + subscription profile + client `onAuthStateChange`)
 - [x] Sign-out button added to dashboard header — calls `supabase.auth.signOut()` then redirects to `/login`
 - [x] `.env.local.example` updated — documents Supabase Redirect URL configuration required in the Supabase dashboard (no new env vars needed; `emailRedirectTo` is derived from `window.location.origin` at runtime)
 - [ ] Rotate `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the current one is already exposed in every deploy's client bundle (deferred to Tier 2.5 / Phase 4 RSC refactor below)
@@ -398,7 +400,7 @@ Move the dashboard from a client component that queries Supabase with the anon k
 
 Why Phase 4 is the trigger: comp-sets are the first feature where logged-in state matters (each user's set is different, and comp-sets are paid-tier gated). Shipping the RSC refactor earlier means owning the service-role query pattern before any feature needs it — infrastructure cost without auth payoff.
 
-### Subscriptions & billing (SHIPPED 2026-06-08 · trial model updated 2026-06-09 · no-card trials 2026-06-09)
+### Subscriptions & billing (SHIPPED 2026-06-08 · trial model updated 2026-06-09 · no-card trials 2026-06-09 · trial upsert + CTA state 2026-06-08)
 
 Three paid tiers, billed monthly via Stripe. **Self-serve users get a 7-day free trial on whichever plan they pick — no credit card required.** First-time signups start a Stripe subscription server-side (`trial_period_days: 7`); access is immediate with no Checkout redirect. If no payment method is on file when the trial ends, Stripe cancels the subscription (`trial_settings.end_behavior.missing_payment_method: cancel`) and the user is sent to `/upgrade` to subscribe. Returning customers (prior Stripe subscription on the account) skip the trial and go through Stripe Checkout with card. Fleet limits during trial match the chosen tier (`solo` / `growth` / `fleet`), not a separate "trial tier."
 
@@ -414,7 +416,7 @@ Three paid tiers, billed monthly via Stripe. **Self-serve users get a 7-day free
 2. Dashboard gate (`hasActiveAccess`) — no subscription → `/upgrade`
 3. Pick plan → `POST /api/stripe/checkout` `{ plan }`
 4. Checkout route creates Stripe customer (if needed), then `stripe.subscriptions.create` with `trial_period_days: 7` and `trial_settings.end_behavior.missing_payment_method: cancel` — **no card, no Checkout session**
-5. `user_profiles` upserted immediately via `profileFromStripeSubscription()`; response redirects to `/dashboard?trial_started=1`
+5. `user_profiles` upserted immediately via `profileFromStripeSubscription()` using `createClient` + `SUPABASE_SERVICE_ROLE_KEY` (must **not** use `createServerClient` with the service role — user session cookies cause RLS to block inserts); response redirects to `/dashboard?trial_started=1`
 6. Dashboard access while `subscription_status` is `trialing` or `active`
 7. Webhooks (`customer.subscription.*`, `invoice.payment_failed`) keep `user_profiles` in sync; `trial_ends_at` mirrored from Stripe `trial_end`
 
@@ -436,13 +438,22 @@ Three paid tiers, billed monthly via Stripe. **Self-serve users get a 7-day free
 
 **Routes:** `/api/stripe/checkout` · `/api/stripe/complete` · `/api/stripe/webhook` · `/api/admin/activate` · `/upgrade` (auth-guarded layout)
 
-**Shared libs:** `lib/stripe-subscription.ts` (`STRIPE_TRIAL_DAYS`, `TRIAL_SUBTEXT`, price→tier map, profile sync) · `lib/stripe-prices.ts` (env validation; rejects `prod_` IDs)
+**Shared libs:** `lib/stripe-subscription.ts` (`STRIPE_TRIAL_DAYS`, `TRIAL_SUBTEXT`, price→tier map, profile sync) · `lib/stripe-prices.ts` (env validation; rejects `prod_` IDs) · `lib/product-cta.ts` (auth + subscription → primary marketing CTA)
 
-**Marketing copy:** All trial CTAs use `TRIAL_SUBTEXT` — *"No credit card required · From $9.99/mo after trial · Cancel anytime"* (`StartTrialCta`, `/upgrade`, `/learn`).
+**Marketing CTAs (state-dependent, 2026-06-08):** Root `AuthProvider` SSR-hydrates `user` + `user_profiles` subscription fields; `resolveProductCta()` in `lib/product-cta.ts` drives all primary acquisition CTAs via `StartTrialCta` and `SiteHeader`. Industry-standard state machine:
+
+| State | Label | Destination | Subtext |
+|---|---|---|---|
+| Anonymous | Start 7-day free trial | `/login?next=/upgrade` | `TRIAL_SUBTEXT` |
+| Signed in, no access | Start 7-day free trial | `/upgrade` | `TRIAL_SUBTEXT` |
+| Signed in, trialing / active | Go to dashboard | `/dashboard` | `N days left in your free trial` (when trialing) |
+| Signed in, lapsed | Resubscribe | `/upgrade?expired=1` | Access-ended copy |
+
+Client refetches profile on auth change and route navigation so post-checkout homepage visits show dashboard CTAs without a full reload. `/upgrade` and hardcoded `/learn` article CTAs unchanged. `TRIAL_SUBTEXT` — *"No credit card required · From $9.99/mo after trial · Cancel anytime"*.
 
 **Verification:** `node scripts/test-stripe-plans.mjs` — admin-activates test users, hits checkout per plan. **Note:** script still expects a Checkout session URL; first-time trial-eligible users now get a dashboard redirect instead — update script or use fresh Stripe customers per plan when re-running. Sandbox plans verified 2026-06-08 on `acct_1TfqHABTCAvIbhXg`.
 
-**Schema:** `user_profiles` (migration 014) holds `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at`, `current_period_end`, `activated_from_waitlist`. `user_fleet.user_id` links fleet rows to auth users (migration 015).
+**Schema:** `user_profiles` (migration 014) holds `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at`, `current_period_end`, `activated_from_waitlist`. RLS: authenticated users may SELECT/UPDATE own row only — **no INSERT policy**; all server-side creates/upserts (checkout, admin activate, webhooks) must use the service-role `createClient` from `@supabase/supabase-js`, not `createServerClient` from `@supabase/ssr` (which still applies the signed-in JWT from cookies). `user_fleet.user_id` links fleet rows to auth users (migration 015).
 
 **Env vars (test vs live must match):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, three `STRIPE_PRICE_ID_*` (**must be `price_…` IDs, not `prod_…` product IDs**), `STRIPE_WEBHOOK_SECRET`, `ADMIN_SECRET`, `NEXT_PUBLIC_SITE_URL`.
 
@@ -622,6 +633,8 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 - **2026-06-09:** **Moved self-serve trials to Stripe (7 days on chosen plan).** Replaced default app-managed 14-day waitlist trial with Stripe `trial_period_days: 7`. `hasActiveAccess()` grants access on `subscription_status` = `trialing` or `active` with the entitled tier; fleet limits follow the selected plan during trial. `/api/admin/activate` now sends magic links only by default; optional `trial_days` retained for manual waitlist VIPs. `lib/stripe-subscription.ts` centralizes profile sync. Production incident: Vercel env vars must use `price_…` IDs — `prod_…` product IDs fail checkout with "No such price."
 - **2026-06-09:** **No-card self-serve trials.** First-time users no longer pass through Stripe Checkout. `/api/stripe/checkout` creates the subscription via API (`trial_settings.end_behavior.missing_payment_method: cancel`), syncs `user_profiles`, and returns `/dashboard?trial_started=1`. Returning subscribers still use Checkout with card. Marketing copy updated site-wide (`TRIAL_SUBTEXT`). No new env vars, schema changes, or webhook events — deploy code only.
 - **2026-06-09:** **Document Supabase auth email rate limits.** Built-in SMTP caps magic-link volume; production should use Dashboard → Authentication → SMTP Settings (custom provider) and review Authentication → Rate Limits before launch.
+- **2026-06-08:** **Fixed no-card trial `user_profiles` upsert (RLS).** `/api/stripe/checkout` was using `createServerClient` with `SUPABASE_SERVICE_ROLE_KEY` while user auth cookies were present — PostgREST ran as the signed-in user, RLS blocked INSERT, and first-time trial signups saw "Failed to start trial." Aligned with `/api/stripe/complete` and webhooks: service-role writes via `createClient` from `@supabase/supabase-js` only.
+- **2026-06-08:** **State-dependent marketing CTAs.** Extended root `AuthProvider` with SSR-hydrated `user_profiles` + client refetch; added `lib/product-cta.ts` and wired `StartTrialCta` + `SiteHeader` to show "Go to dashboard" (with trial-days subtext) for entitled users instead of repeat "Start free trial" prompts on the homepage and `/markets`.
 
 ---
 

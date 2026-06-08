@@ -18,8 +18,7 @@ import {
 import { useAuth } from "@/components/auth-provider";
 import { Logo } from "@/components/logo";
 import { SiteHeaderAuth } from "@/components/site-header-auth";
-import { useTrialHref } from "@/components/start-trial-cta";
-import { STRIPE_TRIAL_DAYS } from "@/lib/stripe-subscription";
+import { useProductCta } from "@/components/start-trial-cta";
 
 type NavLink = {
   href: string;
@@ -43,7 +42,7 @@ function isActive(pathname: string | null, href: string) {
 export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean }) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const trialHref = useTrialHref();
+  const cta = useProductCta();
   const [open, setOpen] = useState(false);
 
   return (
@@ -77,16 +76,19 @@ export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean })
           </nav>
 
           <div className="flex items-center gap-2">
-            {!user ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="hidden sm:flex rounded-sm"
-                asChild
-              >
-                <Link href={trialHref}>Start {STRIPE_TRIAL_DAYS}-day trial</Link>
-              </Button>
-            ) : null}
+            <Button
+              variant={cta.variant === "dashboard" ? "outline" : "default"}
+              size="sm"
+              className="hidden sm:flex rounded-sm"
+              style={
+                cta.variant !== "dashboard"
+                  ? { background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }
+                  : undefined
+              }
+              asChild
+            >
+              <Link href={cta.href}>{cta.label}</Link>
+            </Button>
             <SiteHeaderAuth user={user} />
 
             <Sheet open={open} onOpenChange={setOpen}>
@@ -134,13 +136,20 @@ export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean })
                     variant="mobile"
                     onNavigate={() => setOpen(false)}
                   />
-                  {!user ? (
-                    <SheetClose asChild>
-                      <Button asChild className="w-full rounded-sm" style={{ background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }}>
-                        <Link href={trialHref}>Start {STRIPE_TRIAL_DAYS}-day trial</Link>
-                      </Button>
-                    </SheetClose>
-                  ) : null}
+                  <SheetClose asChild>
+                    <Button
+                      asChild
+                      variant={cta.variant === "dashboard" ? "outline" : "default"}
+                      className="w-full rounded-sm"
+                      style={
+                        cta.variant !== "dashboard"
+                          ? { background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }
+                          : undefined
+                      }
+                    >
+                      <Link href={cta.href}>{cta.label}</Link>
+                    </Button>
+                  </SheetClose>
                 </div>
               </SheetContent>
             </Sheet>
