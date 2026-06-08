@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, TrendingUp, BarChart3, ArrowRight } from "lucide-react";
+import { MapPin, BarChart3, ArrowRight } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { StartTrialCta } from "@/components/start-trial-cta";
 import { WaitlistSignup } from "@/components/waitlist-signup";
@@ -22,8 +22,6 @@ export default function MarketsPage() {
     acc.set(m.region, list);
     return acc;
   }, new Map<string, typeof markets>());
-
-  const discoveryCount = markets.filter((m) => m.outdoorsyAddress && m.rvshareLocation).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -51,7 +49,6 @@ export default function MarketsPage() {
             <div className="flex flex-wrap gap-10">
               {[
                 { icon: BarChart3, label: "Markets tracked", value: `${markets.length} live` },
-                { icon: TrendingUp, label: "Discovery anchors", value: `${discoveryCount} crons` },
                 { icon: MapPin, label: "Regions", value: `${byRegion.size} regions` },
               ].map(({ icon: Icon, label, value }) => (
                 <div key={label} className="flex items-center gap-3">

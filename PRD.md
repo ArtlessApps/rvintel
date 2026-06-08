@@ -379,6 +379,10 @@ Three tiers of protection for `/dashboard`. We ship only the tier the current ph
 - [x] `.env.local.example` updated — documents Supabase Redirect URL configuration required in the Supabase dashboard (no new env vars needed; `emailRedirectTo` is derived from `window.location.origin` at runtime)
 - [ ] Rotate `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the current one is already exposed in every deploy's client bundle (deferred to Tier 2.5 / Phase 4 RSC refactor below)
 - [ ] Restrict `waitlist` email list as the allowlist for who can request a magic link (currently any email can sign in)
+- [ ] **Custom SMTP for auth emails (production)** — Supabase Dashboard → **Authentication → SMTP Settings**; connect a provider (Resend, SendGrid, Postmark, etc.). The built-in Supabase mailer has a very low project-wide hourly cap (~2–4 emails/hour); heavy dev testing or real signups hit `email rate limit exceeded` on `/login`. Custom SMTP raises limits substantially.
+- [ ] **Review auth rate limits** — Supabase Dashboard → **Authentication → Rate Limits**; adjust OTP / email caps if testing heavily. Per-user OTP cooldown also applies between magic-link requests.
+
+**Auth email rate limits (operational note):** Magic links use `signInWithOtp` and count against the project’s auth email quota (shared with admin `generateLink`, password reset, etc.). Symptom: login shows *email rate limit exceeded*. Mitigations: wait ~1 hour for built-in SMTP reset, reuse a link already in inbox, use `/api/admin/activate` magic links for dev, or configure custom SMTP before go-live.
 
 What Tier 2 adds over Tier 1: real identity — we know who is in the dashboard, not just that they had the passcode. Magic-link is passwordless, which fits the waitlist-activation model: invite a user → they click the link → they're authenticated.
 What it still does **not** protect: the Supabase `listings` table itself — the anon key is still shipped in the client bundle and `listings` has an `anon` SELECT policy. A determined visitor who opens devtools can still hit the Supabase REST endpoint directly. That gap closes in the Tier 2.5 RSC refactor below.
@@ -607,6 +611,7 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 - **2026-06-08:** **Upgrade page auth + checkout hardening.** `/upgrade` layout requires sign-in; checkout returns clear JSON errors (401, misconfigured `prod_` vs `price_` env vars); `credentials: "include"` on checkout fetch.
 - **2026-06-08:** **Marketing site header auth state.** Root `AuthProvider` SSR-loads user; `SiteHeader` shows Sign in or profile dropdown (Dashboard, My Fleet, Sign out) on homepage and public pages.
 - **2026-06-09:** **Moved self-serve trials to Stripe (7 days on chosen plan).** Replaced default app-managed 14-day waitlist trial with Stripe `trial_period_days: 7` at Checkout. `hasActiveAccess()` grants access on `subscription_status` = `trialing` or `active` with the entitled tier; fleet limits follow the selected plan during trial. `/api/admin/activate` now sends magic links only by default; optional `trial_days` retained for manual waitlist VIPs. `lib/stripe-subscription.ts` centralizes profile sync; complete route accepts `no_payment_required` for trialing checkouts. Production incident: Vercel env vars must use `price_…` IDs — `prod_…` product IDs fail checkout with "No such price."
+- **2026-06-09:** **Document Supabase auth email rate limits.** Built-in SMTP caps magic-link volume; production should use Dashboard → Authentication → SMTP Settings (custom provider) and review Authentication → Rate Limits before launch.
 
 ---
 
