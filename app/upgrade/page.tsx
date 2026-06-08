@@ -4,10 +4,11 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { STRIPE_TRIAL_DAYS } from "@/lib/stripe-subscription";
 
 type Plan = "solo" | "growth" | "fleet";
 
@@ -44,7 +45,14 @@ const PLANS = [
 export default function UpgradePage() {
   const [loading, setLoading] = useState<Plan | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isRenewal, setIsRenewal] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsRenewal(
+      new URLSearchParams(window.location.search).get("expired") === "1"
+    );
+  }, []);
 
   async function handleSubscribe(plan: Plan) {
     setLoading(plan);
@@ -98,7 +106,9 @@ export default function UpgradePage() {
             Choose your plan
           </h1>
           <p className="text-sm text-muted-foreground">
-            Your trial has ended. Subscribe to keep your market edge.
+            {isRenewal
+              ? "Your access has ended. Pick a plan to subscribe again."
+              : `Start a ${STRIPE_TRIAL_DAYS}-day free trial on any plan. Card required; cancel anytime.`}
           </p>
         </div>
 
@@ -131,6 +141,9 @@ export default function UpgradePage() {
                   <span className="text-sm font-normal text-muted-foreground">/mo</span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">{plan.subtitle}</p>
+                {!isRenewal ? (
+                  <p className="text-xs text-primary mt-2">{STRIPE_TRIAL_DAYS}-day free trial</p>
+                ) : null}
               </div>
 
               {/* Features */}
@@ -154,14 +167,18 @@ export default function UpgradePage() {
                 disabled={loading !== null}
                 className="w-full rounded-md py-2.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
-                {loading === plan.key ? "Redirecting…" : `Get ${plan.label}`}
+                {loading === plan.key
+                  ? "Redirecting…"
+                  : isRenewal
+                    ? `Subscribe to ${plan.label}`
+                    : `Start ${STRIPE_TRIAL_DAYS}-day trial`}
               </button>
             </div>
           ))}
         </div>
 
         <p className="text-xs text-muted-foreground text-center">
-          Secure payment via Stripe · Cancel anytime
+          Secure payment via Stripe · {STRIPE_TRIAL_DAYS}-day free trial, then billed monthly · Cancel anytime
         </p>
 
         <button

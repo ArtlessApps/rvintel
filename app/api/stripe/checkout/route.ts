@@ -5,6 +5,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { resolveStripePriceId } from "@/lib/stripe-prices";
+import { STRIPE_TRIAL_DAYS } from "@/lib/stripe-subscription";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -12,15 +14,6 @@ function getStripe() {
     throw new Error("Stripe is not configured on this server.");
   }
   return new Stripe(key);
-}
-
-function priceIdForPlan(plan: string): string | undefined {
-  const map: Record<string, string | undefined> = {
-    solo: process.env.STRIPE_PRICE_ID_SOLO,
-    growth: process.env.STRIPE_PRICE_ID_GROWTH,
-    fleet: process.env.STRIPE_PRICE_ID_FLEET,
-  };
-  return map[plan] ?? process.env.STRIPE_PRICE_ID_SOLO;
 }
 
 function adminClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
@@ -75,14 +68,11 @@ export async function POST(request: Request) {
 
     const body = await request.json().catch(() => ({}));
     const plan = (body.plan as string) ?? "solo";
-    const priceId = priceIdForPlan(plan);
-
-    if (!priceId) {
-      return NextResponse.json(
-        { error: `Billing is not configured for the ${plan} plan.` },
-        { status: 500 }
-      );
+    const priceResult = resolveStripePriceId(plan);
+    if ("error" in priceResult) {
+      return NextResponse.json({ error: priceResult.error }, { status: 500 });
     }
+    const priceId = priceResult.priceId;
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     if (!siteUrl) {
@@ -94,9 +84,19 @@ export async function POST(request: Request) {
 
     const { data: profile } = await supabase
       .from("user_profiles")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, subscription_status")
       .eq("id", user.id)
       .single();
+
+    if (
+      profile?.subscription_status === "active" ||
+      profile?.subscription_status === "trialing"
+    ) {
+      return NextResponse.json(
+        { error: "You already have an active subscription." },
+        { status: 400 }
+      );
+    }
 
     let customerId = profile?.stripe_customer_id ?? null;
 
@@ -117,11 +117,22 @@ export async function POST(request: Request) {
       await saveCustomerId(cookieStore, user.id, user.email, customerId);
     }
 
+    const priorSubs = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 1,
+    });
+    const eligibleForTrial = priorSubs.data.length === 0;
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
+      subscription_data: {
+        ...(eligibleForTrial ? { trial_period_days: STRIPE_TRIAL_DAYS } : {}),
+        metadata: { supabase_uid: user.id, plan },
+      },
       success_url: `${siteUrl}/api/stripe/complete?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/upgrade`,
       metadata: { supabase_uid: user.id, plan },

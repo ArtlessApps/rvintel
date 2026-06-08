@@ -82,7 +82,7 @@ async function activate(email) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${env.ADMIN_SECRET}`,
     },
-    body: JSON.stringify({ email, trial_days: 0 }),
+    body: JSON.stringify({ email }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error ?? `activate failed ${res.status}`);

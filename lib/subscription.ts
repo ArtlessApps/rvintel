@@ -13,12 +13,13 @@ export const PLAN_CONFIG = {
 
 export type PlanKey = keyof typeof PLAN_CONFIG;
 
+const ENTITLED_STRIPE_STATUSES = new Set(["active", "trialing"]);
+
 /**
  * Returns how many RVs this subscription tier allows.
  * Returns 0 if the tier is unrecognised (e.g. 'none' or null = no access).
  */
 export function getFleetLimit(tier: string | null): number {
-  if (tier === "trial") return PLAN_CONFIG.solo.rvLimit;
   if (!tier || !(tier in PLAN_CONFIG)) return 0;
   return PLAN_CONFIG[tier as PlanKey].rvLimit;
 }
@@ -32,34 +33,54 @@ export type UserProfile = {
   current_period_end: string | null;
 };
 
+function hasEntitledTier(profile: UserProfile): boolean {
+  return (
+    profile.subscription_tier !== null &&
+    profile.subscription_tier !== "none" &&
+    profile.subscription_tier in PLAN_CONFIG
+  );
+}
+
 /**
  * Returns true if the user should have access to the dashboard.
  * Access is granted if:
- *   (a) They have an active paid Stripe subscription, OR
- *   (b) They're on a free trial and the trial hasn't expired yet.
+ *   (a) Stripe subscription is active or in a free trial (trialing), OR
+ *   (b) Legacy waitlist manual trial (admin activate with trial_days) hasn't expired.
  */
 export function hasActiveAccess(profile: UserProfile | null): boolean {
   if (!profile) return false;
 
-  // Active paid subscription
-  if (profile.subscription_status === 'active') return true;
-
-  // Trial still running
   if (
-    profile.subscription_tier === 'trial' &&
+    profile.subscription_status &&
+    ENTITLED_STRIPE_STATUSES.has(profile.subscription_status) &&
+    hasEntitledTier(profile)
+  ) {
+    return true;
+  }
+
+  // Legacy waitlist-only manual trial (optional via /api/admin/activate).
+  if (
+    profile.subscription_tier === "trial" &&
     profile.trial_ends_at &&
     new Date(profile.trial_ends_at) > new Date()
-  ) return true;
+  ) {
+    return true;
+  }
 
   return false;
 }
 
 /**
- * Returns how many days remain in the free trial (0 if expired or not on trial).
- * Use this to show a "X days left in your trial" banner.
+ * Days left in the current Stripe or legacy trial (0 if not trialing).
  */
 export function trialDaysRemaining(profile: UserProfile | null): number {
   if (!profile?.trial_ends_at) return 0;
+  if (
+    profile.subscription_status !== "trialing" &&
+    profile.subscription_tier !== "trial"
+  ) {
+    return 0;
+  }
   const ms = new Date(profile.trial_ends_at).getTime() - Date.now();
   return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
 }

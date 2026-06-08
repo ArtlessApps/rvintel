@@ -421,7 +421,13 @@ Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard 
 | RVIntel Growth | `price_1TfqxeBTCAvIbhXgWtOud6Fb` |
 | RVIntel Fleet | `price_1TfqxfBTCAvIbhXgzPv5Lbjz` |
 
-**Production:** Create a Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live** price IDs on Vercel — never mix with test IDs. Live products on a separate Stripe account (`acct_1TfqGnB67ExGpyp5`, MCP-linked); create or copy products there before go-live.
+**Production:** Create a Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live price IDs** on Vercel — never mix with test IDs. Live products on account `acct_1TfqGnB67ExGpyp5`. **Env vars must be `price_…` IDs, not `prod_…` product IDs.**
+
+| Plan | Live price ID |
+|---|---|
+| RVIntel One | `price_1TftbrB67ExGpyp5SCj5mQ78` |
+| RVIntel Growth | `price_1TfqxkB67ExGpyp5XyJNEB9L` |
+| RVIntel Fleet | `price_1TfqxlB67ExGpyp5zk5zjlPs` |
 
 **Open items:**
 - [ ] Stripe Customer Portal for self-serve cancel / payment-method update

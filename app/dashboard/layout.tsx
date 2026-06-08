@@ -44,7 +44,7 @@ export default async function DashboardLayout({
 
   // If they don't have a valid trial or subscription, send them to the upgrade page.
   if (!hasActiveAccess(profile)) {
-    redirect("/upgrade");
+    redirect(profile ? "/upgrade?expired=1" : "/upgrade");
   }
 
   // User has access — render the dashboard page normally.
