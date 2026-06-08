@@ -1,6 +1,5 @@
 // Stripe redirects here after successful checkout.
 // Verifies the session, updates user_profiles, then sends the user to the dashboard.
-// This runs before the dashboard layout gate so we don't lose to webhook latency.
 
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
@@ -16,6 +15,15 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+function tierForPriceId(priceId: string): string {
+  const map: Record<string, string | undefined> = {
+    [process.env.STRIPE_PRICE_ID_SOLO ?? ""]: "solo",
+    [process.env.STRIPE_PRICE_ID_GROWTH ?? ""]: "growth",
+    [process.env.STRIPE_PRICE_ID_FLEET ?? ""]: "fleet",
+  };
+  return map[priceId] ?? "solo";
+}
 
 function subscriptionPeriodEnd(sub: Stripe.Subscription): string | null {
   const periodEnd = sub.items.data[0]?.current_period_end;
@@ -59,13 +67,15 @@ export async function GET(request: NextRequest) {
 
     if (session.subscription) {
       const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+      const priceId = sub.items.data[0]?.price?.id ?? "";
+      const tier = tierForPriceId(priceId);
 
       await supabaseAdmin
         .from("user_profiles")
         .update({
           stripe_subscription_id: sub.id,
           subscription_status: sub.status,
-          subscription_tier: sub.status === "active" ? "solo" : "none",
+          subscription_tier: sub.status === "active" ? tier : "none",
           current_period_end: subscriptionPeriodEnd(sub),
         })
         .eq("id", user.id);
