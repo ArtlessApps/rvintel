@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.11 · 2026-06-08
+**Status:** Draft v1.12 · 2026-06-08
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -403,29 +403,38 @@ Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard 
 | `growth` | RVIntel Growth | $19.99/mo | 5 RVs | `STRIPE_PRICE_ID_GROWTH` |
 | `fleet` | RVIntel Fleet | $39.99/mo | Unlimited | `STRIPE_PRICE_ID_FLEET` |
 
-**Flow:** waitlist → `POST /api/admin/activate` (trial) → magic-link login → dashboard gate (`hasActiveAccess`) → `/upgrade` → `/api/stripe/checkout` → Stripe hosted checkout → webhook updates `user_profiles` → fleet add enforces `getFleetLimit()`.
+**Flow:** waitlist → `POST /api/admin/activate` (trial) → magic-link login → dashboard gate (`hasActiveAccess`) → `/upgrade` (pick plan) → `POST /api/stripe/checkout` `{ plan }` → Stripe hosted checkout → `/api/stripe/complete` verifies session + writes tier → `/dashboard?subscribed=1`. Webhooks (`customer.subscription.*`, `invoice.payment_failed`) keep `user_profiles` in sync. Fleet add enforces `getFleetLimit()`.
+
+**Routes:** `/api/stripe/checkout` · `/api/stripe/complete` · `/api/stripe/webhook` · `/api/admin/activate` · `/upgrade`
+
+**Verification:** `node scripts/test-stripe-plans.mjs` — activates test users, opens a Checkout session per plan, asserts price ID + product name. All three plans verified 2026-06-08 on sandbox `acct_1TfqHABTCAvIbhXg`.
 
 **Schema:** `user_profiles` (migration 014) holds `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at`, `current_period_end`. `user_fleet.user_id` links fleet rows to auth users (migration 015).
 
 **Env vars (test vs live must match):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, three `STRIPE_PRICE_ID_*`, `STRIPE_WEBHOOK_SECRET`, `ADMIN_SECRET`, `NEXT_PUBLIC_SITE_URL`.
 
-**Local dev:** `stripe listen --forward-to localhost:3000/api/stripe/webhook` — CLI signing secret must match `STRIPE_WEBHOOK_SECRET`. Test products live on sandbox account `acct_1TfqHABTCAvIbhXg` (`livemode: false` price IDs contain `BTCAvIbhXg`).
+**Local dev:** `pnpm dev` + `stripe listen --forward-to localhost:3000/api/stripe/webhook` — CLI signing secret must match `STRIPE_WEBHOOK_SECRET`. Test products on sandbox `acct_1TfqHABTCAvIbhXg` (`livemode: false`; price IDs contain `BTCAvIbhXg`):
 
-**Production:** Create a Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live** price IDs on Vercel — never mix with test IDs.
+| Plan | Test price ID |
+|---|---|
+| RVIntel One | `price_1TftbYBTCAvIbhXgH4hFAFAI` |
+| RVIntel Growth | `price_1TfqxeBTCAvIbhXgWtOud6Fb` |
+| RVIntel Fleet | `price_1TfqxfBTCAvIbhXgzPv5Lbjz` |
+
+**Production:** Create a Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live** price IDs on Vercel — never mix with test IDs. Live products on a separate Stripe account (`acct_1TfqGnB67ExGpyp5`, MCP-linked); create or copy products there before go-live.
 
 **Open items:**
 - [ ] Fix magic-link callback (admin `generateLink` tokens land on `/login?error=1` in browser)
-- [ ] Point checkout `success_url` at `/api/stripe/complete?session_id={CHECKOUT_SESSION_ID}` (avoids webhook race)
-- [ ] `/api/stripe/complete` should resolve tier from price ID, not hardcode `solo`
 - [ ] Stripe Customer Portal for self-serve cancel / payment-method update
 - [ ] Vercel production env: all live Stripe vars + webhook secret
+- [ ] Apply migration 015 unique index on `user_fleet (user_id, listing_url)` if not yet in Supabase
 
 **Tier 3 — Full auth provider + per-user RLS (TRIGGER: paid-tier launch)**
 
 Only when we're charging money or when a feature needs user-scoped data (saved filters, host-claimed listings, B2B orgs for the fleet tier).
 
 - [x] Already on **Supabase Auth** (magic-link, Tier 2)
-- [x] **Stripe integration** — Checkout + webhooks → `user_profiles`; three tiers; fleet limits enforced in `/api/fleet/lookup`
+- [x] **Stripe integration** — multi-plan Checkout + `/api/stripe/complete` + webhooks → `user_profiles`; fleet limits in `/api/fleet/lookup`; smoke test in `scripts/test-stripe-plans.mjs`
 - [ ] RLS rewrite on `listings`, `listing_snapshots`, and any future user-scoped tables — policies gate on `auth.uid()` and subscription tier claims
 - [ ] Stripe Customer Portal + subscription management UI
 - [ ] Organization/team model deferred until multi-seat fleet signal
@@ -565,7 +574,8 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 - **2026-06-06:** **Bulk US expansion to 33 live markets.** Seeded all planned regions from `lib/markets.ts`; regenerated `vercel.json` (95 crons: 31×3 discovery + sweeper + all-markets dedup). Bootstrapped 27 new discovery anchors via parameterized backfill scripts (~28 min, 0 failures). Landing page, markets hub, dashboard selector, and sitemap updated to reflect nationwide coverage. Firecrawl Growth tier confirmed unnecessary at this scale.
 - **2026-06-06:** **PRD v1.9 refresh.** Closed remaining pre-geo stale references (dashboard query pattern, sweeper schedule, per-market dedup crons, backfill script lineage). Documented bootstrap inventory ranges, audit scripts, and geo-aware rate-history/report tooling.
 - **2026-06-07:** **SEO P0 + P1 shipped.** Full audit run via `marketing-seo-specialist.md`; crawlability fixes (robots, sitemap rewrite, legacy market 301s, noindex on private routes) and on-page foundation (Organization/WebSite/Article JSON-LD, site-wide Open Graph, keyword-focused homepage metadata, `next/image` optimization). Removed duplicate static market routes in favor of `/markets/[slug]` only. Post-deploy: set `NEXT_PUBLIC_SITE_URL` in Vercel and submit sitemap in Search Console.
-- **2026-06-08:** **Shipped three-tier Stripe billing (RVIntel One / Growth / Fleet).** Test-mode products on sandbox `acct_1TfqHABTCAvIbhXg` at $9.99 / $19.99 / $39.99 per month. Checkout accepts a `plan` param; webhooks map price IDs → `subscription_tier`; dashboard layout gates on `hasActiveAccess()`; fleet add enforces per-tier RV limits. Separate live-mode products exist on MCP-linked account — production must use live keys + live price IDs only. Magic-link browser callback and checkout success-url race remain open.
+- **2026-06-08:** **Shipped three-tier Stripe billing (RVIntel One / Growth / Fleet).** Test-mode products on sandbox `acct_1TfqHABTCAvIbhXg` at $9.99 / $19.99 / $39.99 per month. `/upgrade` passes `plan` to checkout; webhooks + `/api/stripe/complete` map price IDs → `subscription_tier`; dashboard gates on `hasActiveAccess()`; fleet add enforces per-tier RV limits. Live-mode products on separate MCP account — production uses live keys + live price IDs only.
+- **2026-06-08:** **Multi-plan checkout wired + verified.** Fixed checkout route that still hardcoded `STRIPE_PRICE_ID_SOLO`; `success_url` now routes through `/api/stripe/complete` with tier resolved from price ID. `scripts/test-stripe-plans.mjs` confirms all three sandbox products open the correct Checkout session. Magic-link browser callback remains open.
 
 ---
 
