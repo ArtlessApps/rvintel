@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Mail, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,21 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (window.location.hash.includes("access_token")) {
+      window.location.replace(
+        `/auth/callback${window.location.search}${window.location.hash}`
+      );
+      return;
+    }
+
+    if (new URLSearchParams(window.location.search).get("error")) {
+      setError("Sign-in link expired or invalid. Request a new one.");
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

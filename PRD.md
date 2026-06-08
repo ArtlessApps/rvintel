@@ -373,7 +373,7 @@ Three tiers of protection for `/dashboard`. We ship only the tier the current ph
 - [x] `lib/supabase/server.ts` — `createServerClient` wrapper with async cookie handling for Server Components
 - [x] `proxy.ts` — refreshes session on every non-static request; redirects `/dashboard/*` → `/login` when no session exists
 - [x] `app/login/page.tsx` — email input → `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })` → "check your email" confirmation state; shadcn/ui, design-system compliant
-- [x] `app/auth/callback/route.ts` — exchanges the magic-link `code` for a session via `exchangeCodeForSession`; redirects to `/dashboard` on success, `/login?error=1` on failure
+- [x] `app/auth/callback/page.tsx` — client callback handles PKCE `?code=`, implicit `#access_token` hash, and `token_hash` verify; redirects to `/dashboard` on success
 - [x] Sign-out button added to dashboard header — calls `supabase.auth.signOut()` then redirects to `/login`
 - [x] `.env.local.example` updated — documents Supabase Redirect URL configuration required in the Supabase dashboard (no new env vars needed; `emailRedirectTo` is derived from `window.location.origin` at runtime)
 - [ ] Rotate `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the current one is already exposed in every deploy's client bundle (deferred to Tier 2.5 / Phase 4 RSC refactor below)
@@ -424,7 +424,6 @@ Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard 
 **Production:** Create a Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live** price IDs on Vercel — never mix with test IDs. Live products on a separate Stripe account (`acct_1TfqGnB67ExGpyp5`, MCP-linked); create or copy products there before go-live.
 
 **Open items:**
-- [ ] Fix magic-link callback (admin `generateLink` tokens land on `/login?error=1` in browser)
 - [ ] Stripe Customer Portal for self-serve cancel / payment-method update
 - [ ] Vercel production env: all live Stripe vars + webhook secret
 - [ ] Apply migration 015 unique index on `user_fleet (user_id, listing_url)` if not yet in Supabase
