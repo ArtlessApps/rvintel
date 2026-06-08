@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { AuthProvider } from "@/components/auth-provider";
 import { JsonLd } from "@/lib/json-ld";
+import { createClient } from "@/lib/supabase/server";
 import {
   SITE_URL,
   SITE_NAME,
@@ -76,17 +78,24 @@ const websiteJsonLd = {
   publisher: { "@type": "Organization", name: SITE_NAME },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html lang="en" className="bg-background">
       <body className="font-sans antialiased">
-        <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
-        {children}
-        {process.env.NODE_ENV === "production" && <Analytics />}
+        <AuthProvider initialUser={user}>
+          <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
+          {children}
+          {process.env.NODE_ENV === "production" && <Analytics />}
+        </AuthProvider>
       </body>
     </html>
   );

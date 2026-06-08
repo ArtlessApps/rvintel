@@ -15,7 +15,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuth } from "@/components/auth-provider";
 import { Logo } from "@/components/logo";
+import { SiteHeaderAuth } from "@/components/site-header-auth";
 
 type NavLink = {
   href: string;
@@ -38,6 +40,7 @@ function isActive(pathname: string | null, href: string) {
 
 export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean }) {
   const pathname = usePathname();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
@@ -71,9 +74,12 @@ export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean })
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-              <Link href="/#waitlist">Join Waitlist</Link>
-            </Button>
+            {!user ? (
+              <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
+                <Link href="/#waitlist">Join Waitlist</Link>
+              </Button>
+            ) : null}
+            <SiteHeaderAuth user={user} />
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -114,12 +120,19 @@ export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean })
                     );
                   })}
                 </nav>
-                <div className="mt-auto p-4 border-t border-border">
-                  <SheetClose asChild>
-                    <Button asChild className="w-full">
-                      <Link href="/#waitlist">Join Waitlist</Link>
-                    </Button>
-                  </SheetClose>
+                <div className="mt-auto p-4 border-t border-border space-y-3">
+                  <SiteHeaderAuth
+                    user={user}
+                    variant="mobile"
+                    onNavigate={() => setOpen(false)}
+                  />
+                  {!user ? (
+                    <SheetClose asChild>
+                      <Button asChild className="w-full">
+                        <Link href="/#waitlist">Join Waitlist</Link>
+                      </Button>
+                    </SheetClose>
+                  ) : null}
                 </div>
               </SheetContent>
             </Sheet>
