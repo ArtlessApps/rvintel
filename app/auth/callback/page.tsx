@@ -11,7 +11,7 @@ function AuthCallbackInner() {
 
   useEffect(() => {
     const supabase = createClient();
-    const next = searchParams.get("next") ?? "/dashboard";
+    const next = searchParams.get("next") ?? "/upgrade";
 
     async function finish() {
       const code = searchParams.get("code");

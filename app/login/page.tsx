@@ -9,7 +9,7 @@ import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 
 function safeNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/upgrade";
   return raw;
 }
 

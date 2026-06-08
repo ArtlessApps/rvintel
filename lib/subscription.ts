@@ -71,6 +71,26 @@ export function hasActiveAccess(profile: UserProfile | null): boolean {
 }
 
 /**
+ * True when the user previously had (or attempted) a subscription and no longer has access.
+ * Default profile rows (tier/status `none`, no trial history) are treated as new signups.
+ */
+export function hadLapsedSubscription(profile: UserProfile | null): boolean {
+  if (!profile || hasActiveAccess(profile)) return false;
+
+  const { subscription_status, subscription_tier, trial_ends_at } = profile;
+
+  if (
+    subscription_status === "none" &&
+    subscription_tier === "none" &&
+    !trial_ends_at
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Days left in the current Stripe or legacy trial (0 if not trialing).
  */
 export function trialDaysRemaining(profile: UserProfile | null): number {
