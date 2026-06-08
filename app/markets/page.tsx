@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { MapPin, TrendingUp, BarChart3, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
+import { StartTrialCta } from "@/components/start-trial-cta";
+import { WaitlistSignup } from "@/components/waitlist-signup";
 import { liveMarkets } from "@/lib/markets";
 
 export const metadata = {
@@ -110,7 +111,7 @@ export default function MarketsPage() {
           ))}
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="rounded-sm bg-muted/40 px-8 py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
               <h2 className="text-[1.5rem] font-semibold tracking-tight mb-1">
@@ -120,15 +121,12 @@ export default function MarketsPage() {
                 The dashboard queries each market by geographic radius — no double-counting across overlapping metros.
               </p>
             </div>
-            <Button
-              asChild
-              size="lg"
-              className="shrink-0 rounded-sm"
-              style={{ background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }}
-            >
-              <Link href="/dashboard">Open Dashboard</Link>
-            </Button>
+            <StartTrialCta />
           </div>
+        </section>
+
+        <section id="expansion-waitlist" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 border-t border-border pt-16">
+          <WaitlistSignup />
         </section>
       </main>
     </div>

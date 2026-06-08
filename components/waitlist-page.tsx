@@ -1,21 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/logo";
 import { SiteHeader } from "@/components/site-header";
-import { supabase } from "@/lib/supabase";
+import { StartTrialCta } from "@/components/start-trial-cta";
 import { liveMarkets } from "@/lib/markets";
 import {
   TrendingUp,
   DollarSign,
   BarChart3,
   Zap,
-  CheckCircle2,
-  ArrowRight,
   Sparkles,
   MapPin,
 } from "lucide-react";
@@ -83,23 +79,6 @@ function HeroProductVisual() {
 }
 
 export function WaitlistPage() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setLoading(true);
-    try {
-      await supabase.from("waitlist").insert({ email });
-    } finally {
-      setSubmitted(true);
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader priorityLogo />
@@ -131,47 +110,15 @@ export function WaitlistPage() {
                   The average RV owner underprices by 18% on peak weekends. RVIntel tracks supply, demand, and competitor rates across {REGION_COUNT} US regions — from San Diego to Seattle — so you never guess again.
                 </p>
 
-                <div id="waitlist" className="max-w-md mx-auto lg:mx-0 w-full">
-                  {!submitted ? (
-                    <form
-                      onSubmit={handleSubmit}
-                      className="flex flex-col sm:flex-row gap-3"
-                    >
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        autoComplete="email"
-                        className="flex-1 h-12 bg-background border-border"
-                      />
-                      <Button
-                        type="submit"
-                        disabled={loading}
-                        className="h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shrink-0"
-                      >
-                        {loading ? (
-                          "Joining..."
-                        ) : (
-                          <>
-                            Get Early Access
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </>
-                        )}
-                      </Button>
-                    </form>
-                  ) : (
-                    <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-primary/10 rounded-xl">
-                      <CheckCircle2 className="w-6 h-6 text-primary shrink-0" />
-                      <p className="text-foreground font-medium text-left">
-                        {"You're on the list! We'll be in touch soon."}
-                      </p>
-                    </div>
-                  )}
-                  <p className="text-sm text-muted-foreground mt-4">
-                    Be among the first to get access. No spam, ever.
-                  </p>
+                <div className="max-w-md mx-auto lg:mx-0 w-full">
+                  <StartTrialCta size="lg" showSubtext className="flex flex-col items-center lg:items-start" />
+                  <Button
+                    asChild
+                    variant="ghost"
+                    className="mt-3 h-10 text-muted-foreground"
+                  >
+                    <Link href="/markets">Browse {LIVE_MARKET_COUNT} live markets</Link>
+                  </Button>
                 </div>
               </div>
 
@@ -219,23 +166,10 @@ export function WaitlistPage() {
             </div>
 
             <div className="flex flex-wrap justify-center gap-3">
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-sm"
-              >
+              <Button asChild variant="outline" className="rounded-sm">
                 <Link href="/markets">Browse all markets</Link>
               </Button>
-              <Button
-                asChild
-                className="rounded-sm"
-                style={{ background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }}
-              >
-                <Link href="/dashboard">
-                  Open dashboard
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
+              <StartTrialCta />
             </div>
           </div>
         </section>
@@ -349,47 +283,10 @@ export function WaitlistPage() {
               Ready to Maximize Your RV Revenue?
             </h2>
             <p className="text-lg text-muted-foreground mb-10">
-              The dashboard is live across {LIVE_MARKET_COUNT} markets. Join the waitlist for full
-              access and benchmark reports as we roll out.
+              Live data across {LIVE_MARKET_COUNT} markets. Start your free trial and price with confidence.
             </p>
 
-            {!submitted ? (
-              <form
-                onSubmit={handleSubmit}
-                className="max-w-md mx-auto flex flex-col sm:flex-row gap-3"
-              >
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  className="flex-1 h-12 bg-card border-border"
-                />
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
-                >
-                  {loading ? (
-                    "Joining..."
-                  ) : (
-                    <>
-                      Join Waitlist
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            ) : (
-              <div className="inline-flex items-center gap-3 p-4 bg-primary/10 rounded-xl">
-                <CheckCircle2 className="w-6 h-6 text-primary" />
-                <p className="text-foreground font-medium">
-                  {"You're already on the list!"}
-                </p>
-              </div>
-            )}
+            <StartTrialCta size="lg" showSubtext className="flex flex-col items-center" />
           </div>
         </section>
       </main>

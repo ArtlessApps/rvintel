@@ -162,9 +162,9 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-xs text-muted-foreground text-center">
-            Don&apos;t have access?{" "}
-            <Link href="/#waitlist" className="text-primary hover:underline">
-              Join the waitlist
+            Don&apos;t see your market?{" "}
+            <Link href="/markets#expansion-waitlist" className="text-primary hover:underline">
+              Join the expansion waitlist
             </Link>
           </p>
         </div>

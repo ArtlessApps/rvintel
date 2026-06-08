@@ -18,6 +18,8 @@ import {
 import { useAuth } from "@/components/auth-provider";
 import { Logo } from "@/components/logo";
 import { SiteHeaderAuth } from "@/components/site-header-auth";
+import { useTrialHref } from "@/components/start-trial-cta";
+import { STRIPE_TRIAL_DAYS } from "@/lib/stripe-subscription";
 
 type NavLink = {
   href: string;
@@ -41,6 +43,7 @@ function isActive(pathname: string | null, href: string) {
 export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean }) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const trialHref = useTrialHref();
   const [open, setOpen] = useState(false);
 
   return (
@@ -75,8 +78,13 @@ export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean })
 
           <div className="flex items-center gap-2">
             {!user ? (
-              <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-                <Link href="/#waitlist">Join Waitlist</Link>
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden sm:flex rounded-sm"
+                asChild
+              >
+                <Link href={trialHref}>Start {STRIPE_TRIAL_DAYS}-day trial</Link>
               </Button>
             ) : null}
             <SiteHeaderAuth user={user} />
@@ -128,8 +136,8 @@ export function SiteHeader({ priorityLogo = false }: { priorityLogo?: boolean })
                   />
                   {!user ? (
                     <SheetClose asChild>
-                      <Button asChild className="w-full">
-                        <Link href="/#waitlist">Join Waitlist</Link>
+                      <Button asChild className="w-full rounded-sm" style={{ background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }}>
+                        <Link href={trialHref}>Start {STRIPE_TRIAL_DAYS}-day trial</Link>
                       </Button>
                     </SheetClose>
                   ) : null}

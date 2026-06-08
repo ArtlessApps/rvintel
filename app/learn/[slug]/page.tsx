@@ -240,7 +240,7 @@ export default async function ArticlePage({ params }: Props) {
                     background: "linear-gradient(135deg, #006b5f, #2dd4bf)",
                   }}
                 >
-                  <Link href="/dashboard">View Market Dashboard</Link>
+                  <Link href="/login?next=/upgrade">Start 7-day free trial</Link>
                 </Button>
                 <Button
                   asChild
@@ -248,7 +248,7 @@ export default async function ArticlePage({ params }: Props) {
                   size="sm"
                   className="rounded-sm"
                 >
-                  <Link href="/#waitlist">Join the Waitlist</Link>
+                  <Link href="/markets#expansion-waitlist">Market expansion waitlist</Link>
                 </Button>
               </div>
             </div>

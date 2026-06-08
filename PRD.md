@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.12 · 2026-06-08
+**Status:** Draft v1.13 · 2026-06-09
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -44,7 +44,7 @@ The opportunity is a **"AirDNA for RVs"** — a subscription product that gives 
 | **Fleet operator** (6+ RVs) | Needs unlimited fleet tracking + occupancy (coming) | **$39.99/mo** (RVIntel Fleet) |
 | **Investor / dealer** | Evaluating market entry, pricing floors for financing | Enterprise (deferred) |
 
-MVP monetization is live via a waitlist → trial → Stripe subscription funnel. All three self-serve tiers ship at launch; comp-sets and occupancy remain phased (§Phase 4).
+MVP monetization is live via **self-serve sign-up → 7-day Stripe trial on the chosen plan → paid subscription**. All three tiers ship at launch; comp-sets and occupancy remain phased (§Phase 4). Waitlist VIPs are handled separately via optional admin overrides (§Subscriptions).
 
 ---
 
@@ -316,7 +316,7 @@ A public-facing "paste your listing URL → get a benchmark report" tool, modele
 
 **Gating model:**
 - Free teaser (unauthenticated): header card + price percentile + anonymized comp-set count. No per-comp detail, no occupancy, no price suggestion. Email wall to unlock the rest → feeds waitlist.
-- Full report (paid tier, or time-limited trial post-waitlist-activation): everything above.
+- Full report (paid tier, or active Stripe trial / subscription): everything above.
 - Rate limit: 3 URL lookups per IP per day unauthenticated, to cap enrichment credit spend from curiosity traffic.
 
 **Engineering notes:**
@@ -373,7 +373,8 @@ Three tiers of protection for `/dashboard`. We ship only the tier the current ph
 - [x] `lib/supabase/server.ts` — `createServerClient` wrapper with async cookie handling for Server Components
 - [x] `proxy.ts` — refreshes session on every non-static request; redirects `/dashboard/*` → `/login` when no session exists
 - [x] `app/login/page.tsx` — email input → `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })` → "check your email" confirmation state; shadcn/ui, design-system compliant
-- [x] `app/auth/callback/page.tsx` — client callback handles PKCE `?code=`, implicit `#access_token` hash, and `token_hash` verify; redirects to `/dashboard` on success
+- [x] `app/auth/callback/page.tsx` — client callback handles PKCE `?code=`, implicit `#access_token` hash, and `token_hash` verify; redirects to `/dashboard` (or `?next=` path) on success
+- [x] Marketing site header (`components/site-header.tsx`) — auth-aware Sign in / profile menu via root `AuthProvider` (SSR user + client `onAuthStateChange`)
 - [x] Sign-out button added to dashboard header — calls `supabase.auth.signOut()` then redirects to `/login`
 - [x] `.env.local.example` updated — documents Supabase Redirect URL configuration required in the Supabase dashboard (no new env vars needed; `emailRedirectTo` is derived from `window.location.origin` at runtime)
 - [ ] Rotate `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the current one is already exposed in every deploy's client bundle (deferred to Tier 2.5 / Phase 4 RSC refactor below)
@@ -393,9 +394,9 @@ Move the dashboard from a client component that queries Supabase with the anon k
 
 Why Phase 4 is the trigger: comp-sets are the first feature where logged-in state matters (each user's set is different, and comp-sets are paid-tier gated). Shipping the RSC refactor earlier means owning the service-role query pattern before any feature needs it — infrastructure cost without auth payoff.
 
-### Subscriptions & billing (SHIPPED 2026-06-08)
+### Subscriptions & billing (SHIPPED 2026-06-08 · trial model updated 2026-06-09)
 
-Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard access for N days (set by `/api/admin/activate`); expired trials hit `/upgrade`.
+Three paid tiers, billed monthly via Stripe Checkout. **Self-serve users get a 7-day free trial on whichever plan they pick** (Stripe-managed; card collected at signup; first charge on day 8). Fleet limits during trial match the chosen tier (`solo` / `growth` / `fleet`), not a separate "trial tier."
 
 | Tier (DB key) | Product name | Price | Fleet limit | Stripe env var |
 |---|---|---|---|---|
@@ -403,15 +404,34 @@ Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard 
 | `growth` | RVIntel Growth | $19.99/mo | 5 RVs | `STRIPE_PRICE_ID_GROWTH` |
 | `fleet` | RVIntel Fleet | $39.99/mo | Unlimited | `STRIPE_PRICE_ID_FLEET` |
 
-**Flow:** waitlist → `POST /api/admin/activate` (trial) → magic-link login → dashboard gate (`hasActiveAccess`) → `/upgrade` (pick plan) → `POST /api/stripe/checkout` `{ plan }` → Stripe hosted checkout → `/api/stripe/complete` verifies session + writes tier → `/dashboard?subscribed=1`. Webhooks (`customer.subscription.*`, `invoice.payment_failed`) keep `user_profiles` in sync. Fleet add enforces `getFleetLimit()`.
+**Self-serve flow:**
 
-**Routes:** `/api/stripe/checkout` · `/api/stripe/complete` · `/api/stripe/webhook` · `/api/admin/activate` · `/upgrade`
+1. Magic-link login (`/login`)
+2. Dashboard gate (`hasActiveAccess`) — no subscription → `/upgrade`
+3. Pick plan → `POST /api/stripe/checkout` `{ plan }` with `subscription_data.trial_period_days: 7` (first-time Stripe customers only; returning customers skip trial)
+4. Stripe hosted Checkout (card required) → `/api/stripe/complete` verifies session (`paid` or `no_payment_required` during trial) + writes tier
+5. Dashboard access while `subscription_status` is `trialing` or `active`
+6. Webhooks (`customer.subscription.*`, `invoice.payment_failed`) keep `user_profiles` in sync; `trial_ends_at` mirrored from Stripe `trial_end`
 
-**Verification:** `node scripts/test-stripe-plans.mjs` — activates test users, opens a Checkout session per plan, asserts price ID + product name. All three plans verified 2026-06-08 on sandbox `acct_1TfqHABTCAvIbhXg`.
+**Waitlist flow (separate):** `POST /api/admin/activate` `{ email }` generates a magic link and marks `activated_from_waitlist`. **Does not grant access by default.** Optional `{ trial_days: N }` sets a legacy app-managed trial (`subscription_tier: trial`, solo fleet limits only) for VIP waitlist users handled manually.
 
-**Schema:** `user_profiles` (migration 014) holds `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at`, `current_period_end`. `user_fleet.user_id` links fleet rows to auth users (migration 015).
+**Access logic (`lib/subscription.ts`):**
 
-**Env vars (test vs live must match):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, three `STRIPE_PRICE_ID_*`, `STRIPE_WEBHOOK_SECRET`, `ADMIN_SECRET`, `NEXT_PUBLIC_SITE_URL`.
+| Condition | Dashboard access | Fleet limit |
+|---|---|---|
+| `subscription_status` = `active` or `trialing` + entitled tier | Yes | Per chosen plan |
+| Legacy waitlist trial (`tier=trial`, `trial_ends_at` in future) | Yes | Solo (1 RV) |
+| Expired / none | Redirect `/upgrade?expired=1` | 0 |
+
+**Routes:** `/api/stripe/checkout` · `/api/stripe/complete` · `/api/stripe/webhook` · `/api/admin/activate` · `/upgrade` (auth-guarded layout)
+
+**Shared libs:** `lib/stripe-subscription.ts` (trial days, price→tier map, profile sync) · `lib/stripe-prices.ts` (env validation; rejects `prod_` IDs)
+
+**Verification:** `node scripts/test-stripe-plans.mjs` — admin-activates test users (no default trial), opens Checkout per plan, asserts price ID + product name. All three sandbox plans verified 2026-06-08 on `acct_1TfqHABTCAvIbhXg`.
+
+**Schema:** `user_profiles` (migration 014) holds `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at`, `current_period_end`, `activated_from_waitlist`. `user_fleet.user_id` links fleet rows to auth users (migration 015).
+
+**Env vars (test vs live must match):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, three `STRIPE_PRICE_ID_*` (**must be `price_…` IDs, not `prod_…` product IDs**), `STRIPE_WEBHOOK_SECRET`, `ADMIN_SECRET`, `NEXT_PUBLIC_SITE_URL`.
 
 **Local dev:** `pnpm dev` + `stripe listen --forward-to localhost:3000/api/stripe/webhook` — CLI signing secret must match `STRIPE_WEBHOOK_SECRET`. Test products on sandbox `acct_1TfqHABTCAvIbhXg` (`livemode: false`; price IDs contain `BTCAvIbhXg`):
 
@@ -421,7 +441,7 @@ Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard 
 | RVIntel Growth | `price_1TfqxeBTCAvIbhXgWtOud6Fb` |
 | RVIntel Fleet | `price_1TfqxfBTCAvIbhXgzPv5Lbjz` |
 
-**Production:** Create a Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live price IDs** on Vercel — never mix with test IDs. Live products on account `acct_1TfqGnB67ExGpyp5`. **Env vars must be `price_…` IDs, not `prod_…` product IDs.**
+**Production:** Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live price IDs** on Vercel — never mix with test IDs. Live account: `acct_1TfqGnB67ExGpyp5`.
 
 | Plan | Live price ID |
 |---|---|
@@ -430,8 +450,10 @@ Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard 
 | RVIntel Fleet | `price_1TfqxlB67ExGpyp5zk5zjlPs` |
 
 **Open items:**
+
+- [ ] Trial countdown banner on dashboard (`trialDaysRemaining()` helper exists, UI not wired)
 - [ ] Stripe Customer Portal for self-serve cancel / payment-method update
-- [ ] Vercel production env: all live Stripe vars + webhook secret
+- [ ] Vercel production env: all live Stripe vars + webhook secret (use `price_…` IDs — a `prod_…` product ID in env causes checkout failure)
 - [ ] Apply migration 015 unique index on `user_fleet (user_id, listing_url)` if not yet in Supabase
 
 **Tier 3 — Full auth provider + per-user RLS (TRIGGER: paid-tier launch)**
@@ -439,7 +461,7 @@ Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard 
 Only when we're charging money or when a feature needs user-scoped data (saved filters, host-claimed listings, B2B orgs for the fleet tier).
 
 - [x] Already on **Supabase Auth** (magic-link, Tier 2)
-- [x] **Stripe integration** — multi-plan Checkout + `/api/stripe/complete` + webhooks → `user_profiles`; fleet limits in `/api/fleet/lookup`; smoke test in `scripts/test-stripe-plans.mjs`
+- [x] **Stripe integration** — multi-plan Checkout with 7-day Stripe trial on chosen tier + `/api/stripe/complete` + webhooks → `user_profiles`; fleet limits in `/api/fleet/lookup`; smoke test in `scripts/test-stripe-plans.mjs`
 - [ ] RLS rewrite on `listings`, `listing_snapshots`, and any future user-scoped tables — policies gate on `auth.uid()` and subscription tier claims
 - [ ] Stripe Customer Portal + subscription management UI
 - [ ] Organization/team model deferred until multi-seat fleet signal
@@ -580,7 +602,11 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 - **2026-06-06:** **PRD v1.9 refresh.** Closed remaining pre-geo stale references (dashboard query pattern, sweeper schedule, per-market dedup crons, backfill script lineage). Documented bootstrap inventory ranges, audit scripts, and geo-aware rate-history/report tooling.
 - **2026-06-07:** **SEO P0 + P1 shipped.** Full audit run via `marketing-seo-specialist.md`; crawlability fixes (robots, sitemap rewrite, legacy market 301s, noindex on private routes) and on-page foundation (Organization/WebSite/Article JSON-LD, site-wide Open Graph, keyword-focused homepage metadata, `next/image` optimization). Removed duplicate static market routes in favor of `/markets/[slug]` only. Post-deploy: set `NEXT_PUBLIC_SITE_URL` in Vercel and submit sitemap in Search Console.
 - **2026-06-08:** **Shipped three-tier Stripe billing (RVIntel One / Growth / Fleet).** Test-mode products on sandbox `acct_1TfqHABTCAvIbhXg` at $9.99 / $19.99 / $39.99 per month. `/upgrade` passes `plan` to checkout; webhooks + `/api/stripe/complete` map price IDs → `subscription_tier`; dashboard gates on `hasActiveAccess()`; fleet add enforces per-tier RV limits. Live-mode products on separate MCP account — production uses live keys + live price IDs only.
-- **2026-06-08:** **Multi-plan checkout wired + verified.** Fixed checkout route that still hardcoded `STRIPE_PRICE_ID_SOLO`; `success_url` now routes through `/api/stripe/complete` with tier resolved from price ID. `scripts/test-stripe-plans.mjs` confirms all three sandbox products open the correct Checkout session. Magic-link browser callback remains open.
+- **2026-06-08:** **Multi-plan checkout wired + verified.** Fixed checkout route that still hardcoded `STRIPE_PRICE_ID_SOLO`; `success_url` now routes through `/api/stripe/complete` with tier resolved from price ID. `scripts/test-stripe-plans.mjs` confirms all three sandbox products open the correct Checkout session.
+- **2026-06-08:** **Fixed magic-link auth callback for browser sessions.** Replaced server-only `app/auth/callback/route.ts` with client `page.tsx` that handles PKCE codes, hash tokens (`#access_token`), and OTP verify — admin `generateLink` flows no longer land on `/login?error=1`.
+- **2026-06-08:** **Upgrade page auth + checkout hardening.** `/upgrade` layout requires sign-in; checkout returns clear JSON errors (401, misconfigured `prod_` vs `price_` env vars); `credentials: "include"` on checkout fetch.
+- **2026-06-08:** **Marketing site header auth state.** Root `AuthProvider` SSR-loads user; `SiteHeader` shows Sign in or profile dropdown (Dashboard, My Fleet, Sign out) on homepage and public pages.
+- **2026-06-09:** **Moved self-serve trials to Stripe (7 days on chosen plan).** Replaced default app-managed 14-day waitlist trial with Stripe `trial_period_days: 7` at Checkout. `hasActiveAccess()` grants access on `subscription_status` = `trialing` or `active` with the entitled tier; fleet limits follow the selected plan during trial. `/api/admin/activate` now sends magic links only by default; optional `trial_days` retained for manual waitlist VIPs. `lib/stripe-subscription.ts` centralizes profile sync; complete route accepts `no_payment_required` for trialing checkouts. Production incident: Vercel env vars must use `price_…` IDs — `prod_…` product IDs fail checkout with "No such price."
 
 ---
 
