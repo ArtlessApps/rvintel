@@ -8,11 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
+  return raw;
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nextPath, setNextPath] = useState("/dashboard");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -27,6 +33,10 @@ export default function LoginPage() {
     if (new URLSearchParams(window.location.search).get("error")) {
       setError("Sign-in link expired or invalid. Request a new one.");
     }
+
+    setNextPath(
+      safeNextPath(new URLSearchParams(window.location.search).get("next"))
+    );
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,10 +47,13 @@ export default function LoginPage() {
     setError(null);
 
     const supabase = createClient();
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    callbackUrl.searchParams.set("next", nextPath);
+
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: callbackUrl.toString(),
       },
     });
 

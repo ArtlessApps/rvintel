@@ -50,18 +50,36 @@ export default function UpgradePage() {
     setLoading(plan);
     setError(null);
     try {
-      // Pass the selected plan to the checkout route.
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ plan }),
       });
-      const { url, error: apiError } = await res.json();
-      if (apiError) throw new Error(apiError);
-      window.location.href = url; // → Stripe hosted checkout page
-    } catch {
-      setError("Something went wrong. Please try again.");
+
+      let data: { url?: string; error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Unexpected server response. Try signing in again.");
+      }
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Your session expired. Please sign in again.");
+        }
+        throw new Error(data.error ?? "Checkout failed. Please try again.");
+      }
+
+      if (!data.url) {
+        throw new Error("Checkout could not be started. Please try again.");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setError(message);
       setLoading(null);
     }
   }
