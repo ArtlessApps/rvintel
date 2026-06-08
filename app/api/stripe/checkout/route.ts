@@ -2,6 +2,7 @@
 // Accepts a `plan` parameter from /upgrade and opens the matching Stripe price.
 
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
@@ -19,21 +20,18 @@ function getStripe() {
   return new Stripe(key);
 }
 
-function adminClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
-  );
-}
+// Service-role writes must use @supabase/supabase-js — createServerClient still
+// applies the signed-in user's JWT from cookies, so RLS blocks inserts.
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 async function saveCustomerId(
-  cookieStore: Awaited<ReturnType<typeof cookies>>,
   userId: string,
   email: string | undefined,
   customerId: string
 ) {
-  const supabaseAdmin = adminClient(cookieStore);
   const { error } = await supabaseAdmin.from("user_profiles").upsert({
     id: userId,
     email,
@@ -41,6 +39,7 @@ async function saveCustomerId(
   });
   if (error) {
     console.error("checkout: failed to save stripe_customer_id", error.message);
+    throw error;
   }
 }
 
@@ -117,7 +116,7 @@ export async function POST(request: Request) {
         metadata: { supabase_uid: user.id },
       });
       customerId = customer.id;
-      await saveCustomerId(cookieStore, user.id, user.email, customerId);
+      await saveCustomerId(user.id, user.email, customerId);
     }
 
     const priorSubs = await stripe.subscriptions.list({
@@ -139,7 +138,6 @@ export async function POST(request: Request) {
         metadata: { supabase_uid: user.id, plan },
       });
 
-      const supabaseAdmin = adminClient(cookieStore);
       const { error: profileError } = await supabaseAdmin
         .from("user_profiles")
         .upsert({
