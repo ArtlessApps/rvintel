@@ -6,7 +6,10 @@ import { cookies } from "next/headers";
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { resolveStripePriceId } from "@/lib/stripe-prices";
-import { STRIPE_TRIAL_DAYS } from "@/lib/stripe-subscription";
+import {
+  STRIPE_TRIAL_DAYS,
+  profileFromStripeSubscription,
+} from "@/lib/stripe-subscription";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -124,13 +127,45 @@ export async function POST(request: Request) {
     });
     const eligibleForTrial = priorSubs.data.length === 0;
 
+    // First-time users: start a Stripe trial without collecting a card.
+    if (eligibleForTrial) {
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ price: priceId }],
+        trial_period_days: STRIPE_TRIAL_DAYS,
+        trial_settings: {
+          end_behavior: { missing_payment_method: "cancel" },
+        },
+        metadata: { supabase_uid: user.id, plan },
+      });
+
+      const supabaseAdmin = adminClient(cookieStore);
+      const { error: profileError } = await supabaseAdmin
+        .from("user_profiles")
+        .upsert({
+          id: user.id,
+          email: user.email,
+          stripe_customer_id: customerId,
+          ...profileFromStripeSubscription(subscription),
+        });
+
+      if (profileError) {
+        console.error("checkout: failed to sync trial profile", profileError.message);
+        return NextResponse.json(
+          { error: "Failed to start trial. Please try again." },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ url: `${siteUrl}/dashboard?trial_started=1` });
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
-        ...(eligibleForTrial ? { trial_period_days: STRIPE_TRIAL_DAYS } : {}),
         metadata: { supabase_uid: user.id, plan },
       },
       success_url: `${siteUrl}/api/stripe/complete?session_id={CHECKOUT_SESSION_ID}`,

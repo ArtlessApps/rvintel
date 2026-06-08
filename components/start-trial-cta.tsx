@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth-provider";
-import { STRIPE_TRIAL_DAYS } from "@/lib/stripe-subscription";
+import { STRIPE_TRIAL_DAYS, TRIAL_SUBTEXT } from "@/lib/stripe-subscription";
 import { cn } from "@/lib/utils";
 
 const TRIAL_GRADIENT = { background: "linear-gradient(135deg, #006b5f, #2dd4bf)" };
@@ -42,7 +42,7 @@ export function StartTrialCta({
       </Button>
       {showSubtext ? (
         <p className="text-sm text-muted-foreground">
-          Card required · From $9.99/mo after trial · Cancel anytime
+          {TRIAL_SUBTEXT}
         </p>
       ) : null}
     </div>

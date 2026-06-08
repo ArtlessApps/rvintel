@@ -19,6 +19,7 @@ import {
   SITE_NAME,
   DEFAULT_OG_IMAGE,
 } from "@/lib/site";
+import { STRIPE_TRIAL_DAYS, TRIAL_SUBTEXT } from "@/lib/stripe-subscription";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -231,25 +232,30 @@ export default async function ArticlePage({ params }: Props) {
                 breakdowns, and trend data for your RV class — updated from live
                 platform data so you&apos;re never guessing.
               </p>
-              <div className="flex gap-3 flex-wrap">
-                <Button
-                  asChild
-                  size="sm"
-                  className="rounded-sm"
-                  style={{
-                    background: "linear-gradient(135deg, #006b5f, #2dd4bf)",
-                  }}
-                >
-                  <Link href="/login?next=/upgrade">Start 7-day free trial</Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="rounded-sm"
-                >
-                  <Link href="/markets#expansion-waitlist">Market expansion waitlist</Link>
-                </Button>
+              <div className="space-y-2">
+                <div className="flex gap-3 flex-wrap">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="rounded-sm"
+                    style={{
+                      background: "linear-gradient(135deg, #006b5f, #2dd4bf)",
+                    }}
+                  >
+                    <Link href="/login?next=/upgrade">
+                      Start {STRIPE_TRIAL_DAYS}-day free trial
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="rounded-sm"
+                  >
+                    <Link href="/markets#expansion-waitlist">Market expansion waitlist</Link>
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">{TRIAL_SUBTEXT}</p>
               </div>
             </div>
           </div>

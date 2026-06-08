@@ -125,8 +125,8 @@ export default function LearnPage() {
                 Get new guides in your inbox
               </h2>
               <p className="text-sm text-muted-foreground">
-                Start a free trial for live dashboard access, or join the waitlist on our
-                markets page for expansion updates.
+                Start a free trial for live dashboard access — no credit card required.
+                Or join the waitlist on our markets page for expansion updates.
               </p>
             </div>
             <Button
@@ -137,7 +137,7 @@ export default function LearnPage() {
                 background: "linear-gradient(135deg, #006b5f, #2dd4bf)",
               }}
             >
-              <Link href="/login?next=/upgrade">Start 7-day free trial</Link>
+              <Link href="/login?next=/upgrade">Start free trial</Link>
             </Button>
           </div>
         </section>

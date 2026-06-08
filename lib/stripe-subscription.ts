@@ -6,6 +6,10 @@ import { PLAN_CONFIG, type PlanKey } from "@/lib/subscription";
 /** Free trial length for new self-serve signups (days). */
 export const STRIPE_TRIAL_DAYS = 7;
 
+/** Shared marketing copy for no-card trial CTAs. */
+export const TRIAL_SUBTEXT =
+  "No credit card required · From $9.99/mo after trial · Cancel anytime";
+
 export function buildPriceToTierMap(): Record<string, PlanKey> {
   const map: Record<string, PlanKey> = {};
   if (process.env.STRIPE_PRICE_ID_SOLO) {

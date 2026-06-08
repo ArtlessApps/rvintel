@@ -1,7 +1,7 @@
 // A protected admin route for waitlist activation.
 // Generates a magic login link. Optional trial_days grants legacy manual access
-// (for waitlist VIPs you handle separately). Self-serve users get a 7-day Stripe
-// trial when they pick a plan on /upgrade.
+// (for waitlist VIPs you handle separately). Self-serve users get a 7-day no-card
+// Stripe trial when they pick a plan on /upgrade.
 
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";

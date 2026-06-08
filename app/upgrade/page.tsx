@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { STRIPE_TRIAL_DAYS } from "@/lib/stripe-subscription";
+import { STRIPE_TRIAL_DAYS, TRIAL_SUBTEXT } from "@/lib/stripe-subscription";
 
 type Plan = "solo" | "growth" | "fleet";
 
@@ -108,7 +108,7 @@ export default function UpgradePage() {
           <p className="text-sm text-muted-foreground">
             {isRenewal
               ? "Your access has ended. Pick a plan to subscribe again."
-              : `Start a ${STRIPE_TRIAL_DAYS}-day free trial on any plan. Card required; cancel anytime.`}
+              : `Start a ${STRIPE_TRIAL_DAYS}-day free trial on any plan. No credit card required.`}
           </p>
         </div>
 
@@ -168,7 +168,9 @@ export default function UpgradePage() {
                 className="w-full rounded-md py-2.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
                 {loading === plan.key
-                  ? "Redirecting…"
+                  ? isRenewal
+                    ? "Redirecting…"
+                    : "Starting trial…"
                   : isRenewal
                     ? `Subscribe to ${plan.label}`
                     : `Start ${STRIPE_TRIAL_DAYS}-day trial`}
@@ -178,7 +180,9 @@ export default function UpgradePage() {
         </div>
 
         <p className="text-xs text-muted-foreground text-center">
-          Secure payment via Stripe · {STRIPE_TRIAL_DAYS}-day free trial, then billed monthly · Cancel anytime
+          {isRenewal
+            ? "Secure payment via Stripe · Billed monthly · Cancel anytime"
+            : TRIAL_SUBTEXT}
         </p>
 
         <button

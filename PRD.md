@@ -44,7 +44,7 @@ The opportunity is a **"AirDNA for RVs"** — a subscription product that gives 
 | **Fleet operator** (6+ RVs) | Needs unlimited fleet tracking + occupancy (coming) | **$39.99/mo** (RVIntel Fleet) |
 | **Investor / dealer** | Evaluating market entry, pricing floors for financing | Enterprise (deferred) |
 
-MVP monetization is live via **self-serve sign-up → 7-day Stripe trial on the chosen plan → paid subscription**. All three tiers ship at launch; comp-sets and occupancy remain phased (§Phase 4). Waitlist VIPs are handled separately via optional admin overrides (§Subscriptions).
+MVP monetization is live via **self-serve sign-up → 7-day no-card Stripe trial on the chosen plan → paid subscription**. All three tiers ship at launch; comp-sets and occupancy remain phased (§Phase 4). Waitlist VIPs are handled separately via optional admin overrides (§Subscriptions).
 
 ---
 
@@ -398,9 +398,9 @@ Move the dashboard from a client component that queries Supabase with the anon k
 
 Why Phase 4 is the trigger: comp-sets are the first feature where logged-in state matters (each user's set is different, and comp-sets are paid-tier gated). Shipping the RSC refactor earlier means owning the service-role query pattern before any feature needs it — infrastructure cost without auth payoff.
 
-### Subscriptions & billing (SHIPPED 2026-06-08 · trial model updated 2026-06-09)
+### Subscriptions & billing (SHIPPED 2026-06-08 · trial model updated 2026-06-09 · no-card trials 2026-06-09)
 
-Three paid tiers, billed monthly via Stripe Checkout. **Self-serve users get a 7-day free trial on whichever plan they pick** (Stripe-managed; card collected at signup; first charge on day 8). Fleet limits during trial match the chosen tier (`solo` / `growth` / `fleet`), not a separate "trial tier."
+Three paid tiers, billed monthly via Stripe. **Self-serve users get a 7-day free trial on whichever plan they pick — no credit card required.** First-time signups start a Stripe subscription server-side (`trial_period_days: 7`); access is immediate with no Checkout redirect. If no payment method is on file when the trial ends, Stripe cancels the subscription (`trial_settings.end_behavior.missing_payment_method: cancel`) and the user is sent to `/upgrade` to subscribe. Returning customers (prior Stripe subscription on the account) skip the trial and go through Stripe Checkout with card. Fleet limits during trial match the chosen tier (`solo` / `growth` / `fleet`), not a separate "trial tier."
 
 | Tier (DB key) | Product name | Price | Fleet limit | Stripe env var |
 |---|---|---|---|---|
@@ -408,14 +408,21 @@ Three paid tiers, billed monthly via Stripe Checkout. **Self-serve users get a 7
 | `growth` | RVIntel Growth | $19.99/mo | 5 RVs | `STRIPE_PRICE_ID_GROWTH` |
 | `fleet` | RVIntel Fleet | $39.99/mo | Unlimited | `STRIPE_PRICE_ID_FLEET` |
 
-**Self-serve flow:**
+**Self-serve flow (first-time / trial-eligible):**
 
 1. Magic-link login (`/login`)
 2. Dashboard gate (`hasActiveAccess`) — no subscription → `/upgrade`
-3. Pick plan → `POST /api/stripe/checkout` `{ plan }` with `subscription_data.trial_period_days: 7` (first-time Stripe customers only; returning customers skip trial)
-4. Stripe hosted Checkout (card required) → `/api/stripe/complete` verifies session (`paid` or `no_payment_required` during trial) + writes tier
-5. Dashboard access while `subscription_status` is `trialing` or `active`
-6. Webhooks (`customer.subscription.*`, `invoice.payment_failed`) keep `user_profiles` in sync; `trial_ends_at` mirrored from Stripe `trial_end`
+3. Pick plan → `POST /api/stripe/checkout` `{ plan }`
+4. Checkout route creates Stripe customer (if needed), then `stripe.subscriptions.create` with `trial_period_days: 7` and `trial_settings.end_behavior.missing_payment_method: cancel` — **no card, no Checkout session**
+5. `user_profiles` upserted immediately via `profileFromStripeSubscription()`; response redirects to `/dashboard?trial_started=1`
+6. Dashboard access while `subscription_status` is `trialing` or `active`
+7. Webhooks (`customer.subscription.*`, `invoice.payment_failed`) keep `user_profiles` in sync; `trial_ends_at` mirrored from Stripe `trial_end`
+
+**Self-serve flow (returning / not trial-eligible):**
+
+1. Steps 1–3 same as above
+2. Checkout route opens Stripe hosted Checkout (card required, no trial period)
+3. `/api/stripe/complete` verifies session (`paid`) + writes tier → `/dashboard?subscribed=1`
 
 **Waitlist flow (separate):** `POST /api/admin/activate` `{ email }` generates a magic link and marks `activated_from_waitlist`. **Does not grant access by default.** Optional `{ trial_days: N }` sets a legacy app-managed trial (`subscription_tier: trial`, solo fleet limits only) for VIP waitlist users handled manually.
 
@@ -429,9 +436,11 @@ Three paid tiers, billed monthly via Stripe Checkout. **Self-serve users get a 7
 
 **Routes:** `/api/stripe/checkout` · `/api/stripe/complete` · `/api/stripe/webhook` · `/api/admin/activate` · `/upgrade` (auth-guarded layout)
 
-**Shared libs:** `lib/stripe-subscription.ts` (trial days, price→tier map, profile sync) · `lib/stripe-prices.ts` (env validation; rejects `prod_` IDs)
+**Shared libs:** `lib/stripe-subscription.ts` (`STRIPE_TRIAL_DAYS`, `TRIAL_SUBTEXT`, price→tier map, profile sync) · `lib/stripe-prices.ts` (env validation; rejects `prod_` IDs)
 
-**Verification:** `node scripts/test-stripe-plans.mjs` — admin-activates test users (no default trial), opens Checkout per plan, asserts price ID + product name. All three sandbox plans verified 2026-06-08 on `acct_1TfqHABTCAvIbhXg`.
+**Marketing copy:** All trial CTAs use `TRIAL_SUBTEXT` — *"No credit card required · From $9.99/mo after trial · Cancel anytime"* (`StartTrialCta`, `/upgrade`, `/learn`).
+
+**Verification:** `node scripts/test-stripe-plans.mjs` — admin-activates test users, hits checkout per plan. **Note:** script still expects a Checkout session URL; first-time trial-eligible users now get a dashboard redirect instead — update script or use fresh Stripe customers per plan when re-running. Sandbox plans verified 2026-06-08 on `acct_1TfqHABTCAvIbhXg`.
 
 **Schema:** `user_profiles` (migration 014) holds `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at`, `current_period_end`, `activated_from_waitlist`. `user_fleet.user_id` links fleet rows to auth users (migration 015).
 
@@ -465,7 +474,7 @@ Three paid tiers, billed monthly via Stripe Checkout. **Self-serve users get a 7
 Only when we're charging money or when a feature needs user-scoped data (saved filters, host-claimed listings, B2B orgs for the fleet tier).
 
 - [x] Already on **Supabase Auth** (magic-link, Tier 2)
-- [x] **Stripe integration** — multi-plan Checkout with 7-day Stripe trial on chosen tier + `/api/stripe/complete` + webhooks → `user_profiles`; fleet limits in `/api/fleet/lookup`; smoke test in `scripts/test-stripe-plans.mjs`
+- [x] **Stripe integration** — no-card 7-day trial on chosen tier (server-side `subscriptions.create` for first-time users) + Stripe Checkout for returning subscribers + `/api/stripe/complete` + webhooks → `user_profiles`; fleet limits in `/api/fleet/lookup`
 - [ ] RLS rewrite on `listings`, `listing_snapshots`, and any future user-scoped tables — policies gate on `auth.uid()` and subscription tier claims
 - [ ] Stripe Customer Portal + subscription management UI
 - [ ] Organization/team model deferred until multi-seat fleet signal
@@ -610,7 +619,8 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 - **2026-06-08:** **Fixed magic-link auth callback for browser sessions.** Replaced server-only `app/auth/callback/route.ts` with client `page.tsx` that handles PKCE codes, hash tokens (`#access_token`), and OTP verify — admin `generateLink` flows no longer land on `/login?error=1`.
 - **2026-06-08:** **Upgrade page auth + checkout hardening.** `/upgrade` layout requires sign-in; checkout returns clear JSON errors (401, misconfigured `prod_` vs `price_` env vars); `credentials: "include"` on checkout fetch.
 - **2026-06-08:** **Marketing site header auth state.** Root `AuthProvider` SSR-loads user; `SiteHeader` shows Sign in or profile dropdown (Dashboard, My Fleet, Sign out) on homepage and public pages.
-- **2026-06-09:** **Moved self-serve trials to Stripe (7 days on chosen plan).** Replaced default app-managed 14-day waitlist trial with Stripe `trial_period_days: 7` at Checkout. `hasActiveAccess()` grants access on `subscription_status` = `trialing` or `active` with the entitled tier; fleet limits follow the selected plan during trial. `/api/admin/activate` now sends magic links only by default; optional `trial_days` retained for manual waitlist VIPs. `lib/stripe-subscription.ts` centralizes profile sync; complete route accepts `no_payment_required` for trialing checkouts. Production incident: Vercel env vars must use `price_…` IDs — `prod_…` product IDs fail checkout with "No such price."
+- **2026-06-09:** **Moved self-serve trials to Stripe (7 days on chosen plan).** Replaced default app-managed 14-day waitlist trial with Stripe `trial_period_days: 7`. `hasActiveAccess()` grants access on `subscription_status` = `trialing` or `active` with the entitled tier; fleet limits follow the selected plan during trial. `/api/admin/activate` now sends magic links only by default; optional `trial_days` retained for manual waitlist VIPs. `lib/stripe-subscription.ts` centralizes profile sync. Production incident: Vercel env vars must use `price_…` IDs — `prod_…` product IDs fail checkout with "No such price."
+- **2026-06-09:** **No-card self-serve trials.** First-time users no longer pass through Stripe Checkout. `/api/stripe/checkout` creates the subscription via API (`trial_settings.end_behavior.missing_payment_method: cancel`), syncs `user_profiles`, and returns `/dashboard?trial_started=1`. Returning subscribers still use Checkout with card. Marketing copy updated site-wide (`TRIAL_SUBTEXT`). No new env vars, schema changes, or webhook events — deploy code only.
 - **2026-06-09:** **Document Supabase auth email rate limits.** Built-in SMTP caps magic-link volume; production should use Dashboard → Authentication → SMTP Settings (custom provider) and review Authentication → Rate Limits before launch.
 
 ---
