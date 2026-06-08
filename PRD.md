@@ -1,6 +1,6 @@
 # RVIntel — Product Requirements Document
 
-**Status:** Draft v1.10 · 2026-06-07
+**Status:** Draft v1.11 · 2026-06-08
 **Owner:** Nick Dame
 **Stack:** Next.js 16 · Supabase · Firecrawl · Vercel Pro
 
@@ -39,11 +39,12 @@ The opportunity is a **"AirDNA for RVs"** — a subscription product that gives 
 
 | Persona | Pain | Willingness to Pay |
 |---|---|---|
-| **Solo host** (1-3 units) | Undercharging because they have no reference | $29-49/mo |
-| **Fleet operator** (10-50 units) | Needs per-market pricing across diverse inventory | $199-499/mo |
-| **Investor / dealer** | Evaluating market entry, pricing floors for financing | $500-2000/mo |
+| **Solo host** (1 RV) | Undercharging because they have no reference | **$9.99/mo** (RVIntel One) |
+| **Growing operator** (2–5 RVs) | Needs fleet tracker + comp-sets across a small portfolio | **$19.99/mo** (RVIntel Growth) |
+| **Fleet operator** (6+ RVs) | Needs unlimited fleet tracking + occupancy (coming) | **$39.99/mo** (RVIntel Fleet) |
+| **Investor / dealer** | Evaluating market entry, pricing floors for financing | Enterprise (deferred) |
 
-MVP focuses on the solo host via a waitlist-driven freemium funnel; fleet and investor tiers come later once time-series depth is sufficient (≥90 days).
+MVP monetization is live via a waitlist → trial → Stripe subscription funnel. All three self-serve tiers ship at launch; comp-sets and occupancy remain phased (§Phase 4).
 
 ---
 
@@ -392,15 +393,42 @@ Move the dashboard from a client component that queries Supabase with the anon k
 
 Why Phase 4 is the trigger: comp-sets are the first feature where logged-in state matters (each user's set is different, and comp-sets are paid-tier gated). Shipping the RSC refactor earlier means owning the service-role query pattern before any feature needs it — infrastructure cost without auth payoff.
 
+### Subscriptions & billing (SHIPPED 2026-06-08)
+
+Three paid tiers, billed monthly via Stripe Checkout. Trial users get dashboard access for N days (set by `/api/admin/activate`); expired trials hit `/upgrade`.
+
+| Tier (DB key) | Product name | Price | Fleet limit | Stripe env var |
+|---|---|---|---|---|
+| `solo` | RVIntel One | $9.99/mo | 1 RV | `STRIPE_PRICE_ID_SOLO` |
+| `growth` | RVIntel Growth | $19.99/mo | 5 RVs | `STRIPE_PRICE_ID_GROWTH` |
+| `fleet` | RVIntel Fleet | $39.99/mo | Unlimited | `STRIPE_PRICE_ID_FLEET` |
+
+**Flow:** waitlist → `POST /api/admin/activate` (trial) → magic-link login → dashboard gate (`hasActiveAccess`) → `/upgrade` → `/api/stripe/checkout` → Stripe hosted checkout → webhook updates `user_profiles` → fleet add enforces `getFleetLimit()`.
+
+**Schema:** `user_profiles` (migration 014) holds `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at`, `current_period_end`. `user_fleet.user_id` links fleet rows to auth users (migration 015).
+
+**Env vars (test vs live must match):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, three `STRIPE_PRICE_ID_*`, `STRIPE_WEBHOOK_SECRET`, `ADMIN_SECRET`, `NEXT_PUBLIC_SITE_URL`.
+
+**Local dev:** `stripe listen --forward-to localhost:3000/api/stripe/webhook` — CLI signing secret must match `STRIPE_WEBHOOK_SECRET`. Test products live on sandbox account `acct_1TfqHABTCAvIbhXg` (`livemode: false` price IDs contain `BTCAvIbhXg`).
+
+**Production:** Create a Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live** price IDs on Vercel — never mix with test IDs.
+
+**Open items:**
+- [ ] Fix magic-link callback (admin `generateLink` tokens land on `/login?error=1` in browser)
+- [ ] Point checkout `success_url` at `/api/stripe/complete?session_id={CHECKOUT_SESSION_ID}` (avoids webhook race)
+- [ ] `/api/stripe/complete` should resolve tier from price ID, not hardcode `solo`
+- [ ] Stripe Customer Portal for self-serve cancel / payment-method update
+- [ ] Vercel production env: all live Stripe vars + webhook secret
+
 **Tier 3 — Full auth provider + per-user RLS (TRIGGER: paid-tier launch)**
 
 Only when we're charging money or when a feature needs user-scoped data (saved filters, host-claimed listings, B2B orgs for the fleet tier).
 
-- [ ] Already on **Supabase Auth** (magic-link, Tier 2) — evaluate whether to stay on Supabase Auth (adding OAuth providers, MFA) or migrate to Clerk via Vercel Marketplace for richer UI/orgs. The Tier 2 session model (`@supabase/ssr` + cookie-based JWTs) is compatible with both; migration cost is low pre-scale.
-- [ ] Stripe integration for paid tiers, mirroring subscription status into the users table
+- [x] Already on **Supabase Auth** (magic-link, Tier 2)
+- [x] **Stripe integration** — Checkout + webhooks → `user_profiles`; three tiers; fleet limits enforced in `/api/fleet/lookup`
 - [ ] RLS rewrite on `listings`, `listing_snapshots`, and any future user-scoped tables — policies gate on `auth.uid()` and subscription tier claims
-- [ ] Extend Tier 2 magic-link users with paid-tier claims (no forced re-registration needed if staying on Supabase Auth)
-- [ ] Organization/team model deferred until the fleet tier has signal (per §3, ≥90 days of time-series)
+- [ ] Stripe Customer Portal + subscription management UI
+- [ ] Organization/team model deferred until multi-seat fleet signal
 
 Why not earlier: Tier 3's RLS model depends on knowing what users actually do. Designing user-scoped policies before the product has user-scoped features produces speculative RLS that gets rewritten when real features ship — with production user data in the middle of the migration.
 
@@ -537,6 +565,7 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 - **2026-06-06:** **Bulk US expansion to 33 live markets.** Seeded all planned regions from `lib/markets.ts`; regenerated `vercel.json` (95 crons: 31×3 discovery + sweeper + all-markets dedup). Bootstrapped 27 new discovery anchors via parameterized backfill scripts (~28 min, 0 failures). Landing page, markets hub, dashboard selector, and sitemap updated to reflect nationwide coverage. Firecrawl Growth tier confirmed unnecessary at this scale.
 - **2026-06-06:** **PRD v1.9 refresh.** Closed remaining pre-geo stale references (dashboard query pattern, sweeper schedule, per-market dedup crons, backfill script lineage). Documented bootstrap inventory ranges, audit scripts, and geo-aware rate-history/report tooling.
 - **2026-06-07:** **SEO P0 + P1 shipped.** Full audit run via `marketing-seo-specialist.md`; crawlability fixes (robots, sitemap rewrite, legacy market 301s, noindex on private routes) and on-page foundation (Organization/WebSite/Article JSON-LD, site-wide Open Graph, keyword-focused homepage metadata, `next/image` optimization). Removed duplicate static market routes in favor of `/markets/[slug]` only. Post-deploy: set `NEXT_PUBLIC_SITE_URL` in Vercel and submit sitemap in Search Console.
+- **2026-06-08:** **Shipped three-tier Stripe billing (RVIntel One / Growth / Fleet).** Test-mode products on sandbox `acct_1TfqHABTCAvIbhXg` at $9.99 / $19.99 / $39.99 per month. Checkout accepts a `plan` param; webhooks map price IDs → `subscription_tier`; dashboard layout gates on `hasActiveAccess()`; fleet add enforces per-tier RV limits. Separate live-mode products exist on MCP-linked account — production must use live keys + live price IDs only. Magic-link browser callback and checkout success-url race remain open.
 
 ---
 

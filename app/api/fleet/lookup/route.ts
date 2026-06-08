@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { getFleetLimit, PLAN_CONFIG, type PlanKey } from "@/lib/subscription";
 
 export const maxDuration = 30;
 
@@ -45,16 +48,65 @@ function normalizeUrl(raw: string): string {
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const raw: string | undefined = body?.url;
-  const sessionId: string | undefined = body?.session_id;
 
   if (!raw || typeof raw !== "string") {
     return NextResponse.json({ error: "url is required" }, { status: 400 });
   }
 
   const url = normalizeUrl(raw);
-  const supabase = getServiceSupabase();
 
-  const { data, error: listingErr } = await supabase
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
+  );
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("subscription_tier")
+    .eq("id", user.id)
+    .single();
+
+  const limit = getFleetLimit(profile?.subscription_tier ?? null);
+  const supabaseAdmin = getServiceSupabase();
+
+  const { count: existingForUrl } = await supabaseAdmin
+    .from("user_fleet")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .ilike("listing_url", url);
+
+  if ((existingForUrl ?? 0) === 0) {
+    const { count } = await supabaseAdmin
+      .from("user_fleet")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if ((count ?? 0) >= limit) {
+      const tier = profile?.subscription_tier ?? null;
+      const planLabel =
+        tier && tier in PLAN_CONFIG
+          ? PLAN_CONFIG[tier as PlanKey].label
+          : "current";
+      return NextResponse.json(
+        {
+          error: "fleet_limit_reached",
+          message: `Your ${planLabel} plan allows ${limit} RV${limit === 1 ? "" : "s"}. Upgrade to add more.`,
+          limit,
+          current: count,
+        },
+        { status: 403 }
+      );
+    }
+  }
+
+  const { data, error: listingErr } = await supabaseAdmin
     .from("listings")
     .select(
       "id, listing_url, rv_year, rv_make, rv_model, rv_class, nightly_rate, " +
@@ -100,7 +152,7 @@ export async function POST(req: NextRequest) {
   };
 
   // Outdoorsy has class-grain medians; RVshare does not.
-  const { data: snapData } = await supabase
+  const { data: snapData } = await supabaseAdmin
     .from("search_snapshots")
     .select("price_median, captured_at")
     .eq("platform", "outdoorsy")
@@ -113,32 +165,40 @@ export async function POST(req: NextRequest) {
   const snapRows = snapData as unknown as SnapRow[] | null;
   const snap = snapRows?.[0] ?? null;
 
-  if (!snap || snap.price_median == null) {
-    return NextResponse.json({ found: true, listing, comp: null });
+  let comp: {
+    market_median: number;
+    sample_freshness: string;
+    delta_pct: number;
+    position_label: string;
+  } | null = null;
+
+  if (snap && snap.price_median != null) {
+    const rawDelta =
+      ((row.nightly_rate - snap.price_median) / snap.price_median) * 100;
+    const delta_pct = Math.round(rawDelta * 10) / 10;
+    const position_label =
+      delta_pct < -5 ? "Below Market" : delta_pct > 5 ? "Above Market" : "At Market";
+
+    comp = {
+      market_median: snap.price_median,
+      sample_freshness: snap.captured_at,
+      delta_pct,
+      position_label,
+    };
   }
 
-  const rawDelta =
-    ((row.nightly_rate - snap.price_median) / snap.price_median) * 100;
-  const delta_pct = Math.round(rawDelta * 10) / 10;
-  const position_label =
-    delta_pct < -5 ? "Below Market" : delta_pct > 5 ? "Above Market" : "At Market";
+  const { error: fleetErr } = await supabaseAdmin.from("user_fleet").upsert(
+    {
+      user_id: user.id,
+      session_id: user.id,
+      listing_id: row.id,
+      listing_url: raw,
+    },
+    { onConflict: "user_id,listing_url", ignoreDuplicates: false }
+  );
 
-  const comp = {
-    market_median: snap.price_median,
-    sample_freshness: snap.captured_at,
-    delta_pct,
-    position_label,
-  };
-
-  // Save to user_fleet — best effort, don't fail the request.
-  if (sessionId) {
-    supabase
-      .from("user_fleet")
-      .upsert(
-        { session_id: sessionId, listing_id: row.id, listing_url: raw },
-        { onConflict: "session_id,listing_url", ignoreDuplicates: true }
-      )
-      .then(() => {});
+  if (fleetErr) {
+    return NextResponse.json({ error: fleetErr.message }, { status: 500 });
   }
 
   return NextResponse.json({ found: true, listing, comp });

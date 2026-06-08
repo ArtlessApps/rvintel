@@ -1,6 +1,6 @@
-// The paywall page users land on when their trial expires.
-// The Subscribe button calls our /api/stripe/checkout route and redirects
-// to Stripe's hosted payment page.
+// app/upgrade/page.tsx
+// Three-plan upgrade page. Each Subscribe button passes its plan name
+// to /api/stripe/checkout, which uses the right Stripe price ID.
 
 "use client";
 
@@ -9,31 +9,59 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 
+type Plan = "solo" | "growth" | "fleet";
+
+const PLANS = [
+  {
+    key: "solo" as Plan,
+    label: "RVIntel One",
+    price: "$9.99",
+    subtitle: "Track 1 RV",
+    features: ["All 33 US markets", "Daily price updates", "Rate trends & history", "1 RV in fleet tracker"],
+    missing: ["Multiple RVs", "Comp-sets"],
+    featured: false,
+  },
+  {
+    key: "growth" as Plan,
+    label: "Growth",
+    price: "$19.99",
+    subtitle: "Track up to 5 RVs",
+    features: ["All 33 US markets", "Daily price updates", "Rate trends & history", "Up to 5 RVs in fleet", "Comp-sets (coming soon)"],
+    missing: ["Occupancy data"],
+    featured: true,
+  },
+  {
+    key: "fleet" as Plan,
+    label: "Fleet",
+    price: "$39.99",
+    subtitle: "Unlimited RVs",
+    features: ["All 33 US markets", "Daily price updates", "Rate trends & history", "Unlimited RVs in fleet", "Comp-sets (coming soon)", "Occupancy data (coming soon)"],
+    missing: [],
+    featured: false,
+  },
+];
+
 export default function UpgradePage() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<Plan | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  async function handleSubscribe() {
-    setLoading(true);
+  async function handleSubscribe(plan: Plan) {
+    setLoading(plan);
     setError(null);
-
     try {
-      // Ask our API route to create a Stripe Checkout session.
-      const res = await fetch("/api/stripe/checkout", { method: "POST" });
-      const data = await res.json();
-
-      if (!res.ok || !data.url) {
-        throw new Error(data.error ?? "Checkout failed");
-      }
-
-      // Redirect to Stripe's hosted payment page.
-      // After payment, Stripe sends the user to /api/stripe/complete → /dashboard
-      window.location.href = data.url;
-
-    } catch (err) {
+      // Pass the selected plan to the checkout route.
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const { url, error: apiError } = await res.json();
+      if (apiError) throw new Error(apiError);
+      window.location.href = url; // → Stripe hosted checkout page
+    } catch {
       setError("Something went wrong. Please try again.");
-      setLoading(false);
+      setLoading(null);
     }
   }
 
@@ -45,80 +73,84 @@ export default function UpgradePage() {
         </Link>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 pb-16">
-        <div className="w-full max-w-md space-y-6">
-
-          {/* Header */}
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Your trial has ended
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Subscribe to continue accessing RVIntel market intelligence.
-            </p>
-          </div>
-
-          {/* Pricing card */}
-          <div className="border rounded-lg p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-lg">Solo Host</span>
-              <span className="text-2xl font-semibold">
-                $39
-                <span className="text-sm font-normal text-muted-foreground">/mo</span>
-              </span>
-            </div>
-
-            {/* Feature list — update these to match your actual features */}
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                Live pricing for all 33 US markets
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                Market trends and rate averages
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                Comp-set analysis (coming soon)
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                Occupancy benchmarking (coming soon)
-              </li>
-            </ul>
-
-            {/* Error message */}
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
-
-            {/* Subscribe button */}
-            <button
-              onClick={handleSubscribe}
-              disabled={loading}
-              className="w-full bg-primary text-primary-foreground rounded-md py-3 text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
-            >
-              {loading ? "Redirecting to Stripe…" : "Subscribe — $39/mo"}
-            </button>
-
-            <p className="text-xs text-center text-muted-foreground">
-              Secure payment via Stripe · Cancel anytime
-            </p>
-          </div>
-
-          {/* Sign out link */}
-          <p className="text-center text-sm text-muted-foreground">
-            Wrong account?{" "}
-            <button
-              onClick={() => router.push("/login")}
-              className="underline hover:no-underline"
-            >
-              Sign in with a different email
-            </button>
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 space-y-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Choose your plan
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Your trial has ended. Subscribe to keep your market edge.
           </p>
-
         </div>
+
+        {error && (
+          <p className="text-sm text-destructive text-center">{error}</p>
+        )}
+
+        {/* Plan cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl">
+          {PLANS.map((plan) => (
+            <div
+              key={plan.key}
+              className={`rounded-lg p-6 space-y-4 ${
+                plan.featured
+                  ? "border-2 border-primary"
+                  : "border border-border"
+              }`}
+            >
+              {/* Most popular badge */}
+              {plan.featured && (
+                <span className="inline-block text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded-md">
+                  Most popular
+                </span>
+              )}
+
+              <div>
+                <p className="text-sm text-muted-foreground">{plan.label}</p>
+                <p className="text-3xl font-semibold mt-1">
+                  {plan.price}
+                  <span className="text-sm font-normal text-muted-foreground">/mo</span>
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">{plan.subtitle}</p>
+              </div>
+
+              {/* Features */}
+              <ul className="text-sm text-muted-foreground space-y-2">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">✓</span>
+                    {f}
+                  </li>
+                ))}
+                {plan.missing.map((f) => (
+                  <li key={f} className="flex items-start gap-2 opacity-40">
+                    <span className="mt-0.5">—</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => handleSubscribe(plan.key)}
+                disabled={loading !== null}
+                className="w-full rounded-md py-2.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              >
+                {loading === plan.key ? "Redirecting…" : `Get ${plan.label}`}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-muted-foreground text-center">
+          Secure payment via Stripe · Cancel anytime
+        </p>
+
+        <button
+          onClick={() => router.push("/login")}
+          className="text-sm text-muted-foreground hover:underline"
+        >
+          Sign in with a different account
+        </button>
       </main>
     </div>
   );

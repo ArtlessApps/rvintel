@@ -112,10 +112,15 @@ async function lookup(url: string) {
   const res = await fetch("/api/fleet/lookup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url, session_id: memSession }),
+    credentials: "include",
+    body: JSON.stringify({ url }),
   });
-  if (!res.ok) throw new Error(`lookup failed: ${res.status}`);
-  return res.json();
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 403 && data.error === "fleet_limit_reached") {
+    throw new Error(data.message ?? "Fleet limit reached. Upgrade to add more RVs.");
+  }
+  if (!res.ok) throw new Error(data.error ?? `lookup failed: ${res.status}`);
+  return data;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -183,8 +188,9 @@ export function useFleet(): UseFleet {
         listing: data.listing,
         comp: data.comp ?? null,
       });
-    } catch {
-      patchEntry(entry.id, { status: "error" });
+    } catch (err) {
+      setFleet(memFleet.filter((e) => e.id !== entry.id));
+      throw err instanceof Error ? err : new Error("Lookup failed.");
     }
     return entry.id;
   }, []);
