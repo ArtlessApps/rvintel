@@ -296,6 +296,18 @@ export const MARKETS: MarketDefinition[] = [
     isLive: true,
   },
   {
+    slug: "jacksonville-fl",
+    displayName: "Jacksonville, FL",
+    centerLat: 30.3322,
+    centerLng: -81.6557,
+    radiusMiles: 35,
+    outdoorsyAddress: "Jacksonville, FL",
+    rvshareLocation: "jacksonville fl",
+    region: "Southeast",
+    sortOrder: 340,
+    isLive: true,
+  },
+  {
     slug: "columbus-oh",
     displayName: "Columbus, OH",
     centerLat: 39.9612,

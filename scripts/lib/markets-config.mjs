@@ -67,6 +67,7 @@ export const EXPANSION_SLUGS = [
   "tampa-fl",
   "atlanta-ga",
   "chattanooga-tn",
+  "jacksonville-fl",
   "columbus-oh",
   "cincinnati-oh",
   "detroit-mi",

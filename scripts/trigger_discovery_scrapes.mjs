@@ -40,7 +40,7 @@ const BATCHES = {
     "dallas-fort-worth-tx",
     "albuquerque-nm",
   ],
-  southeast: ["orlando-fl", "tampa-fl", "atlanta-ga", "chattanooga-tn"],
+  southeast: ["orlando-fl", "tampa-fl", "atlanta-ga", "chattanooga-tn", "jacksonville-fl"],
   midwest: [
     "columbus-oh",
     "cincinnati-oh",
