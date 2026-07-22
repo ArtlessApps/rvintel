@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MARKET_BY_SLUG } from "@/lib/markets";
-import { marketPageTitle, marketReportForSlug } from "@/lib/market-reports";
+import { marketReportForSlug } from "@/lib/market-reports";
+import { getMarketMagnet } from "@/lib/market-magnets";
 import { fetchMarketStats } from "@/lib/market-stats";
-import { MarketReportViewer } from "@/components/market-report-viewer";
 import { MarketLanding } from "@/components/market-landing";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -12,9 +12,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const market = MARKET_BY_SLUG[slug];
   if (!market) return { title: { absolute: "Market Not Found · RVIntel" } };
+
+  const magnet = getMarketMagnet(slug);
   return {
-    title: `${market.displayName} RV Rental Market`,
-    description: `RV rental market intelligence for ${market.displayName} — pricing trends and competitive benchmarks.`,
+    title: magnet?.seo.title ?? `${market.displayName} RV Rental Market`,
+    description:
+      magnet?.seo.description ??
+      `RV rental market intelligence for ${market.displayName} — pricing trends and competitive benchmarks.`,
     alternates: {
       canonical: `/markets/${slug}`,
     },
@@ -26,20 +30,8 @@ export default async function MarketSlugPage({ params }: Props) {
   const market = MARKET_BY_SLUG[slug];
   if (!market?.isLive) notFound();
 
+  const magnet = getMarketMagnet(slug);
   const report = marketReportForSlug(slug);
-  if (report) {
-    return (
-      <MarketReportViewer
-        reportPath={report.path}
-        region={market.displayName}
-        title={marketPageTitle(slug)}
-        period={report.period}
-        description="Pricing benchmarks, platform breakdown, and occupancy signals across active listings on Outdoorsy and RVshare. Updated quarterly."
-        downloadFileName={report.fileName}
-        format={report.format}
-      />
-    );
-  }
 
   let stats = {
     listingCount: 0,
@@ -48,10 +40,21 @@ export default async function MarketSlugPage({ params }: Props) {
     outdoorsyCount: 0,
     rvshareCount: 0,
   };
-  try {
-    stats = await fetchMarketStats(slug);
-  } catch {
-    // RPC unavailable or empty — landing page still renders
+
+  if (magnet) {
+    stats = {
+      listingCount: magnet.listingCount,
+      avgRate: magnet.avgRate,
+      medianRate: magnet.medianRate,
+      outdoorsyCount: magnet.outdoorsyCount,
+      rvshareCount: magnet.rvshareCount,
+    };
+  } else {
+    try {
+      stats = await fetchMarketStats(slug);
+    } catch {
+      // RPC unavailable or empty — landing page still renders
+    }
   }
 
   return (
@@ -62,6 +65,8 @@ export default async function MarketSlugPage({ params }: Props) {
       radiusMiles={market.radiusMiles}
       stats={stats}
       hasDiscovery={Boolean(market.outdoorsyAddress && market.rvshareLocation)}
+      magnet={magnet}
+      report={report}
     />
   );
 }

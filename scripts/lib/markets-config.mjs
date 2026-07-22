@@ -4,21 +4,46 @@ import path from "node:path";
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const marketsTs = fs.readFileSync(path.join(ROOT, "lib/markets.ts"), "utf-8");
 
-/** @returns {Map<string, { slug: string, displayName: string, outdoorsyAddress: string|null, rvshareLocation: string|null }>} */
+/**
+ * @typedef {{
+ *   slug: string,
+ *   displayName: string,
+ *   region: string,
+ *   radiusMiles: number,
+ *   outdoorsyAddress: string|null,
+ *   rvshareLocation: string|null,
+ * }} LiveMarket
+ */
+
+/** @returns {Map<string, LiveMarket>} */
 export function loadMarkets() {
   const blocks = marketsTs.split(/\{\s*\n\s*slug:/).slice(1);
   const map = new Map();
   for (const block of blocks) {
     const slug = block.match(/^\s*"([^"]+)"/)?.[1];
     const displayName = block.match(/displayName:\s*"([^"]+)"/)?.[1];
+    const region = block.match(/region:\s*"([^"]+)"/)?.[1] ?? "";
+    const radiusMiles = Number(block.match(/radiusMiles:\s*(\d+)/)?.[1] ?? 35);
     const outdoorsy = block.match(/outdoorsyAddress:\s*(null|"([^"]*)")/)?.[2] ?? null;
     const rvshare = block.match(/rvshareLocation:\s*(null|"([^"]*)")/)?.[2] ?? null;
     const isLive = block.match(/isLive:\s*(true|false)/)?.[1] === "true";
     if (slug && isLive) {
-      map.set(slug, { slug, displayName: displayName ?? slug, outdoorsyAddress: outdoorsy, rvshareLocation: rvshare });
+      map.set(slug, {
+        slug,
+        displayName: displayName ?? slug,
+        region,
+        radiusMiles,
+        outdoorsyAddress: outdoorsy,
+        rvshareLocation: rvshare,
+      });
     }
   }
   return map;
+}
+
+/** @returns {LiveMarket[]} */
+export function liveMarketList() {
+  return [...loadMarkets().values()];
 }
 
 /** Markets listed for expansion bootstrap (excludes 4 original live anchors). */

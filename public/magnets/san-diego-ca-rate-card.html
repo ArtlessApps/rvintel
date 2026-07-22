@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>San Diego, CA RV Rental Rate Card · RVIntel</title>
+  <meta name="description" content="San Diego, CA RV rental prices: median $193/night across 799 Outdoorsy &amp; RVshare listings. Live market benchmarks for hosts." />
+  <style>
+    :root {
+      --teal: #2dd4bf;
+      --teal-deep: #006b5f;
+      --ink: #191c1e;
+      --muted: #5f6b68;
+      --surface: #f4f7f6;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(160deg, #e8f5f2 0%, var(--surface) 40%, #fff 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .card {
+      max-width: 640px;
+      margin: 0 auto;
+      background: color-mix(in oklab, var(--card) 92%, transparent);
+      backdrop-filter: blur(20px);
+      border-radius: 0.25rem;
+      box-shadow: 0 12px 40px rgba(25, 28, 30, 0.06);
+      overflow: hidden;
+    }
+    .accent { height: 4px; background: linear-gradient(90deg, var(--teal-deep), var(--teal)); }
+    .inner { padding: 1.75rem 1.5rem 2rem; }
+    .eyebrow {
+      font-size: 0.6875rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--teal-deep);
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      line-height: 1.2;
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.02em;
+    }
+    .sub { color: var(--muted); font-size: 0.875rem; margin: 0 0 1.5rem; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric {
+      background: var(--surface);
+      border-radius: 0.25rem;
+      padding: 0.85rem 0.75rem;
+    }
+    .metric .label {
+      font-size: 0.625rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    .metric .value { font-size: 1.25rem; font-weight: 650; letter-spacing: -0.02em; }
+    ul.bullets { margin: 0 0 1.5rem; padding-left: 1.1rem; color: var(--muted); font-size: 0.875rem; }
+    ul.bullets li { margin-bottom: 0.35rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-bottom: 1.5rem; }
+    th, td { text-align: left; padding: 0.55rem 0.35rem; border-bottom: 1px solid rgba(186, 202, 197, 0.35); }
+    th { font-size: 0.625rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    td.num, th.num { text-align: right; }
+    .cta {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.7rem 1.1rem;
+      border-radius: 0.25rem;
+      background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+    }
+    .foot { margin-top: 1.25rem; font-size: 0.75rem; color: var(--muted); }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <article class="card">
+    <div class="accent"></div>
+    <div class="inner">
+      <p class="eyebrow">California · 35 mi · RVIntel</p>
+      <h1>San Diego, CA RV rental rates</h1>
+      <p class="sub">Rate card · July 2026 · Outdoorsy + RVshare</p>
+      <div class="metrics">
+        <div class="metric"><div class="label">Active listings</div><div class="value">799</div></div>
+        <div class="metric"><div class="label">Median / night</div><div class="value">$193</div></div>
+        <div class="metric"><div class="label">Avg / night</div><div class="value">$207</div></div>
+      </div>
+      <ul class="bullets">
+        <li>P25–P75: $145 – $240</li>
+        <li>Outdoorsy 474 · RVshare 325</li>
+        <li>Delivery 74% · Instant book 31%</li>
+      </ul>
+      <table>
+        <thead><tr><th>Class</th><th class="num">Listings</th><th class="num">Median</th></tr></thead>
+        <tbody>
+<tr><td>Travel Trailer</td><td class="num">279</td><td class="num">$140</td></tr>
+<tr><td>Class C</td><td class="num">225</td><td class="num">$219</td></tr>
+<tr><td>Class B</td><td class="num">173</td><td class="num">$199</td></tr>
+<tr><td>Class A</td><td class="num">83</td><td class="num">$289</td></tr>
+<tr><td>Toy Hauler</td><td class="num">20</td><td class="num">$150</td></tr>
+<tr><td>Fifth Wheel</td><td class="num">19</td><td class="num">$219</td></tr>
+        </tbody>
+      </table>
+      <a class="cta" href="https://www.rvintel.io/markets/san-diego-ca">View full San Diego, CA market →</a>
+      <p class="foot">Data as of Jul 21, 2026 · Active geo-scoped listings with positive nightly rates · rvintel.io</p>
+    </div>
+  </article>
+</body>
+</html>

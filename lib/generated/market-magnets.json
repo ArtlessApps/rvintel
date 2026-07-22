@@ -1,0 +1,2517 @@
+{
+  "generatedAt": "2026-07-22T02:06:34.276Z",
+  "siteUrl": "https://www.rvintel.io",
+  "markets": {
+    "san-diego-ca": {
+      "slug": "san-diego-ca",
+      "displayName": "San Diego, CA",
+      "region": "California",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T08:35:00.741+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 799,
+      "avgRate": 207,
+      "medianRate": 193,
+      "p25": 145,
+      "p75": 240,
+      "outdoorsyCount": 474,
+      "rvshareCount": 325,
+      "deliveryPct": 74,
+      "instantBookPct": 31,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 279,
+          "medianRate": 140
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 225,
+          "medianRate": 219
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 173,
+          "medianRate": 199
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 83,
+          "medianRate": 289
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 20,
+          "medianRate": 150
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 19,
+          "medianRate": 219
+        }
+      ],
+      "seo": {
+        "title": "San Diego, CA RV Rental Market",
+        "description": "San Diego, CA RV rental prices: median $193/night across 799 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>San Diego, CA RV rental hosts currently compete across <strong>799 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$193/night</strong> (average $207), a $14 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>59% Outdoorsy / 41% RVshare</strong> (474 vs 325). By class: Travel Trailer median $140 (279 listings); Class C median $219 (225 listings); Class B median $199 (173 listings). 74% of listings offer delivery; 31% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in San Diego?",
+            "answer": "The average asking rate in San Diego, CA is $207 per night; the median is $193 (P25 $145 · P75 $240) across 799 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in San Diego?",
+            "answer": "RVIntel currently tracks 799 active listings in the San Diego, CA market window (35 mi): 474 on Outdoorsy and 325 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in San Diego?",
+            "answer": "Outdoorsy currently has more inventory in San Diego, CA (474 vs 325 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/san-diego-ca-rate-card.html",
+      "marketPath": "/markets/san-diego-ca"
+    },
+    "riverside-county-ca": {
+      "slug": "riverside-county-ca",
+      "displayName": "Riverside County, CA",
+      "region": "California",
+      "radiusMiles": 45,
+      "asOf": "2026-07-21T08:35:04.547+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 2136,
+      "avgRate": 206,
+      "medianRate": 169,
+      "p25": 131,
+      "p75": 240,
+      "outdoorsyCount": 1133,
+      "rvshareCount": 1003,
+      "deliveryPct": 66,
+      "instantBookPct": 28,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 992,
+          "medianRate": 135
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 491,
+          "medianRate": 220
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 253,
+          "medianRate": 289
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 245,
+          "medianRate": 210
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 80,
+          "medianRate": 217
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 65,
+          "medianRate": 151
+        }
+      ],
+      "seo": {
+        "title": "Riverside County, CA RV Rental Market",
+        "description": "Riverside County, CA RV rental prices: median $169/night across 2,136 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Riverside County, CA RV rental hosts currently compete across <strong>2,136 active listings</strong> on Outdoorsy and RVshare within a 45-mile radius. The median asking rate is <strong>$169/night</strong> (average $206), a $37 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>53% Outdoorsy / 47% RVshare</strong> (1,133 vs 1,003). By class: Travel Trailer median $135 (992 listings); Class C median $220 (491 listings); Class A median $289 (253 listings). 66% of listings offer delivery; 28% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Riverside County?",
+            "answer": "The average asking rate in Riverside County, CA is $206 per night; the median is $169 (P25 $131 · P75 $240) across 2,136 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Riverside County?",
+            "answer": "RVIntel currently tracks 2,136 active listings in the Riverside County, CA market window (45 mi): 1,133 on Outdoorsy and 1,003 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Riverside County?",
+            "answer": "Outdoorsy currently has more inventory in Riverside County, CA (1,133 vs 1,003 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/riverside-county-ca-rate-card.html",
+      "marketPath": "/markets/riverside-county-ca"
+    },
+    "portland-or": {
+      "slug": "portland-or",
+      "displayName": "Portland, OR",
+      "region": "Pacific Northwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T08:14:43.1+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 775,
+      "avgRate": 192,
+      "medianRate": 185,
+      "p25": 130,
+      "p75": 240,
+      "outdoorsyCount": 444,
+      "rvshareCount": 331,
+      "deliveryPct": 58,
+      "instantBookPct": 32,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 313,
+          "medianRate": 129
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 201,
+          "medianRate": 206
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 193,
+          "medianRate": 245
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 52,
+          "medianRate": 312
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 9,
+          "medianRate": 166
+        },
+        {
+          "class": "Pop Up",
+          "label": "Pop Up",
+          "count": 5,
+          "medianRate": 125
+        }
+      ],
+      "seo": {
+        "title": "Portland, OR RV Rental Market",
+        "description": "Portland, OR RV rental prices: median $185/night across 775 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Portland, OR RV rental hosts currently compete across <strong>775 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$185/night</strong> (average $192), a $7 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>57% Outdoorsy / 43% RVshare</strong> (444 vs 331). By class: Travel Trailer median $129 (313 listings); Class B median $206 (201 listings); Class C median $245 (193 listings). 58% of listings offer delivery; 32% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Portland?",
+            "answer": "The average asking rate in Portland, OR is $192 per night; the median is $185 (P25 $130 · P75 $240) across 775 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Portland?",
+            "answer": "RVIntel currently tracks 775 active listings in the Portland, OR market window (35 mi): 444 on Outdoorsy and 331 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Portland?",
+            "answer": "Outdoorsy currently has more inventory in Portland, OR (444 vs 331 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/portland-or-rate-card.html",
+      "marketPath": "/markets/portland-or"
+    },
+    "arklatex": {
+      "slug": "arklatex",
+      "displayName": "ArkLaTex",
+      "region": "Southwest",
+      "radiusMiles": 50,
+      "asOf": "2026-07-21T08:24:15.285+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 33,
+      "avgRate": 155,
+      "medianRate": 125,
+      "p25": 120,
+      "p75": 139,
+      "outdoorsyCount": 10,
+      "rvshareCount": 23,
+      "deliveryPct": 88,
+      "instantBookPct": 9,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 27,
+          "medianRate": 125
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 2,
+          "medianRate": 415
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 2,
+          "medianRate": 263
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 2,
+          "medianRate": 173
+        }
+      ],
+      "seo": {
+        "title": "ArkLaTex RV Rental Market",
+        "description": "ArkLaTex RV rental prices: median $125/night across 33 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>ArkLaTex RV rental hosts currently compete across <strong>33 active listings</strong> on Outdoorsy and RVshare within a 50-mile radius. The median asking rate is <strong>$125/night</strong> (average $155), a $30 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>30% Outdoorsy / 70% RVshare</strong> (10 vs 23). By class: Travel Trailer median $125 (27 listings); Class B median $415 (2 listings); Class C median $263 (2 listings). 88% of listings offer delivery; 9% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in ArkLaTex?",
+            "answer": "The average asking rate in ArkLaTex is $155 per night; the median is $125 (P25 $120 · P75 $139) across 33 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in ArkLaTex?",
+            "answer": "RVIntel currently tracks 33 active listings in the ArkLaTex market window (50 mi): 10 on Outdoorsy and 23 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in ArkLaTex?",
+            "answer": "RVshare currently has more inventory in ArkLaTex (23 vs 10 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/arklatex-rate-card.html",
+      "marketPath": "/markets/arklatex"
+    },
+    "los-angeles-ca": {
+      "slug": "los-angeles-ca",
+      "displayName": "Los Angeles, CA",
+      "region": "California",
+      "radiusMiles": 40,
+      "asOf": "2026-07-21T08:35:04.547+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 1681,
+      "avgRate": 227,
+      "medianRate": 199,
+      "p25": 145,
+      "p75": 250,
+      "outdoorsyCount": 995,
+      "rvshareCount": 686,
+      "deliveryPct": 59,
+      "instantBookPct": 28,
+      "byClass": [
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 542,
+          "medianRate": 229
+        },
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 516,
+          "medianRate": 136
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 351,
+          "medianRate": 225
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 203,
+          "medianRate": 299
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 32,
+          "medianRate": 220
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 27,
+          "medianRate": 150
+        }
+      ],
+      "seo": {
+        "title": "Los Angeles, CA RV Rental Market",
+        "description": "Los Angeles, CA RV rental prices: median $199/night across 1,681 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Los Angeles, CA RV rental hosts currently compete across <strong>1,681 active listings</strong> on Outdoorsy and RVshare within a 40-mile radius. The median asking rate is <strong>$199/night</strong> (average $227), a $28 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>59% Outdoorsy / 41% RVshare</strong> (995 vs 686). By class: Class C median $229 (542 listings); Travel Trailer median $136 (516 listings); Class B median $225 (351 listings). 59% of listings offer delivery; 28% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Los Angeles?",
+            "answer": "The average asking rate in Los Angeles, CA is $227 per night; the median is $199 (P25 $145 · P75 $250) across 1,681 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Los Angeles?",
+            "answer": "RVIntel currently tracks 1,681 active listings in the Los Angeles, CA market window (40 mi): 995 on Outdoorsy and 686 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Los Angeles?",
+            "answer": "Outdoorsy currently has more inventory in Los Angeles, CA (995 vs 686 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/los-angeles-ca-rate-card.html",
+      "marketPath": "/markets/los-angeles-ca"
+    },
+    "long-beach-ca": {
+      "slug": "long-beach-ca",
+      "displayName": "Long Beach, CA",
+      "region": "California",
+      "radiusMiles": 25,
+      "asOf": "2026-07-21T08:35:04.547+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 870,
+      "avgRate": 227,
+      "medianRate": 207,
+      "p25": 150,
+      "p75": 250,
+      "outdoorsyCount": 545,
+      "rvshareCount": 325,
+      "deliveryPct": 54,
+      "instantBookPct": 27,
+      "byClass": [
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 292,
+          "medianRate": 231
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 259,
+          "medianRate": 225
+        },
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 202,
+          "medianRate": 136
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 94,
+          "medianRate": 292
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 11,
+          "medianRate": 198
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 8,
+          "medianRate": 155
+        }
+      ],
+      "seo": {
+        "title": "Long Beach, CA RV Rental Market",
+        "description": "Long Beach, CA RV rental prices: median $207/night across 870 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Long Beach, CA RV rental hosts currently compete across <strong>870 active listings</strong> on Outdoorsy and RVshare within a 25-mile radius. The median asking rate is <strong>$207/night</strong> (average $227), a $20 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>63% Outdoorsy / 37% RVshare</strong> (545 vs 325). By class: Class C median $231 (292 listings); Class B median $225 (259 listings); Travel Trailer median $136 (202 listings). 54% of listings offer delivery; 27% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Long Beach?",
+            "answer": "The average asking rate in Long Beach, CA is $227 per night; the median is $207 (P25 $150 · P75 $250) across 870 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Long Beach?",
+            "answer": "RVIntel currently tracks 870 active listings in the Long Beach, CA market window (25 mi): 545 on Outdoorsy and 325 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Long Beach?",
+            "answer": "Outdoorsy currently has more inventory in Long Beach, CA (545 vs 325 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/long-beach-ca-rate-card.html",
+      "marketPath": "/markets/long-beach-ca"
+    },
+    "sacramento-ca": {
+      "slug": "sacramento-ca",
+      "displayName": "Sacramento, CA",
+      "region": "California",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T09:24:52.013+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 741,
+      "avgRate": 183,
+      "medianRate": 154,
+      "p25": 130,
+      "p75": 220,
+      "outdoorsyCount": 423,
+      "rvshareCount": 318,
+      "deliveryPct": 70,
+      "instantBookPct": 29,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 379,
+          "medianRate": 135
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 213,
+          "medianRate": 209
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 85,
+          "medianRate": 225
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 37,
+          "medianRate": 275
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 13,
+          "medianRate": 200
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 12,
+          "medianRate": 152
+        }
+      ],
+      "seo": {
+        "title": "Sacramento, CA RV Rental Market",
+        "description": "Sacramento, CA RV rental prices: median $154/night across 741 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Sacramento, CA RV rental hosts currently compete across <strong>741 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$154/night</strong> (average $183), a $29 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>57% Outdoorsy / 43% RVshare</strong> (423 vs 318). By class: Travel Trailer median $135 (379 listings); Class C median $209 (213 listings); Class B median $225 (85 listings). 70% of listings offer delivery; 29% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Sacramento?",
+            "answer": "The average asking rate in Sacramento, CA is $183 per night; the median is $154 (P25 $130 · P75 $220) across 741 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Sacramento?",
+            "answer": "RVIntel currently tracks 741 active listings in the Sacramento, CA market window (35 mi): 423 on Outdoorsy and 318 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Sacramento?",
+            "answer": "Outdoorsy currently has more inventory in Sacramento, CA (423 vs 318 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/sacramento-ca-rate-card.html",
+      "marketPath": "/markets/sacramento-ca"
+    },
+    "san-francisco-ca": {
+      "slug": "san-francisco-ca",
+      "displayName": "San Francisco, CA",
+      "region": "California",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T08:54:56.875+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 427,
+      "avgRate": 240,
+      "medianRate": 221,
+      "p25": 161,
+      "p75": 265,
+      "outdoorsyCount": 245,
+      "rvshareCount": 182,
+      "deliveryPct": 52,
+      "instantBookPct": 24,
+      "byClass": [
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 209,
+          "medianRate": 225
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 100,
+          "medianRate": 250
+        },
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 92,
+          "medianRate": 153
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 17,
+          "medianRate": 299
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 5,
+          "medianRate": 150
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 350
+        }
+      ],
+      "seo": {
+        "title": "San Francisco, CA RV Rental Market",
+        "description": "San Francisco, CA RV rental prices: median $221/night across 427 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>San Francisco, CA RV rental hosts currently compete across <strong>427 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$221/night</strong> (average $240), a $19 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>57% Outdoorsy / 43% RVshare</strong> (245 vs 182). By class: Class B median $225 (209 listings); Class C median $250 (100 listings); Travel Trailer median $153 (92 listings). 52% of listings offer delivery; 24% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in San Francisco?",
+            "answer": "The average asking rate in San Francisco, CA is $240 per night; the median is $221 (P25 $161 · P75 $265) across 427 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in San Francisco?",
+            "answer": "RVIntel currently tracks 427 active listings in the San Francisco, CA market window (35 mi): 245 on Outdoorsy and 182 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in San Francisco?",
+            "answer": "Outdoorsy currently has more inventory in San Francisco, CA (245 vs 182 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/san-francisco-ca-rate-card.html",
+      "marketPath": "/markets/san-francisco-ca"
+    },
+    "san-jose-ca": {
+      "slug": "san-jose-ca",
+      "displayName": "San Jose, CA",
+      "region": "California",
+      "radiusMiles": 30,
+      "asOf": "2026-07-21T08:54:56.875+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 424,
+      "avgRate": 208,
+      "medianRate": 200,
+      "p25": 150,
+      "p75": 250,
+      "outdoorsyCount": 241,
+      "rvshareCount": 183,
+      "deliveryPct": 61,
+      "instantBookPct": 30,
+      "byClass": [
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 154,
+          "medianRate": 220
+        },
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 138,
+          "medianRate": 153
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 101,
+          "medianRate": 240
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 20,
+          "medianRate": 255
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 6,
+          "medianRate": 200
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 189
+        }
+      ],
+      "seo": {
+        "title": "San Jose, CA RV Rental Market",
+        "description": "San Jose, CA RV rental prices: median $200/night across 424 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>San Jose, CA RV rental hosts currently compete across <strong>424 active listings</strong> on Outdoorsy and RVshare within a 30-mile radius. The median asking rate is <strong>$200/night</strong> (average $208), a $8 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>57% Outdoorsy / 43% RVshare</strong> (241 vs 183). By class: Class B median $220 (154 listings); Travel Trailer median $153 (138 listings); Class C median $240 (101 listings). 61% of listings offer delivery; 30% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in San Jose?",
+            "answer": "The average asking rate in San Jose, CA is $208 per night; the median is $200 (P25 $150 · P75 $250) across 424 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in San Jose?",
+            "answer": "RVIntel currently tracks 424 active listings in the San Jose, CA market window (30 mi): 241 on Outdoorsy and 183 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in San Jose?",
+            "answer": "Outdoorsy currently has more inventory in San Jose, CA (241 vs 183 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/san-jose-ca-rate-card.html",
+      "marketPath": "/markets/san-jose-ca"
+    },
+    "denver-co": {
+      "slug": "denver-co",
+      "displayName": "Denver, CO",
+      "region": "Mountain West",
+      "radiusMiles": 40,
+      "asOf": "2026-07-21T09:34:39.62+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 914,
+      "avgRate": 197,
+      "medianRate": 180,
+      "p25": 130,
+      "p75": 248,
+      "outdoorsyCount": 557,
+      "rvshareCount": 357,
+      "deliveryPct": 59,
+      "instantBookPct": 32,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 390,
+          "medianRate": 130
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 249,
+          "medianRate": 241
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 195,
+          "medianRate": 231
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 33,
+          "medianRate": 270
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 28,
+          "medianRate": 165
+        },
+        {
+          "class": "Pop Up",
+          "label": "Pop Up",
+          "count": 10,
+          "medianRate": 132
+        }
+      ],
+      "seo": {
+        "title": "Denver, CO RV Rental Market",
+        "description": "Denver, CO RV rental prices: median $180/night across 914 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Denver, CO RV rental hosts currently compete across <strong>914 active listings</strong> on Outdoorsy and RVshare within a 40-mile radius. The median asking rate is <strong>$180/night</strong> (average $197), a $17 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>61% Outdoorsy / 39% RVshare</strong> (557 vs 357). By class: Travel Trailer median $130 (390 listings); Class B median $241 (249 listings); Class C median $231 (195 listings). 59% of listings offer delivery; 32% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Denver?",
+            "answer": "The average asking rate in Denver, CO is $197 per night; the median is $180 (P25 $130 · P75 $248) across 914 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Denver?",
+            "answer": "RVIntel currently tracks 914 active listings in the Denver, CO market window (40 mi): 557 on Outdoorsy and 357 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Denver?",
+            "answer": "Outdoorsy currently has more inventory in Denver, CO (557 vs 357 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/denver-co-rate-card.html",
+      "marketPath": "/markets/denver-co"
+    },
+    "salt-lake-city-ut": {
+      "slug": "salt-lake-city-ut",
+      "displayName": "Salt Lake City, UT",
+      "region": "Mountain West",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T09:14:18.933+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 974,
+      "avgRate": 192,
+      "medianRate": 165,
+      "p25": 120,
+      "p75": 229,
+      "outdoorsyCount": 559,
+      "rvshareCount": 415,
+      "deliveryPct": 66,
+      "instantBookPct": 36,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 409,
+          "medianRate": 119
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 275,
+          "medianRate": 210
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 184,
+          "medianRate": 220
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 53,
+          "medianRate": 290
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 27,
+          "medianRate": 134
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 20,
+          "medianRate": 162
+        }
+      ],
+      "seo": {
+        "title": "Salt Lake City, UT RV Rental Market",
+        "description": "Salt Lake City, UT RV rental prices: median $165/night across 974 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Salt Lake City, UT RV rental hosts currently compete across <strong>974 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$165/night</strong> (average $192), a $27 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>57% Outdoorsy / 43% RVshare</strong> (559 vs 415). By class: Travel Trailer median $119 (409 listings); Class C median $210 (275 listings); Class B median $220 (184 listings). 66% of listings offer delivery; 36% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Salt Lake City?",
+            "answer": "The average asking rate in Salt Lake City, UT is $192 per night; the median is $165 (P25 $120 · P75 $229) across 974 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Salt Lake City?",
+            "answer": "RVIntel currently tracks 974 active listings in the Salt Lake City, UT market window (35 mi): 559 on Outdoorsy and 415 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Salt Lake City?",
+            "answer": "Outdoorsy currently has more inventory in Salt Lake City, UT (559 vs 415 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/salt-lake-city-ut-rate-card.html",
+      "marketPath": "/markets/salt-lake-city-ut"
+    },
+    "reno-nv": {
+      "slug": "reno-nv",
+      "displayName": "Reno, NV",
+      "region": "Mountain West",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T09:24:52.013+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 417,
+      "avgRate": 352,
+      "medianRate": 200,
+      "p25": 150,
+      "p75": 349,
+      "outdoorsyCount": 283,
+      "rvshareCount": 134,
+      "deliveryPct": 68,
+      "instantBookPct": 27,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 203,
+          "medianRate": 153
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 119,
+          "medianRate": 349
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 40,
+          "medianRate": 316
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 35,
+          "medianRate": 225
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 14,
+          "medianRate": 200
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 6,
+          "medianRate": 167
+        }
+      ],
+      "seo": {
+        "title": "Reno, NV RV Rental Market",
+        "description": "Reno, NV RV rental prices: median $200/night across 417 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Reno, NV RV rental hosts currently compete across <strong>417 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$200/night</strong> (average $352), a $152 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>68% Outdoorsy / 32% RVshare</strong> (283 vs 134). By class: Travel Trailer median $153 (203 listings); Class C median $349 (119 listings); Class A median $316 (40 listings). 68% of listings offer delivery; 27% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Reno?",
+            "answer": "The average asking rate in Reno, NV is $352 per night; the median is $200 (P25 $150 · P75 $349) across 417 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Reno?",
+            "answer": "RVIntel currently tracks 417 active listings in the Reno, NV market window (35 mi): 283 on Outdoorsy and 134 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Reno?",
+            "answer": "Outdoorsy currently has more inventory in Reno, NV (283 vs 134 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/reno-nv-rate-card.html",
+      "marketPath": "/markets/reno-nv"
+    },
+    "cheyenne-wy": {
+      "slug": "cheyenne-wy",
+      "displayName": "Cheyenne, WY",
+      "region": "Mountain West",
+      "radiusMiles": 40,
+      "asOf": "2026-07-21T09:34:39.62+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 31,
+      "avgRate": 157,
+      "medianRate": 135,
+      "p25": 122,
+      "p75": 200,
+      "outdoorsyCount": 15,
+      "rvshareCount": 16,
+      "deliveryPct": 81,
+      "instantBookPct": 16,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 24,
+          "medianRate": 125
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 4,
+          "medianRate": 245
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 3,
+          "medianRate": 200
+        }
+      ],
+      "seo": {
+        "title": "Cheyenne, WY RV Rental Market",
+        "description": "Cheyenne, WY RV rental prices: median $135/night across 31 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Cheyenne, WY RV rental hosts currently compete across <strong>31 active listings</strong> on Outdoorsy and RVshare within a 40-mile radius. The median asking rate is <strong>$135/night</strong> (average $157), a $22 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>48% Outdoorsy / 52% RVshare</strong> (15 vs 16). By class: Travel Trailer median $125 (24 listings); Class C median $245 (4 listings); Fifth Wheel median $200 (3 listings). 81% of listings offer delivery; 16% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Cheyenne?",
+            "answer": "The average asking rate in Cheyenne, WY is $157 per night; the median is $135 (P25 $122 · P75 $200) across 31 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Cheyenne?",
+            "answer": "RVIntel currently tracks 31 active listings in the Cheyenne, WY market window (40 mi): 15 on Outdoorsy and 16 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Cheyenne?",
+            "answer": "RVshare currently has more inventory in Cheyenne, WY (16 vs 15 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/cheyenne-wy-rate-card.html",
+      "marketPath": "/markets/cheyenne-wy"
+    },
+    "phoenix-az": {
+      "slug": "phoenix-az",
+      "displayName": "Phoenix, AZ",
+      "region": "Southwest",
+      "radiusMiles": 45,
+      "asOf": "2026-07-21T09:44:39.396+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 1134,
+      "avgRate": 193,
+      "medianRate": 150,
+      "p25": 110,
+      "p75": 225,
+      "outdoorsyCount": 693,
+      "rvshareCount": 441,
+      "deliveryPct": 53,
+      "instantBookPct": 30,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 526,
+          "medianRate": 110
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 328,
+          "medianRate": 209
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 123,
+          "medianRate": 224
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 76,
+          "medianRate": 300
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 51,
+          "medianRate": 168
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 23,
+          "medianRate": 129
+        }
+      ],
+      "seo": {
+        "title": "Phoenix, AZ RV Rental Market",
+        "description": "Phoenix, AZ RV rental prices: median $150/night across 1,134 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Phoenix, AZ RV rental hosts currently compete across <strong>1,134 active listings</strong> on Outdoorsy and RVshare within a 45-mile radius. The median asking rate is <strong>$150/night</strong> (average $193), a $43 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>61% Outdoorsy / 39% RVshare</strong> (693 vs 441). By class: Travel Trailer median $110 (526 listings); Class C median $209 (328 listings); Class B median $224 (123 listings). 53% of listings offer delivery; 30% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Phoenix?",
+            "answer": "The average asking rate in Phoenix, AZ is $193 per night; the median is $150 (P25 $110 · P75 $225) across 1,134 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Phoenix?",
+            "answer": "RVIntel currently tracks 1,134 active listings in the Phoenix, AZ market window (45 mi): 693 on Outdoorsy and 441 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Phoenix?",
+            "answer": "Outdoorsy currently has more inventory in Phoenix, AZ (693 vs 441 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/phoenix-az-rate-card.html",
+      "marketPath": "/markets/phoenix-az"
+    },
+    "austin-tx": {
+      "slug": "austin-tx",
+      "displayName": "Austin, TX",
+      "region": "Southwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T10:04:41.318+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 433,
+      "avgRate": 206,
+      "medianRate": 133,
+      "p25": 116,
+      "p75": 211,
+      "outdoorsyCount": 216,
+      "rvshareCount": 217,
+      "deliveryPct": 77,
+      "instantBookPct": 29,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 270,
+          "medianRate": 122
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 56,
+          "medianRate": 231
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 53,
+          "medianRate": 250
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 25,
+          "medianRate": 301
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 21,
+          "medianRate": 176
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 151
+        }
+      ],
+      "seo": {
+        "title": "Austin, TX RV Rental Market",
+        "description": "Austin, TX RV rental prices: median $133/night across 433 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Austin, TX RV rental hosts currently compete across <strong>433 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$133/night</strong> (average $206), a $73 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>50% Outdoorsy / 50% RVshare</strong> (216 vs 217). By class: Travel Trailer median $122 (270 listings); Class C median $231 (56 listings); Class B median $250 (53 listings). 77% of listings offer delivery; 29% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Austin?",
+            "answer": "The average asking rate in Austin, TX is $206 per night; the median is $133 (P25 $116 · P75 $211) across 433 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Austin?",
+            "answer": "RVIntel currently tracks 433 active listings in the Austin, TX market window (35 mi): 216 on Outdoorsy and 217 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Austin?",
+            "answer": "RVshare currently has more inventory in Austin, TX (217 vs 216 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/austin-tx-rate-card.html",
+      "marketPath": "/markets/austin-tx"
+    },
+    "san-antonio-tx": {
+      "slug": "san-antonio-tx",
+      "displayName": "San Antonio, TX",
+      "region": "Southwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T10:04:41.318+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 356,
+      "avgRate": 161,
+      "medianRate": 140,
+      "p25": 122,
+      "p75": 193,
+      "outdoorsyCount": 151,
+      "rvshareCount": 205,
+      "deliveryPct": 77,
+      "instantBookPct": 29,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 236,
+          "medianRate": 125
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 47,
+          "medianRate": 200
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 43,
+          "medianRate": 180
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 16,
+          "medianRate": 269
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 8,
+          "medianRate": 244
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 5,
+          "medianRate": 138
+        }
+      ],
+      "seo": {
+        "title": "San Antonio, TX RV Rental Market",
+        "description": "San Antonio, TX RV rental prices: median $140/night across 356 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>San Antonio, TX RV rental hosts currently compete across <strong>356 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$140/night</strong> (average $161), a $21 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>42% Outdoorsy / 58% RVshare</strong> (151 vs 205). By class: Travel Trailer median $125 (236 listings); Class C median $200 (47 listings); Fifth Wheel median $180 (43 listings). 77% of listings offer delivery; 29% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in San Antonio?",
+            "answer": "The average asking rate in San Antonio, TX is $161 per night; the median is $140 (P25 $122 · P75 $193) across 356 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in San Antonio?",
+            "answer": "RVIntel currently tracks 356 active listings in the San Antonio, TX market window (35 mi): 151 on Outdoorsy and 205 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in San Antonio?",
+            "answer": "RVshare currently has more inventory in San Antonio, TX (205 vs 151 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/san-antonio-tx-rate-card.html",
+      "marketPath": "/markets/san-antonio-tx"
+    },
+    "dallas-fort-worth-tx": {
+      "slug": "dallas-fort-worth-tx",
+      "displayName": "Dallas / Fort Worth, TX",
+      "region": "Southwest",
+      "radiusMiles": 45,
+      "asOf": "2026-07-21T10:14:24.127+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 774,
+      "avgRate": 198,
+      "medianRate": 150,
+      "p25": 119,
+      "p75": 231,
+      "outdoorsyCount": 361,
+      "rvshareCount": 413,
+      "deliveryPct": 71,
+      "instantBookPct": 36,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 409,
+          "medianRate": 120
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 168,
+          "medianRate": 230
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 71,
+          "medianRate": 317
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 68,
+          "medianRate": 333
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 46,
+          "medianRate": 175
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 8,
+          "medianRate": 156
+        }
+      ],
+      "seo": {
+        "title": "Dallas / Fort Worth, TX RV Rental Market",
+        "description": "Dallas / Fort Worth, TX RV rental prices: median $150/night across 774 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Dallas / Fort Worth, TX RV rental hosts currently compete across <strong>774 active listings</strong> on Outdoorsy and RVshare within a 45-mile radius. The median asking rate is <strong>$150/night</strong> (average $198), a $48 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>47% Outdoorsy / 53% RVshare</strong> (361 vs 413). By class: Travel Trailer median $120 (409 listings); Class C median $230 (168 listings); Class A median $317 (71 listings). 71% of listings offer delivery; 36% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Dallas / Fort Worth?",
+            "answer": "The average asking rate in Dallas / Fort Worth, TX is $198 per night; the median is $150 (P25 $119 · P75 $231) across 774 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Dallas / Fort Worth?",
+            "answer": "RVIntel currently tracks 774 active listings in the Dallas / Fort Worth, TX market window (45 mi): 361 on Outdoorsy and 413 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Dallas / Fort Worth?",
+            "answer": "RVshare currently has more inventory in Dallas / Fort Worth, TX (413 vs 361 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/dallas-fort-worth-tx-rate-card.html",
+      "marketPath": "/markets/dallas-fort-worth-tx"
+    },
+    "orlando-fl": {
+      "slug": "orlando-fl",
+      "displayName": "Orlando, FL",
+      "region": "Southeast",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T10:34:42.223+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 701,
+      "avgRate": 175,
+      "medianRate": 150,
+      "p25": 107,
+      "p75": 225,
+      "outdoorsyCount": 312,
+      "rvshareCount": 389,
+      "deliveryPct": 78,
+      "instantBookPct": 32,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 380,
+          "medianRate": 110
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 105,
+          "medianRate": 197
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 98,
+          "medianRate": 227
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 82,
+          "medianRate": 285
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 21,
+          "medianRate": 235
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 14,
+          "medianRate": 134
+        }
+      ],
+      "seo": {
+        "title": "Orlando, FL RV Rental Market",
+        "description": "Orlando, FL RV rental prices: median $150/night across 701 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Orlando, FL RV rental hosts currently compete across <strong>701 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$150/night</strong> (average $175), a $25 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>45% Outdoorsy / 55% RVshare</strong> (312 vs 389). By class: Travel Trailer median $110 (380 listings); Class C median $197 (105 listings); Fifth Wheel median $227 (98 listings). 78% of listings offer delivery; 32% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Orlando?",
+            "answer": "The average asking rate in Orlando, FL is $175 per night; the median is $150 (P25 $107 · P75 $225) across 701 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Orlando?",
+            "answer": "RVIntel currently tracks 701 active listings in the Orlando, FL market window (35 mi): 312 on Outdoorsy and 389 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Orlando?",
+            "answer": "RVshare currently has more inventory in Orlando, FL (389 vs 312 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/orlando-fl-rate-card.html",
+      "marketPath": "/markets/orlando-fl"
+    },
+    "tampa-fl": {
+      "slug": "tampa-fl",
+      "displayName": "Tampa, FL",
+      "region": "Southeast",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T10:34:42.223+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 761,
+      "avgRate": 190,
+      "medianRate": 148,
+      "p25": 105,
+      "p75": 215,
+      "outdoorsyCount": 310,
+      "rvshareCount": 451,
+      "deliveryPct": 78,
+      "instantBookPct": 31,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 363,
+          "medianRate": 105
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 129,
+          "medianRate": 299
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 129,
+          "medianRate": 199
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 65,
+          "medianRate": 175
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 54,
+          "medianRate": 199
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 17,
+          "medianRate": 128
+        }
+      ],
+      "seo": {
+        "title": "Tampa, FL RV Rental Market",
+        "description": "Tampa, FL RV rental prices: median $148/night across 761 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Tampa, FL RV rental hosts currently compete across <strong>761 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$148/night</strong> (average $190), a $42 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>41% Outdoorsy / 59% RVshare</strong> (310 vs 451). By class: Travel Trailer median $105 (363 listings); Class A median $299 (129 listings); Class C median $199 (129 listings). 78% of listings offer delivery; 31% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Tampa?",
+            "answer": "The average asking rate in Tampa, FL is $190 per night; the median is $148 (P25 $105 · P75 $215) across 761 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Tampa?",
+            "answer": "RVIntel currently tracks 761 active listings in the Tampa, FL market window (35 mi): 310 on Outdoorsy and 451 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Tampa?",
+            "answer": "RVshare currently has more inventory in Tampa, FL (451 vs 310 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/tampa-fl-rate-card.html",
+      "marketPath": "/markets/tampa-fl"
+    },
+    "atlanta-ga": {
+      "slug": "atlanta-ga",
+      "displayName": "Atlanta, GA",
+      "region": "Southeast",
+      "radiusMiles": 40,
+      "asOf": "2026-07-21T10:54:24.78+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 541,
+      "avgRate": 238,
+      "medianRate": 166,
+      "p25": 115,
+      "p75": 250,
+      "outdoorsyCount": 251,
+      "rvshareCount": 290,
+      "deliveryPct": 72,
+      "instantBookPct": 26,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 261,
+          "medianRate": 115
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 100,
+          "medianRate": 249
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 70,
+          "medianRate": 374
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 60,
+          "medianRate": 275
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 42,
+          "medianRate": 186
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 6,
+          "medianRate": 169
+        }
+      ],
+      "seo": {
+        "title": "Atlanta, GA RV Rental Market",
+        "description": "Atlanta, GA RV rental prices: median $166/night across 541 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Atlanta, GA RV rental hosts currently compete across <strong>541 active listings</strong> on Outdoorsy and RVshare within a 40-mile radius. The median asking rate is <strong>$166/night</strong> (average $238), a $72 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>46% Outdoorsy / 54% RVshare</strong> (251 vs 290). By class: Travel Trailer median $115 (261 listings); Class C median $249 (100 listings); Class A median $374 (70 listings). 72% of listings offer delivery; 26% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Atlanta?",
+            "answer": "The average asking rate in Atlanta, GA is $238 per night; the median is $166 (P25 $115 · P75 $250) across 541 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Atlanta?",
+            "answer": "RVIntel currently tracks 541 active listings in the Atlanta, GA market window (40 mi): 251 on Outdoorsy and 290 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Atlanta?",
+            "answer": "RVshare currently has more inventory in Atlanta, GA (290 vs 251 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/atlanta-ga-rate-card.html",
+      "marketPath": "/markets/atlanta-ga"
+    },
+    "chattanooga-tn": {
+      "slug": "chattanooga-tn",
+      "displayName": "Chattanooga, TN",
+      "region": "Southeast",
+      "radiusMiles": 30,
+      "asOf": "2026-07-21T10:54:24.78+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 150,
+      "avgRate": 169,
+      "medianRate": 149,
+      "p25": 115,
+      "p75": 200,
+      "outdoorsyCount": 77,
+      "rvshareCount": 73,
+      "deliveryPct": 84,
+      "instantBookPct": 20,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 89,
+          "medianRate": 120
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 26,
+          "medianRate": 254
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 16,
+          "medianRate": 200
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 10,
+          "medianRate": 200
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 7,
+          "medianRate": 298
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 1,
+          "medianRate": 192
+        }
+      ],
+      "seo": {
+        "title": "Chattanooga, TN RV Rental Market",
+        "description": "Chattanooga, TN RV rental prices: median $149/night across 150 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Chattanooga, TN RV rental hosts currently compete across <strong>150 active listings</strong> on Outdoorsy and RVshare within a 30-mile radius. The median asking rate is <strong>$149/night</strong> (average $169), a $20 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>51% Outdoorsy / 49% RVshare</strong> (77 vs 73). By class: Travel Trailer median $120 (89 listings); Fifth Wheel median $254 (26 listings); Class C median $200 (16 listings). 84% of listings offer delivery; 20% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Chattanooga?",
+            "answer": "The average asking rate in Chattanooga, TN is $169 per night; the median is $149 (P25 $115 · P75 $200) across 150 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Chattanooga?",
+            "answer": "RVIntel currently tracks 150 active listings in the Chattanooga, TN market window (30 mi): 77 on Outdoorsy and 73 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Chattanooga?",
+            "answer": "Outdoorsy currently has more inventory in Chattanooga, TN (77 vs 73 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/chattanooga-tn-rate-card.html",
+      "marketPath": "/markets/chattanooga-tn"
+    },
+    "columbus-oh": {
+      "slug": "columbus-oh",
+      "displayName": "Columbus, OH",
+      "region": "Midwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T11:14:40.794+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 287,
+      "avgRate": 178,
+      "medianRate": 146,
+      "p25": 124,
+      "p75": 200,
+      "outdoorsyCount": 156,
+      "rvshareCount": 131,
+      "deliveryPct": 78,
+      "instantBookPct": 18,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 198,
+          "medianRate": 131
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 34,
+          "medianRate": 235
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 24,
+          "medianRate": 189
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 13,
+          "medianRate": 226
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 11,
+          "medianRate": 358
+        },
+        {
+          "class": "Pop Up",
+          "label": "Pop Up",
+          "count": 5,
+          "medianRate": 68
+        }
+      ],
+      "seo": {
+        "title": "Columbus, OH RV Rental Market",
+        "description": "Columbus, OH RV rental prices: median $146/night across 287 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Columbus, OH RV rental hosts currently compete across <strong>287 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$146/night</strong> (average $178), a $32 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>54% Outdoorsy / 46% RVshare</strong> (156 vs 131). By class: Travel Trailer median $131 (198 listings); Class C median $235 (34 listings); Fifth Wheel median $189 (24 listings). 78% of listings offer delivery; 18% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Columbus?",
+            "answer": "The average asking rate in Columbus, OH is $178 per night; the median is $146 (P25 $124 · P75 $200) across 287 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Columbus?",
+            "answer": "RVIntel currently tracks 287 active listings in the Columbus, OH market window (35 mi): 156 on Outdoorsy and 131 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Columbus?",
+            "answer": "Outdoorsy currently has more inventory in Columbus, OH (156 vs 131 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/columbus-oh-rate-card.html",
+      "marketPath": "/markets/columbus-oh"
+    },
+    "cincinnati-oh": {
+      "slug": "cincinnati-oh",
+      "displayName": "Cincinnati, OH",
+      "region": "Midwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T11:14:42.366+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 155,
+      "avgRate": 193,
+      "medianRate": 139,
+      "p25": 119,
+      "p75": 215,
+      "outdoorsyCount": 69,
+      "rvshareCount": 86,
+      "deliveryPct": 81,
+      "instantBookPct": 32,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 92,
+          "medianRate": 124
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 18,
+          "medianRate": 225
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 16,
+          "medianRate": 260
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 14,
+          "medianRate": 363
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 11,
+          "medianRate": 175
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 2,
+          "medianRate": 143
+        }
+      ],
+      "seo": {
+        "title": "Cincinnati, OH RV Rental Market",
+        "description": "Cincinnati, OH RV rental prices: median $139/night across 155 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Cincinnati, OH RV rental hosts currently compete across <strong>155 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$139/night</strong> (average $193), a $54 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>45% Outdoorsy / 55% RVshare</strong> (69 vs 86). By class: Travel Trailer median $124 (92 listings); Class C median $225 (18 listings); Class A median $260 (16 listings). 81% of listings offer delivery; 32% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Cincinnati?",
+            "answer": "The average asking rate in Cincinnati, OH is $193 per night; the median is $139 (P25 $119 · P75 $215) across 155 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Cincinnati?",
+            "answer": "RVIntel currently tracks 155 active listings in the Cincinnati, OH market window (35 mi): 69 on Outdoorsy and 86 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Cincinnati?",
+            "answer": "RVshare currently has more inventory in Cincinnati, OH (86 vs 69 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/cincinnati-oh-rate-card.html",
+      "marketPath": "/markets/cincinnati-oh"
+    },
+    "detroit-mi": {
+      "slug": "detroit-mi",
+      "displayName": "Detroit, MI",
+      "region": "Midwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T11:24:14.183+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 309,
+      "avgRate": 180,
+      "medianRate": 150,
+      "p25": 125,
+      "p75": 209,
+      "outdoorsyCount": 131,
+      "rvshareCount": 178,
+      "deliveryPct": 70,
+      "instantBookPct": 22,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 201,
+          "medianRate": 135
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 47,
+          "medianRate": 219
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 23,
+          "medianRate": 300
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 21,
+          "medianRate": 289
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 11,
+          "medianRate": 175
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 175
+        }
+      ],
+      "seo": {
+        "title": "Detroit, MI RV Rental Market",
+        "description": "Detroit, MI RV rental prices: median $150/night across 309 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Detroit, MI RV rental hosts currently compete across <strong>309 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$150/night</strong> (average $180), a $30 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>42% Outdoorsy / 58% RVshare</strong> (131 vs 178). By class: Travel Trailer median $135 (201 listings); Class C median $219 (47 listings); Class A median $300 (23 listings). 70% of listings offer delivery; 22% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Detroit?",
+            "answer": "The average asking rate in Detroit, MI is $180 per night; the median is $150 (P25 $125 · P75 $209) across 309 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Detroit?",
+            "answer": "RVIntel currently tracks 309 active listings in the Detroit, MI market window (35 mi): 131 on Outdoorsy and 178 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Detroit?",
+            "answer": "RVshare currently has more inventory in Detroit, MI (178 vs 131 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/detroit-mi-rate-card.html",
+      "marketPath": "/markets/detroit-mi"
+    },
+    "grand-rapids-mi": {
+      "slug": "grand-rapids-mi",
+      "displayName": "Grand Rapids, MI",
+      "region": "Midwest",
+      "radiusMiles": 30,
+      "asOf": "2026-07-21T11:54:23.902+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 302,
+      "avgRate": 156,
+      "medianRate": 143,
+      "p25": 120,
+      "p75": 177,
+      "outdoorsyCount": 145,
+      "rvshareCount": 157,
+      "deliveryPct": 81,
+      "instantBookPct": 27,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 229,
+          "medianRate": 132
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 32,
+          "medianRate": 231
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 19,
+          "medianRate": 250
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 8,
+          "medianRate": 225
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 7,
+          "medianRate": 192
+        },
+        {
+          "class": "Pop Up",
+          "label": "Pop Up",
+          "count": 6,
+          "medianRate": 93
+        }
+      ],
+      "seo": {
+        "title": "Grand Rapids, MI RV Rental Market",
+        "description": "Grand Rapids, MI RV rental prices: median $143/night across 302 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Grand Rapids, MI RV rental hosts currently compete across <strong>302 active listings</strong> on Outdoorsy and RVshare within a 30-mile radius. The median asking rate is <strong>$143/night</strong> (average $156), a $13 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>48% Outdoorsy / 52% RVshare</strong> (145 vs 157). By class: Travel Trailer median $132 (229 listings); Class C median $231 (32 listings); Class A median $250 (19 listings). 81% of listings offer delivery; 27% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Grand Rapids?",
+            "answer": "The average asking rate in Grand Rapids, MI is $156 per night; the median is $143 (P25 $120 · P75 $177) across 302 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Grand Rapids?",
+            "answer": "RVIntel currently tracks 302 active listings in the Grand Rapids, MI market window (30 mi): 145 on Outdoorsy and 157 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Grand Rapids?",
+            "answer": "RVshare currently has more inventory in Grand Rapids, MI (157 vs 145 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/grand-rapids-mi-rate-card.html",
+      "marketPath": "/markets/grand-rapids-mi"
+    },
+    "madison-wi": {
+      "slug": "madison-wi",
+      "displayName": "Madison, WI",
+      "region": "Midwest",
+      "radiusMiles": 30,
+      "asOf": "2026-07-21T11:54:25.25+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 95,
+      "avgRate": 181,
+      "medianRate": 150,
+      "p25": 135,
+      "p75": 224,
+      "outdoorsyCount": 53,
+      "rvshareCount": 42,
+      "deliveryPct": 79,
+      "instantBookPct": 23,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 65,
+          "medianRate": 145
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 16,
+          "medianRate": 225
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 6,
+          "medianRate": 299
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 5,
+          "medianRate": 250
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 1,
+          "medianRate": 365
+        },
+        {
+          "class": "Pop Up",
+          "label": "Pop Up",
+          "count": 1,
+          "medianRate": 122
+        }
+      ],
+      "seo": {
+        "title": "Madison, WI RV Rental Market",
+        "description": "Madison, WI RV rental prices: median $150/night across 95 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Madison, WI RV rental hosts currently compete across <strong>95 active listings</strong> on Outdoorsy and RVshare within a 30-mile radius. The median asking rate is <strong>$150/night</strong> (average $181), a $31 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>56% Outdoorsy / 44% RVshare</strong> (53 vs 42). By class: Travel Trailer median $145 (65 listings); Class C median $225 (16 listings); Class A median $299 (6 listings). 79% of listings offer delivery; 23% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Madison?",
+            "answer": "The average asking rate in Madison, WI is $181 per night; the median is $150 (P25 $135 · P75 $224) across 95 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Madison?",
+            "answer": "RVIntel currently tracks 95 active listings in the Madison, WI market window (30 mi): 53 on Outdoorsy and 42 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Madison?",
+            "answer": "Outdoorsy currently has more inventory in Madison, WI (53 vs 42 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/madison-wi-rate-card.html",
+      "marketPath": "/markets/madison-wi"
+    },
+    "milwaukee-wi": {
+      "slug": "milwaukee-wi",
+      "displayName": "Milwaukee, WI",
+      "region": "Midwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T11:54:25.25+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 177,
+      "avgRate": 207,
+      "medianRate": 158,
+      "p25": 135,
+      "p75": 250,
+      "outdoorsyCount": 77,
+      "rvshareCount": 100,
+      "deliveryPct": 76,
+      "instantBookPct": 23,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 102,
+          "medianRate": 140
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 33,
+          "medianRate": 260
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 15,
+          "medianRate": 259
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 14,
+          "medianRate": 230
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 8,
+          "medianRate": 226
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 136
+        }
+      ],
+      "seo": {
+        "title": "Milwaukee, WI RV Rental Market",
+        "description": "Milwaukee, WI RV rental prices: median $158/night across 177 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Milwaukee, WI RV rental hosts currently compete across <strong>177 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$158/night</strong> (average $207), a $49 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>44% Outdoorsy / 56% RVshare</strong> (77 vs 100). By class: Travel Trailer median $140 (102 listings); Class C median $260 (33 listings); Class A median $259 (15 listings). 76% of listings offer delivery; 23% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Milwaukee?",
+            "answer": "The average asking rate in Milwaukee, WI is $207 per night; the median is $158 (P25 $135 · P75 $250) across 177 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Milwaukee?",
+            "answer": "RVIntel currently tracks 177 active listings in the Milwaukee, WI market window (35 mi): 77 on Outdoorsy and 100 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Milwaukee?",
+            "answer": "RVshare currently has more inventory in Milwaukee, WI (100 vs 77 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/milwaukee-wi-rate-card.html",
+      "marketPath": "/markets/milwaukee-wi"
+    },
+    "philadelphia-pa": {
+      "slug": "philadelphia-pa",
+      "displayName": "Philadelphia, PA",
+      "region": "Northeast",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T12:44:35.788+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 290,
+      "avgRate": 244,
+      "medianRate": 217,
+      "p25": 138,
+      "p75": 295,
+      "outdoorsyCount": 155,
+      "rvshareCount": 135,
+      "deliveryPct": 59,
+      "instantBookPct": 32,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 100,
+          "medianRate": 129
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 85,
+          "medianRate": 245
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 53,
+          "medianRate": 359
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 41,
+          "medianRate": 225
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 6,
+          "medianRate": 175
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 150
+        }
+      ],
+      "seo": {
+        "title": "Philadelphia, PA RV Rental Market",
+        "description": "Philadelphia, PA RV rental prices: median $217/night across 290 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Philadelphia, PA RV rental hosts currently compete across <strong>290 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$217/night</strong> (average $244), a $27 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>53% Outdoorsy / 47% RVshare</strong> (155 vs 135). By class: Travel Trailer median $129 (100 listings); Class C median $245 (85 listings); Class A median $359 (53 listings). 59% of listings offer delivery; 32% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Philadelphia?",
+            "answer": "The average asking rate in Philadelphia, PA is $244 per night; the median is $217 (P25 $138 · P75 $295) across 290 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Philadelphia?",
+            "answer": "RVIntel currently tracks 290 active listings in the Philadelphia, PA market window (35 mi): 155 on Outdoorsy and 135 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Philadelphia?",
+            "answer": "Outdoorsy currently has more inventory in Philadelphia, PA (155 vs 135 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/philadelphia-pa-rate-card.html",
+      "marketPath": "/markets/philadelphia-pa"
+    },
+    "baltimore-md": {
+      "slug": "baltimore-md",
+      "displayName": "Baltimore, MD",
+      "region": "Northeast",
+      "radiusMiles": 30,
+      "asOf": "2026-07-21T12:44:35.788+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 115,
+      "avgRate": 182,
+      "medianRate": 165,
+      "p25": 125,
+      "p75": 225,
+      "outdoorsyCount": 51,
+      "rvshareCount": 64,
+      "deliveryPct": 75,
+      "instantBookPct": 28,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 58,
+          "medianRate": 125
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 21,
+          "medianRate": 218
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 15,
+          "medianRate": 210
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 14,
+          "medianRate": 292
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 6,
+          "medianRate": 173
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 1,
+          "medianRate": 137
+        }
+      ],
+      "seo": {
+        "title": "Baltimore, MD RV Rental Market",
+        "description": "Baltimore, MD RV rental prices: median $165/night across 115 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Baltimore, MD RV rental hosts currently compete across <strong>115 active listings</strong> on Outdoorsy and RVshare within a 30-mile radius. The median asking rate is <strong>$165/night</strong> (average $182), a $17 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>44% Outdoorsy / 56% RVshare</strong> (51 vs 64). By class: Travel Trailer median $125 (58 listings); Class C median $218 (21 listings); Class B median $210 (15 listings). 75% of listings offer delivery; 28% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Baltimore?",
+            "answer": "The average asking rate in Baltimore, MD is $182 per night; the median is $165 (P25 $125 · P75 $225) across 115 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Baltimore?",
+            "answer": "RVIntel currently tracks 115 active listings in the Baltimore, MD market window (30 mi): 51 on Outdoorsy and 64 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Baltimore?",
+            "answer": "RVshare currently has more inventory in Baltimore, MD (64 vs 51 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/baltimore-md-rate-card.html",
+      "marketPath": "/markets/baltimore-md"
+    },
+    "new-york-ny": {
+      "slug": "new-york-ny",
+      "displayName": "New York, NY",
+      "region": "Northeast",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T12:24:13.142+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 228,
+      "avgRate": 368,
+      "medianRate": 250,
+      "p25": 150,
+      "p75": 386,
+      "outdoorsyCount": 131,
+      "rvshareCount": 97,
+      "deliveryPct": 55,
+      "instantBookPct": 20,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 73,
+          "medianRate": 135
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 70,
+          "medianRate": 317
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 44,
+          "medianRate": 732
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 34,
+          "medianRate": 251
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 4,
+          "medianRate": 218
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 2,
+          "medianRate": 144
+        }
+      ],
+      "seo": {
+        "title": "New York, NY RV Rental Market",
+        "description": "New York, NY RV rental prices: median $250/night across 228 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>New York, NY RV rental hosts currently compete across <strong>228 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$250/night</strong> (average $368), a $118 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>57% Outdoorsy / 43% RVshare</strong> (131 vs 97). By class: Travel Trailer median $135 (73 listings); Class B median $317 (70 listings); Class A median $732 (44 listings). 55% of listings offer delivery; 20% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in New York?",
+            "answer": "The average asking rate in New York, NY is $368 per night; the median is $250 (P25 $150 · P75 $386) across 228 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in New York?",
+            "answer": "RVIntel currently tracks 228 active listings in the New York, NY market window (35 mi): 131 on Outdoorsy and 97 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in New York?",
+            "answer": "Outdoorsy currently has more inventory in New York, NY (131 vs 97 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/new-york-ny-rate-card.html",
+      "marketPath": "/markets/new-york-ny"
+    },
+    "washington-dc": {
+      "slug": "washington-dc",
+      "displayName": "Washington, DC",
+      "region": "Northeast",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T12:44:35.788+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 253,
+      "avgRate": 200,
+      "medianRate": 190,
+      "p25": 125,
+      "p75": 240,
+      "outdoorsyCount": 125,
+      "rvshareCount": 128,
+      "deliveryPct": 66,
+      "instantBookPct": 28,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 101,
+          "medianRate": 123
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 70,
+          "medianRate": 219
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 41,
+          "medianRate": 225
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 31,
+          "medianRate": 308
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 5,
+          "medianRate": 161
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 129
+        }
+      ],
+      "seo": {
+        "title": "Washington, DC RV Rental Market",
+        "description": "Washington, DC RV rental prices: median $190/night across 253 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Washington, DC RV rental hosts currently compete across <strong>253 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$190/night</strong> (average $200), a $10 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>49% Outdoorsy / 51% RVshare</strong> (125 vs 128). By class: Travel Trailer median $123 (101 listings); Class C median $219 (70 listings); Class B median $225 (41 listings). 66% of listings offer delivery; 28% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Washington?",
+            "answer": "The average asking rate in Washington, DC is $200 per night; the median is $190 (P25 $125 · P75 $240) across 253 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Washington?",
+            "answer": "RVIntel currently tracks 253 active listings in the Washington, DC market window (35 mi): 125 on Outdoorsy and 128 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Washington?",
+            "answer": "RVshare currently has more inventory in Washington, DC (128 vs 125 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/washington-dc-rate-card.html",
+      "marketPath": "/markets/washington-dc"
+    },
+    "harrisburg-pa": {
+      "slug": "harrisburg-pa",
+      "displayName": "Harrisburg, PA",
+      "region": "Northeast",
+      "radiusMiles": 30,
+      "asOf": "2026-07-21T12:44:35.788+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 143,
+      "avgRate": 180,
+      "medianRate": 154,
+      "p25": 125,
+      "p75": 225,
+      "outdoorsyCount": 61,
+      "rvshareCount": 82,
+      "deliveryPct": 78,
+      "instantBookPct": 29,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 73,
+          "medianRate": 126
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 48,
+          "medianRate": 223
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 14,
+          "medianRate": 265
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 4,
+          "medianRate": 198
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 2,
+          "medianRate": 229
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 1,
+          "medianRate": 134
+        }
+      ],
+      "seo": {
+        "title": "Harrisburg, PA RV Rental Market",
+        "description": "Harrisburg, PA RV rental prices: median $154/night across 143 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Harrisburg, PA RV rental hosts currently compete across <strong>143 active listings</strong> on Outdoorsy and RVshare within a 30-mile radius. The median asking rate is <strong>$154/night</strong> (average $180), a $26 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>43% Outdoorsy / 57% RVshare</strong> (61 vs 82). By class: Travel Trailer median $126 (73 listings); Class C median $223 (48 listings); Class A median $265 (14 listings). 78% of listings offer delivery; 29% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Harrisburg?",
+            "answer": "The average asking rate in Harrisburg, PA is $180 per night; the median is $154 (P25 $125 · P75 $225) across 143 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Harrisburg?",
+            "answer": "RVIntel currently tracks 143 active listings in the Harrisburg, PA market window (30 mi): 61 on Outdoorsy and 82 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Harrisburg?",
+            "answer": "RVshare currently has more inventory in Harrisburg, PA (82 vs 61 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/harrisburg-pa-rate-card.html",
+      "marketPath": "/markets/harrisburg-pa"
+    },
+    "seattle-wa": {
+      "slug": "seattle-wa",
+      "displayName": "Seattle, WA",
+      "region": "Pacific Northwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-21T12:54:38.871+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 679,
+      "avgRate": 203,
+      "medianRate": 195,
+      "p25": 132,
+      "p75": 254,
+      "outdoorsyCount": 402,
+      "rvshareCount": 277,
+      "deliveryPct": 58,
+      "instantBookPct": 26,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 306,
+          "medianRate": 132
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 178,
+          "medianRate": 251
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 137,
+          "medianRate": 249
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 35,
+          "medianRate": 300
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 15,
+          "medianRate": 175
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 4,
+          "medianRate": 165
+        }
+      ],
+      "seo": {
+        "title": "Seattle, WA RV Rental Market",
+        "description": "Seattle, WA RV rental prices: median $195/night across 679 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Seattle, WA RV rental hosts currently compete across <strong>679 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$195/night</strong> (average $203), a $8 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>59% Outdoorsy / 41% RVshare</strong> (402 vs 277). By class: Travel Trailer median $132 (306 listings); Class B median $251 (178 listings); Class C median $249 (137 listings). 58% of listings offer delivery; 26% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Seattle?",
+            "answer": "The average asking rate in Seattle, WA is $203 per night; the median is $195 (P25 $132 · P75 $254) across 679 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Seattle?",
+            "answer": "RVIntel currently tracks 679 active listings in the Seattle, WA market window (35 mi): 402 on Outdoorsy and 277 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Seattle?",
+            "answer": "Outdoorsy currently has more inventory in Seattle, WA (402 vs 277 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/seattle-wa-rate-card.html",
+      "marketPath": "/markets/seattle-wa"
+    }
+  }
+}
