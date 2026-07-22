@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { MapPin, BarChart3, ArrowRight } from "lucide-react";
+import { MapPin, BarChart3, ArrowRight, BookOpen } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { StartTrialCta } from "@/components/start-trial-cta";
 import { WaitlistSignup } from "@/components/waitlist-signup";
 import { liveMarkets } from "@/lib/markets";
@@ -93,11 +94,6 @@ export default function MarketsPage() {
                         Live
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {m.outdoorsyAddress
-                        ? "Discovery + dashboard data"
-                        : "Display market — shares overlapping discovery"}
-                    </p>
                     <div className="mt-4 flex items-center gap-1 text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                       View market <ArrowRight className="w-3 h-3" />
                     </div>
@@ -114,9 +110,16 @@ export default function MarketsPage() {
               <h2 className="text-[1.5rem] font-semibold tracking-tight mb-1">
                 Explore live pricing data
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-3">
                 The dashboard queries each market by geographic radius — no double-counting across overlapping metros.
               </p>
+              <Link
+                href="/learn"
+                className="inline-flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-medium hover:underline"
+              >
+                <BookOpen className="w-3 h-3" aria-hidden />
+                Pricing guides for RV hosts
+              </Link>
             </div>
             <StartTrialCta />
           </div>
@@ -126,6 +129,7 @@ export default function MarketsPage() {
           <WaitlistSignup />
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
