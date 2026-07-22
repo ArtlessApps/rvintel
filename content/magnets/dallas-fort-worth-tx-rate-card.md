@@ -2,7 +2,7 @@
 
 **774 active listings** · Median **$150/night** · Avg **$198/night**
 
-- P25–P75: $119 – $231
+- P25–P75: $119 – $230
 - Outdoorsy: 361 · RVshare: 413
 - Delivery: 71% · Instant book: 36%
 - Radius: 45 mi · Region: Southwest
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/dallas-fort-worth-tx
 Shareable rate card: https://www.rvintel.io/magnets/dallas-fort-worth-tx-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

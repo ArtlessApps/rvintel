@@ -25,6 +25,7 @@ if (!CRON_SECRET) {
 const BATCHES = {
   "ca-mountain-west": [
     "los-angeles-ca",
+    "orange-county-ca",
     "sacramento-ca",
     "san-francisco-ca",
     "denver-co",
@@ -37,6 +38,7 @@ const BATCHES = {
     "austin-tx",
     "san-antonio-tx",
     "dallas-fort-worth-tx",
+    "albuquerque-nm",
   ],
   southeast: ["orlando-fl", "tampa-fl", "atlanta-ga", "chattanooga-tn"],
   midwest: [

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { BookOpen, Clock, ArrowRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { POSTS } from "@/lib/posts";
 
 export const metadata = {
@@ -126,7 +127,11 @@ export default function LearnPage() {
               </h2>
               <p className="text-sm text-muted-foreground">
                 Start a free trial for live dashboard access — no credit card required.
-                Or join the waitlist on our markets page for expansion updates.
+                Or{" "}
+                <Link href="/markets#expansion-waitlist" className="text-primary hover:underline">
+                  join the expansion waitlist
+                </Link>{" "}
+                on the markets page for new-city updates.
               </p>
             </div>
             <Button
@@ -142,6 +147,7 @@ export default function LearnPage() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

@@ -14,11 +14,11 @@
 | Travel Trailer | 380 | $110 |
 | Class C | 105 | $197 |
 | Fifth Wheel | 98 | $227 |
-| Class A | 82 | $285 |
-| Class B | 21 | $235 |
+| Class A | 81 | $285 |
+| Class B | 22 | $227 |
 | Toy Hauler | 14 | $134 |
 
 Full market page: https://www.rvintel.io/markets/orlando-fl
 Shareable rate card: https://www.rvintel.io/magnets/orlando-fl-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

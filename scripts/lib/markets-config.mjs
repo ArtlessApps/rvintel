@@ -49,6 +49,7 @@ export function liveMarketList() {
 /** Markets listed for expansion bootstrap (excludes 4 original live anchors). */
 export const EXPANSION_SLUGS = [
   "los-angeles-ca",
+  "orange-county-ca",
   "long-beach-ca",
   "sacramento-ca",
   "san-francisco-ca",
@@ -61,6 +62,7 @@ export const EXPANSION_SLUGS = [
   "austin-tx",
   "san-antonio-tx",
   "dallas-fort-worth-tx",
+  "albuquerque-nm",
   "orlando-fl",
   "tampa-fl",
   "atlanta-ga",

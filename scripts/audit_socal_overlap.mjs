@@ -23,6 +23,7 @@ const supabase = createClient(
 const MARKETS = [
   "riverside-county-ca",
   "los-angeles-ca",
+  "orange-county-ca",
   "long-beach-ca",
 ];
 
@@ -30,6 +31,7 @@ const MARKETS = [
 const MARKET_GEO = {
   "riverside-county-ca": { lat: 33.9533, lng: -117.3962, radius: 45 },
   "los-angeles-ca": { lat: 34.0522, lng: -118.2437, radius: 40 },
+  "orange-county-ca": { lat: 33.7175, lng: -117.8311, radius: 30 },
   "long-beach-ca": { lat: 33.7701, lng: -118.1937, radius: 25 },
 };
 
@@ -143,7 +145,10 @@ async function main() {
 
   pairReport("riverside", sets["riverside-county-ca"], "LA", sets["los-angeles-ca"]);
   pairReport("riverside", sets["riverside-county-ca"], "long-beach", sets["long-beach-ca"]);
+  pairReport("riverside", sets["riverside-county-ca"], "OC", sets["orange-county-ca"]);
   pairReport("LA", sets["los-angeles-ca"], "long-beach", sets["long-beach-ca"]);
+  pairReport("LA", sets["los-angeles-ca"], "OC", sets["orange-county-ca"]);
+  pairReport("OC", sets["orange-county-ca"], "long-beach", sets["long-beach-ca"]);
 
   console.log("\nHigh overlap is expected and fine — each market is an independent geo window.");
 }

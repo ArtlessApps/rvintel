@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/logo";
 import { SiteHeader } from "@/components/site-header";
 import { StartTrialCta } from "@/components/start-trial-cta";
 import { liveMarkets } from "@/lib/markets";
@@ -14,7 +13,9 @@ import {
   Zap,
   Sparkles,
   MapPin,
+  BookOpen,
 } from "lucide-react";
+import { SiteFooter } from "@/components/site-footer";
 
 const LIVE_MARKET_COUNT = liveMarkets().length;
 const REGION_COUNT = new Set(liveMarkets().map((m) => m.region)).size;
@@ -192,23 +193,29 @@ export function WaitlistPage() {
                   title: "Market Comps",
                   description:
                     "See exactly what comparable RVs are charging in your market. Filter by class, make, and amenities to find your true competitors.",
+                  learnHref: "/learn/comp-analysis",
+                  learnLabel: "How to read a comp set",
                 },
                 {
                   icon: BarChart3,
                   title: "Occupancy Signals",
                   description:
                     "Track blocked calendars and booking velocity across your local market to understand real demand before you price.",
+                  learnHref: "/learn/dynamic-pricing-101",
+                  learnLabel: "Dynamic pricing 101",
                 },
                 {
                   icon: Zap,
                   title: "Event Alerts",
                   description:
                     "Get notified when high-demand events hit your area so you can raise rates at exactly the right moment.",
+                  learnHref: "/learn/peak-season-playbook",
+                  learnLabel: "The peak season playbook",
                 },
               ].map((feature) => (
                 <div
                   key={feature.title}
-                  className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+                  className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 flex flex-col"
                 >
                   <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
                     <feature.icon className="w-6 h-6 text-primary" />
@@ -216,9 +223,16 @@ export function WaitlistPage() {
                   <h3 className="text-xl font-semibold text-foreground mb-3">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed flex-1">
                     {feature.description}
                   </p>
+                  <Link
+                    href={feature.learnHref}
+                    className="mt-5 inline-flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-medium hover:underline"
+                  >
+                    <BookOpen className="w-3 h-3" aria-hidden />
+                    {feature.learnLabel}
+                  </Link>
                 </div>
               ))}
             </div>
@@ -291,14 +305,7 @@ export function WaitlistPage() {
         </section>
       </main>
 
-      <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-border">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Logo />
-          <p className="text-sm text-muted-foreground">
-            © 2026 RVIntel. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

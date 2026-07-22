@@ -12,7 +12,7 @@
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
 | Travel Trailer | 270 | $122 |
-| Class C | 56 | $231 |
+| Class C | 56 | $230 |
 | Class B | 53 | $250 |
 | Class A | 25 | $301 |
 | Fifth Wheel | 21 | $176 |
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/austin-tx
 Shareable rate card: https://www.rvintel.io/magnets/austin-tx-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

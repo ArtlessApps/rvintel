@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Download, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Download, MapPin, BookOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 type MarketReportViewerProps = {
@@ -164,8 +165,36 @@ function ReportFallback({
           <p className="text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground font-medium text-center mt-8">
             {format === "html" ? "HTML report" : "PDF · Optimized for desktop viewing"}
           </p>
+
+          <div className="mt-12 pt-10 border-t border-border">
+            <p className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-muted-foreground mb-4 flex items-center gap-2">
+              <BookOpen className="w-3 h-3" />
+              Make sense of the data
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/learn/comp-analysis"
+                className="text-sm text-primary hover:underline"
+              >
+                How to read a competitive landscape →
+              </Link>
+              <Link
+                href="/learn/dynamic-pricing-101"
+                className="text-sm text-primary hover:underline"
+              >
+                Dynamic pricing 101 →
+              </Link>
+              <Link
+                href="/markets"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                ← All markets
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
+      {!embedded && <SiteFooter />}
     </div>
   );
 }

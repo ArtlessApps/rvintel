@@ -1,17 +1,17 @@
 # Philadelphia, PA RV Rental Rate Card — July 2026
 
-**290 active listings** · Median **$217/night** · Avg **$244/night**
+**289 active listings** · Median **$219/night** · Avg **$246/night**
 
-- P25–P75: $138 – $295
-- Outdoorsy: 155 · RVshare: 135
-- Delivery: 59% · Instant book: 32%
+- P25–P75: $136 – $295
+- Outdoorsy: 154 · RVshare: 135
+- Delivery: 59% · Instant book: 33%
 - Radius: 35 mi · Region: Northeast
 
 ## Rates by class
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 100 | $129 |
+| Travel Trailer | 99 | $129 |
 | Class C | 85 | $245 |
 | Class A | 53 | $359 |
 | Class B | 41 | $225 |
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/philadelphia-pa
 Shareable rate card: https://www.rvintel.io/magnets/philadelphia-pa-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

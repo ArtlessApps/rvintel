@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/detroit-mi
 Shareable rate card: https://www.rvintel.io/magnets/detroit-mi-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

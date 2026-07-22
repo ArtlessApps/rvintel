@@ -1,9 +1,9 @@
 # Sacramento, CA RV Rental Rate Card — July 2026
 
-**741 active listings** · Median **$154/night** · Avg **$183/night**
+**742 active listings** · Median **$155/night** · Avg **$183/night**
 
 - P25–P75: $130 – $220
-- Outdoorsy: 423 · RVshare: 318
+- Outdoorsy: 424 · RVshare: 318
 - Delivery: 70% · Instant book: 29%
 - Radius: 35 mi · Region: California
 
@@ -13,7 +13,7 @@
 | --- | ---: | ---: |
 | Travel Trailer | 379 | $135 |
 | Class C | 213 | $209 |
-| Class B | 85 | $225 |
+| Class B | 86 | $225 |
 | Class A | 37 | $275 |
 | Fifth Wheel | 13 | $200 |
 | Toy Hauler | 12 | $152 |
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/sacramento-ca
 Shareable rate card: https://www.rvintel.io/magnets/sacramento-ca-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

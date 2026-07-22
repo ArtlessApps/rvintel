@@ -1,9 +1,9 @@
 # Grand Rapids, MI RV Rental Rate Card — July 2026
 
-**302 active listings** · Median **$143/night** · Avg **$156/night**
+**302 active listings** · Median **$141/night** · Avg **$156/night**
 
-- P25–P75: $120 – $177
-- Outdoorsy: 145 · RVshare: 157
+- P25–P75: $119 – $177
+- Outdoorsy: 146 · RVshare: 156
 - Delivery: 81% · Instant book: 27%
 - Radius: 30 mi · Region: Midwest
 
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/grand-rapids-mi
 Shareable rate card: https://www.rvintel.io/magnets/grand-rapids-mi-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

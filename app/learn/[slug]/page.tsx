@@ -11,6 +11,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft, Clock, Tag, CalendarDays } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { POSTS, getPost, type Post } from "@/lib/posts";
 import { JsonLd } from "@/lib/json-ld";
@@ -252,7 +253,15 @@ export default async function ArticlePage({ params }: Props) {
                     size="sm"
                     className="rounded-sm"
                   >
-                    <Link href="/markets#expansion-waitlist">Market expansion waitlist</Link>
+                    <Link href="/markets">Browse market data</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-sm text-muted-foreground"
+                  >
+                    <Link href="/markets#expansion-waitlist">Expansion waitlist</Link>
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">{TRIAL_SUBTEXT}</p>
@@ -292,6 +301,7 @@ export default async function ArticlePage({ params }: Props) {
         </section>
 
       </main>
+      <SiteFooter />
     </div>
   );
 }

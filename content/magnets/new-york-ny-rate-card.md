@@ -4,7 +4,7 @@
 
 - P25–P75: $154 – $386
 - Outdoorsy: 131 · RVshare: 97
-- Delivery: 55% · Instant book: 20%
+- Delivery: 56% · Instant book: 20%
 - Radius: 35 mi · Region: Northeast
 
 ## Rates by class
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/new-york-ny
 Shareable rate card: https://www.rvintel.io/magnets/new-york-ny-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

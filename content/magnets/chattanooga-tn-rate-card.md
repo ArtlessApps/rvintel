@@ -3,8 +3,8 @@
 **150 active listings** · Median **$149/night** · Avg **$169/night**
 
 - P25–P75: $115 – $200
-- Outdoorsy: 77 · RVshare: 73
-- Delivery: 84% · Instant book: 20%
+- Outdoorsy: 76 · RVshare: 74
+- Delivery: 85% · Instant book: 19%
 - Radius: 30 mi · Region: Southeast
 
 ## Rates by class
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/chattanooga-tn
 Shareable rate card: https://www.rvintel.io/magnets/chattanooga-tn-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

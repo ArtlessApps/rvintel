@@ -1,8 +1,8 @@
 # Columbus, OH RV Rental Rate Card — July 2026
 
-**287 active listings** · Median **$146/night** · Avg **$178/night**
+**287 active listings** · Median **$148/night** · Avg **$178/night**
 
-- P25–P75: $124 – $200
+- P25–P75: $125 – $200
 - Outdoorsy: 156 · RVshare: 131
 - Delivery: 78% · Instant book: 18%
 - Radius: 35 mi · Region: Midwest
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/columbus-oh
 Shareable rate card: https://www.rvintel.io/magnets/columbus-oh-rate-card.html
 
-_Data as of Jul 21, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_

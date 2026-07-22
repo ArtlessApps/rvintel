@@ -465,7 +465,7 @@ Client refetches profile on auth change and route navigation so post-checkout ho
 | RVIntel Growth | `price_1TfqxeBTCAvIbhXgWtOud6Fb` |
 | RVIntel Fleet | `price_1TfqxfBTCAvIbhXgzPv5Lbjz` |
 
-**Production:** Stripe Dashboard webhook → `https://rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. Use **live** keys + **live price IDs** on Vercel — never mix with test IDs. Live account: `acct_1TfqGnB67ExGpyp5`.
+**Production:** Stripe Dashboard webhook → `https://www.rvintel.io/api/stripe/webhook` with `customer.subscription.*` + `invoice.payment_failed`. **Do not use apex `rvintel.io`** — Vercel 307-redirects apex → www and Stripe counts that as delivery failure. Use **live** keys + **live price IDs** on Vercel — never mix with test IDs. Live account: `acct_1TfqGnB67ExGpyp5`.
 
 | Plan | Live price ID |
 |---|---|
