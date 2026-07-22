@@ -71,11 +71,13 @@ export const EXPANSION_SLUGS = [
   "grand-rapids-mi",
   "madison-wi",
   "milwaukee-wi",
+  "minneapolis-mn",
   "philadelphia-pa",
   "baltimore-md",
   "new-york-ny",
   "washington-dc",
   "harrisburg-pa",
+  "hartford-ct",
   "seattle-wa",
 ];
 

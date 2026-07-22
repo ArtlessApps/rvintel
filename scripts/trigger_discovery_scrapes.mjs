@@ -46,6 +46,7 @@ const BATCHES = {
     "grand-rapids-mi",
     "madison-wi",
     "milwaukee-wi",
+    "minneapolis-mn",
   ],
   northeast: [
     "philadelphia-pa",
@@ -53,6 +54,7 @@ const BATCHES = {
     "new-york-ny",
     "washington-dc",
     "harrisburg-pa",
+    "hartford-ct",
   ],
   pacific: ["seattle-wa"],
 };
@@ -64,7 +66,7 @@ const EXISTING = new Set([
   "arklatex",
 ]);
 
-const PLATFORMS = ["rvshare", "outdoorsy-1", "outdoorsy-2"];
+const PLATFORMS = ["rvshare", "outdoorsy"];
 
 function parseArgs(argv) {
   if (argv.includes("--all-new")) {

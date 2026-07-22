@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-22T02:06:34.276Z",
+  "generatedAt": "2026-07-22T03:58:46.863Z",
   "siteUrl": "https://www.rvintel.io",
   "markets": {
     "san-diego-ca": {
@@ -2051,6 +2051,83 @@
       "magnetPath": "/magnets/milwaukee-wi-rate-card.html",
       "marketPath": "/markets/milwaukee-wi"
     },
+    "minneapolis-mn": {
+      "slug": "minneapolis-mn",
+      "displayName": "Minneapolis, MN",
+      "region": "Midwest",
+      "radiusMiles": 40,
+      "asOf": "2026-07-22T03:57:39.933+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 509,
+      "avgRate": 223,
+      "medianRate": 149,
+      "p25": 129,
+      "p75": 215,
+      "outdoorsyCount": 259,
+      "rvshareCount": 250,
+      "deliveryPct": 70,
+      "instantBookPct": 26,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 330,
+          "medianRate": 135
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 88,
+          "medianRate": 250
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 33,
+          "medianRate": 215
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 29,
+          "medianRate": 265
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 11,
+          "medianRate": 150
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 9,
+          "medianRate": 180
+        }
+      ],
+      "seo": {
+        "title": "Minneapolis, MN RV Rental Market",
+        "description": "Minneapolis, MN RV rental prices: median $149/night across 509 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Minneapolis, MN RV rental hosts currently compete across <strong>509 active listings</strong> on Outdoorsy and RVshare within a 40-mile radius. The median asking rate is <strong>$149/night</strong> (average $223), a $74 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>51% Outdoorsy / 49% RVshare</strong> (259 vs 250). By class: Travel Trailer median $135 (330 listings); Class C median $250 (88 listings); Class B median $215 (33 listings). 70% of listings offer delivery; 26% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Minneapolis?",
+            "answer": "The average asking rate in Minneapolis, MN is $223 per night; the median is $149 (P25 $129 · P75 $215) across 509 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Minneapolis?",
+            "answer": "RVIntel currently tracks 509 active listings in the Minneapolis, MN market window (40 mi): 259 on Outdoorsy and 250 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Minneapolis?",
+            "answer": "Outdoorsy currently has more inventory in Minneapolis, MN (259 vs 250 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/minneapolis-mn-rate-card.html",
+      "marketPath": "/markets/minneapolis-mn"
+    },
     "philadelphia-pa": {
       "slug": "philadelphia-pa",
       "displayName": "Philadelphia, PA",
@@ -2210,13 +2287,13 @@
       "displayName": "New York, NY",
       "region": "Northeast",
       "radiusMiles": 35,
-      "asOf": "2026-07-21T12:24:13.142+00:00",
+      "asOf": "2026-07-22T03:58:18.243+00:00",
       "asOfLabel": "Jul 21, 2026",
       "monthYear": "July 2026",
       "listingCount": 228,
       "avgRate": 368,
       "medianRate": 250,
-      "p25": 150,
+      "p25": 154,
       "p75": 386,
       "outdoorsyCount": 131,
       "rvshareCount": 97,
@@ -2267,7 +2344,7 @@
         "faq": [
           {
             "question": "What is the average RV rental rate in New York?",
-            "answer": "The average asking rate in New York, NY is $368 per night; the median is $250 (P25 $150 · P75 $386) across 228 active listings."
+            "answer": "The average asking rate in New York, NY is $368 per night; the median is $250 (P25 $154 · P75 $386) across 228 active listings."
           },
           {
             "question": "How many RV rentals are listed in New York?",
@@ -2435,6 +2512,83 @@
       },
       "magnetPath": "/magnets/harrisburg-pa-rate-card.html",
       "marketPath": "/markets/harrisburg-pa"
+    },
+    "hartford-ct": {
+      "slug": "hartford-ct",
+      "displayName": "Hartford, CT",
+      "region": "Northeast",
+      "radiusMiles": 35,
+      "asOf": "2026-07-22T03:58:18.243+00:00",
+      "asOfLabel": "Jul 21, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 146,
+      "avgRate": 188,
+      "medianRate": 165,
+      "p25": 136,
+      "p75": 214,
+      "outdoorsyCount": 73,
+      "rvshareCount": 73,
+      "deliveryPct": 71,
+      "instantBookPct": 26,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 95,
+          "medianRate": 150
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 25,
+          "medianRate": 229
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 12,
+          "medianRate": 290
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 10,
+          "medianRate": 208
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 2,
+          "medianRate": 205
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 1,
+          "medianRate": 135
+        }
+      ],
+      "seo": {
+        "title": "Hartford, CT RV Rental Market",
+        "description": "Hartford, CT RV rental prices: median $165/night across 146 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Hartford, CT RV rental hosts currently compete across <strong>146 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$165/night</strong> (average $188), a $23 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>50% Outdoorsy / 50% RVshare</strong> (73 vs 73). By class: Travel Trailer median $150 (95 listings); Class C median $229 (25 listings); Class A median $290 (12 listings). 71% of listings offer delivery; 26% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Hartford?",
+            "answer": "The average asking rate in Hartford, CT is $188 per night; the median is $165 (P25 $136 · P75 $214) across 146 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Hartford?",
+            "answer": "RVIntel currently tracks 146 active listings in the Hartford, CT market window (35 mi): 73 on Outdoorsy and 73 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Hartford?",
+            "answer": "Outdoorsy currently has more inventory in Hartford, CT (73 vs 73 on RVshare). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/hartford-ct-rate-card.html",
+      "marketPath": "/markets/hartford-ct"
     },
     "seattle-wa": {
       "slug": "seattle-wa",

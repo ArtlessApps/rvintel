@@ -29,7 +29,8 @@ function parseDiscoverySlugs() {
   });
 }
 
-/** Stagger discovery markets: 3 crons per market, 10 min apart, starting at 08:00 UTC */
+/** Stagger discovery markets: 2 crons per market (rvshare + full outdoorsy), 10 min apart, from 08:00 UTC.
+ * Outdoorsy groups 1/2 are legacy Firecrawl splits — the API path finishes all 5 classes in one run. */
 function buildScrapeCrons(slugs) {
   const crons = [];
   let baseMinute = 0; // minutes from 06:00 UTC
@@ -38,9 +39,6 @@ function buildScrapeCrons(slugs) {
     const isSd = slug === "san-diego-ca";
     const offset = isSd ? 0 : 120 + baseMinute; // SD at 06:00; others from 08:00+
     if (!isSd) baseMinute += 10;
-
-    const hour = 6 + Math.floor(offset / 60);
-    const minute = offset % 60;
 
     const mk = (platform, extraMin) => {
       const total = offset + extraMin;
@@ -55,8 +53,7 @@ function buildScrapeCrons(slugs) {
     };
 
     crons.push(mk("rvshare", 0));
-    crons.push(mk("outdoorsy-1", 2));
-    crons.push(mk("outdoorsy-2", 4));
+    crons.push(mk("outdoorsy", 2));
   }
 
   return crons;

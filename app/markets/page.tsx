@@ -9,7 +9,7 @@ import { liveMarkets } from "@/lib/markets";
 export const metadata = {
   title: "RV Rental Market Reports by City",
   description:
-    "Browse RV rental market intelligence reports by region — pricing trends, demand signals, and competitive benchmarks across 33 US metros.",
+    "Browse RV rental market intelligence reports by region — pricing trends, demand signals, and competitive benchmarks across US metros.",
   alternates: {
     canonical: "/markets",
   },

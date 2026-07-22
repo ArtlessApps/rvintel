@@ -2,7 +2,7 @@
 
 **228 active listings** · Median **$250/night** · Avg **$368/night**
 
-- P25–P75: $150 – $386
+- P25–P75: $154 – $386
 - Outdoorsy: 131 · RVshare: 97
 - Delivery: 55% · Instant book: 20%
 - Radius: 35 mi · Region: Northeast

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { liveMarkets } from "@/lib/markets";
 
 const NAV = [
   { href: "/markets", label: "Markets" },
@@ -8,6 +9,7 @@ const NAV = [
 ];
 
 export function SiteFooter() {
+  const marketCount = liveMarkets().length;
   return (
     <footer className="border-t border-border bg-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -15,7 +17,7 @@ export function SiteFooter() {
           <div className="flex flex-col gap-2">
             <Logo />
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              RV rental market intelligence across 33 US markets.
+              RV rental market intelligence across {marketCount} US markets.
             </p>
           </div>
 

@@ -10,376 +10,268 @@
       "schedule": "0 6 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1",
+      "path": "/api/scrape?platform=outdoorsy",
       "schedule": "2 6 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2",
-      "schedule": "4 6 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=riverside-county-ca",
       "schedule": "0 8 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=riverside-county-ca",
+      "path": "/api/scrape?platform=outdoorsy&market=riverside-county-ca",
       "schedule": "2 8 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=riverside-county-ca",
-      "schedule": "4 8 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=portland-or",
       "schedule": "10 8 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=portland-or",
+      "path": "/api/scrape?platform=outdoorsy&market=portland-or",
       "schedule": "12 8 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=portland-or",
-      "schedule": "14 8 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=arklatex",
       "schedule": "20 8 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=arklatex",
+      "path": "/api/scrape?platform=outdoorsy&market=arklatex",
       "schedule": "22 8 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=arklatex",
-      "schedule": "24 8 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=los-angeles-ca",
       "schedule": "30 8 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=los-angeles-ca",
+      "path": "/api/scrape?platform=outdoorsy&market=los-angeles-ca",
       "schedule": "32 8 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=los-angeles-ca",
-      "schedule": "34 8 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=sacramento-ca",
       "schedule": "40 8 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=sacramento-ca",
+      "path": "/api/scrape?platform=outdoorsy&market=sacramento-ca",
       "schedule": "42 8 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=sacramento-ca",
-      "schedule": "44 8 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=san-francisco-ca",
       "schedule": "50 8 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=san-francisco-ca",
+      "path": "/api/scrape?platform=outdoorsy&market=san-francisco-ca",
       "schedule": "52 8 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=san-francisco-ca",
-      "schedule": "54 8 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=denver-co",
       "schedule": "0 9 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=denver-co",
+      "path": "/api/scrape?platform=outdoorsy&market=denver-co",
       "schedule": "2 9 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=denver-co",
-      "schedule": "4 9 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=salt-lake-city-ut",
       "schedule": "10 9 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=salt-lake-city-ut",
+      "path": "/api/scrape?platform=outdoorsy&market=salt-lake-city-ut",
       "schedule": "12 9 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=salt-lake-city-ut",
-      "schedule": "14 9 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=reno-nv",
       "schedule": "20 9 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=reno-nv",
+      "path": "/api/scrape?platform=outdoorsy&market=reno-nv",
       "schedule": "22 9 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=reno-nv",
-      "schedule": "24 9 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=cheyenne-wy",
       "schedule": "30 9 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=cheyenne-wy",
+      "path": "/api/scrape?platform=outdoorsy&market=cheyenne-wy",
       "schedule": "32 9 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=cheyenne-wy",
-      "schedule": "34 9 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=phoenix-az",
       "schedule": "40 9 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=phoenix-az",
+      "path": "/api/scrape?platform=outdoorsy&market=phoenix-az",
       "schedule": "42 9 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=phoenix-az",
-      "schedule": "44 9 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=austin-tx",
       "schedule": "50 9 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=austin-tx",
+      "path": "/api/scrape?platform=outdoorsy&market=austin-tx",
       "schedule": "52 9 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=austin-tx",
-      "schedule": "54 9 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=san-antonio-tx",
       "schedule": "0 10 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=san-antonio-tx",
+      "path": "/api/scrape?platform=outdoorsy&market=san-antonio-tx",
       "schedule": "2 10 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=san-antonio-tx",
-      "schedule": "4 10 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=dallas-fort-worth-tx",
       "schedule": "10 10 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=dallas-fort-worth-tx",
+      "path": "/api/scrape?platform=outdoorsy&market=dallas-fort-worth-tx",
       "schedule": "12 10 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=dallas-fort-worth-tx",
-      "schedule": "14 10 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=orlando-fl",
       "schedule": "20 10 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=orlando-fl",
+      "path": "/api/scrape?platform=outdoorsy&market=orlando-fl",
       "schedule": "22 10 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=orlando-fl",
-      "schedule": "24 10 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=tampa-fl",
       "schedule": "30 10 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=tampa-fl",
+      "path": "/api/scrape?platform=outdoorsy&market=tampa-fl",
       "schedule": "32 10 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=tampa-fl",
-      "schedule": "34 10 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=atlanta-ga",
       "schedule": "40 10 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=atlanta-ga",
+      "path": "/api/scrape?platform=outdoorsy&market=atlanta-ga",
       "schedule": "42 10 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=atlanta-ga",
-      "schedule": "44 10 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=chattanooga-tn",
       "schedule": "50 10 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=chattanooga-tn",
+      "path": "/api/scrape?platform=outdoorsy&market=chattanooga-tn",
       "schedule": "52 10 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=chattanooga-tn",
-      "schedule": "54 10 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=columbus-oh",
       "schedule": "0 11 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=columbus-oh",
+      "path": "/api/scrape?platform=outdoorsy&market=columbus-oh",
       "schedule": "2 11 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=columbus-oh",
-      "schedule": "4 11 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=cincinnati-oh",
       "schedule": "10 11 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=cincinnati-oh",
+      "path": "/api/scrape?platform=outdoorsy&market=cincinnati-oh",
       "schedule": "12 11 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=cincinnati-oh",
-      "schedule": "14 11 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=detroit-mi",
       "schedule": "20 11 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=detroit-mi",
+      "path": "/api/scrape?platform=outdoorsy&market=detroit-mi",
       "schedule": "22 11 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=detroit-mi",
-      "schedule": "24 11 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=grand-rapids-mi",
       "schedule": "30 11 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=grand-rapids-mi",
+      "path": "/api/scrape?platform=outdoorsy&market=grand-rapids-mi",
       "schedule": "32 11 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=grand-rapids-mi",
-      "schedule": "34 11 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=madison-wi",
       "schedule": "40 11 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=madison-wi",
+      "path": "/api/scrape?platform=outdoorsy&market=madison-wi",
       "schedule": "42 11 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=outdoorsy-2&market=madison-wi",
-      "schedule": "44 11 * * *"
     },
     {
       "path": "/api/scrape?platform=rvshare&market=milwaukee-wi",
       "schedule": "50 11 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=milwaukee-wi",
+      "path": "/api/scrape?platform=outdoorsy&market=milwaukee-wi",
       "schedule": "52 11 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-2&market=milwaukee-wi",
-      "schedule": "54 11 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=rvshare&market=philadelphia-pa",
+      "path": "/api/scrape?platform=rvshare&market=minneapolis-mn",
       "schedule": "0 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=philadelphia-pa",
+      "path": "/api/scrape?platform=outdoorsy&market=minneapolis-mn",
       "schedule": "2 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-2&market=philadelphia-pa",
-      "schedule": "4 12 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=rvshare&market=baltimore-md",
+      "path": "/api/scrape?platform=rvshare&market=philadelphia-pa",
       "schedule": "10 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=baltimore-md",
+      "path": "/api/scrape?platform=outdoorsy&market=philadelphia-pa",
       "schedule": "12 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-2&market=baltimore-md",
-      "schedule": "14 12 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=rvshare&market=new-york-ny",
+      "path": "/api/scrape?platform=rvshare&market=baltimore-md",
       "schedule": "20 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=new-york-ny",
+      "path": "/api/scrape?platform=outdoorsy&market=baltimore-md",
       "schedule": "22 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-2&market=new-york-ny",
-      "schedule": "24 12 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=rvshare&market=washington-dc",
+      "path": "/api/scrape?platform=rvshare&market=new-york-ny",
       "schedule": "30 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=washington-dc",
+      "path": "/api/scrape?platform=outdoorsy&market=new-york-ny",
       "schedule": "32 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-2&market=washington-dc",
-      "schedule": "34 12 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=rvshare&market=harrisburg-pa",
+      "path": "/api/scrape?platform=rvshare&market=washington-dc",
       "schedule": "40 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=harrisburg-pa",
+      "path": "/api/scrape?platform=outdoorsy&market=washington-dc",
       "schedule": "42 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-2&market=harrisburg-pa",
-      "schedule": "44 12 * * *"
-    },
-    {
-      "path": "/api/scrape?platform=rvshare&market=seattle-wa",
+      "path": "/api/scrape?platform=rvshare&market=harrisburg-pa",
       "schedule": "50 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-1&market=seattle-wa",
+      "path": "/api/scrape?platform=outdoorsy&market=harrisburg-pa",
       "schedule": "52 12 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy-2&market=seattle-wa",
-      "schedule": "54 12 * * *"
+      "path": "/api/scrape?platform=rvshare&market=hartford-ct",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/scrape?platform=outdoorsy&market=hartford-ct",
+      "schedule": "2 13 * * *"
+    },
+    {
+      "path": "/api/scrape?platform=rvshare&market=seattle-wa",
+      "schedule": "10 13 * * *"
+    },
+    {
+      "path": "/api/scrape?platform=outdoorsy&market=seattle-wa",
+      "schedule": "12 13 * * *"
     },
     {
       "path": "/api/sweeper",
-      "schedule": "9 13 * * *"
+      "schedule": "27 13 * * *"
     },
     {
       "path": "/api/detect-duplicates?all=true",
