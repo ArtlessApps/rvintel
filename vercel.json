@@ -286,16 +286,24 @@
       "schedule": "32 13 * * *"
     },
     {
-      "path": "/api/scrape?platform=rvshare&market=seattle-wa",
+      "path": "/api/scrape?platform=rvshare&market=richmond-va",
       "schedule": "40 13 * * *"
     },
     {
-      "path": "/api/scrape?platform=outdoorsy&market=seattle-wa",
+      "path": "/api/scrape?platform=outdoorsy&market=richmond-va",
       "schedule": "42 13 * * *"
     },
     {
+      "path": "/api/scrape?platform=rvshare&market=seattle-wa",
+      "schedule": "50 13 * * *"
+    },
+    {
+      "path": "/api/scrape?platform=outdoorsy&market=seattle-wa",
+      "schedule": "52 13 * * *"
+    },
+    {
       "path": "/api/sweeper",
-      "schedule": "57 13 * * *"
+      "schedule": "7 14 * * *"
     },
     {
       "path": "/api/detect-duplicates?all=true",

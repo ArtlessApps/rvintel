@@ -1,83 +1,160 @@
 {
-  "generatedAt": "2026-07-22T20:22:07.832Z",
+  "generatedAt": "2026-07-23T14:51:42.437Z",
   "siteUrl": "https://www.rvintel.io",
   "markets": {
-    "jacksonville-fl": {
-      "slug": "jacksonville-fl",
-      "displayName": "Jacksonville, FL",
-      "region": "Southeast",
+    "richmond-va": {
+      "slug": "richmond-va",
+      "displayName": "Richmond, VA",
+      "region": "Northeast",
       "radiusMiles": 35,
-      "asOf": "2026-07-22T20:22:00.841+00:00",
-      "asOfLabel": "Jul 22, 2026",
+      "asOf": "2026-07-23T14:50:52.676+00:00",
+      "asOfLabel": "Jul 23, 2026",
       "monthYear": "July 2026",
-      "listingCount": 391,
-      "avgRate": 160,
-      "medianRate": 130,
-      "p25": 115,
-      "p75": 180,
-      "outdoorsyCount": 161,
-      "rvshareCount": 230,
-      "deliveryPct": 89,
-      "instantBookPct": 42,
+      "listingCount": 99,
+      "avgRate": 157,
+      "medianRate": 125,
+      "p25": 110,
+      "p75": 172,
+      "outdoorsyCount": 35,
+      "rvshareCount": 64,
+      "deliveryPct": 73,
+      "instantBookPct": 22,
       "byClass": [
         {
           "class": "Travel Trailer",
           "label": "Travel Trailer",
-          "count": 212,
-          "medianRate": 120
-        },
-        {
-          "class": "Class C",
-          "label": "Class C",
-          "count": 56,
-          "medianRate": 182
+          "count": 67,
+          "medianRate": 115
         },
         {
           "class": "Fifth Wheel",
           "label": "Fifth Wheel",
-          "count": 55,
-          "medianRate": 170
+          "count": 11,
+          "medianRate": 163
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 8,
+          "medianRate": 211
         },
         {
           "class": "Class A",
           "label": "Class A",
-          "count": 44,
-          "medianRate": 250
+          "count": 6,
+          "medianRate": 264
         },
         {
           "class": "Class B",
           "label": "Class B",
-          "count": 18,
-          "medianRate": 195
+          "count": 4,
+          "medianRate": 198
         },
         {
           "class": "Toy Hauler",
           "label": "Toy Hauler",
-          "count": 5,
-          "medianRate": 124
+          "count": 2,
+          "medianRate": 105
         }
       ],
       "seo": {
-        "title": "Jacksonville, FL RV Rental Market",
-        "description": "Jacksonville, FL RV rental prices: median $130/night across 391 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
-        "introHtml": "<p>Jacksonville, FL RV rental hosts currently compete across <strong>391 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$130/night</strong> (average $160), a $30 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>41% Outdoorsy / 59% RVshare</strong> (161 vs 230). By class: Travel Trailer median $120 (212 listings); Class C median $182 (56 listings); Fifth Wheel median $170 (55 listings). 89% of listings offer delivery; 42% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "title": "Richmond, VA RV Rental Market",
+        "description": "Richmond, VA RV rental prices: median $125/night across 99 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Richmond, VA RV rental hosts currently compete across <strong>99 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$125/night</strong> (average $157), a $32 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>35% Outdoorsy / 65% RVshare</strong> (35 vs 64). By class: Travel Trailer median $115 (67 listings); Fifth Wheel median $163 (11 listings); Class C median $211 (8 listings). 73% of listings offer delivery; 22% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
         "faq": [
           {
-            "question": "What is the average RV rental rate in Jacksonville?",
-            "answer": "The average asking rate in Jacksonville, FL is $160 per night; the median is $130 (P25 $115 · P75 $180) across 391 active listings."
+            "question": "What is the average RV rental rate in Richmond?",
+            "answer": "The average asking rate in Richmond, VA is $157 per night; the median is $125 (P25 $110 · P75 $172) across 99 active listings."
           },
           {
-            "question": "How many RV rentals are listed in Jacksonville?",
-            "answer": "RVIntel currently tracks 391 active listings in the Jacksonville, FL market window (35 mi): 161 on Outdoorsy and 230 on RVshare."
+            "question": "How many RV rentals are listed in Richmond?",
+            "answer": "RVIntel currently tracks 99 active listings in the Richmond, VA market window (35 mi): 35 on Outdoorsy and 64 on RVshare."
           },
           {
-            "question": "Is Outdoorsy or RVshare larger in Jacksonville?",
-            "answer": "RVshare currently has more inventory in Jacksonville, FL (230 vs 161 on Outdoorsy). Many hosts list on both."
+            "question": "Is Outdoorsy or RVshare larger in Richmond?",
+            "answer": "RVshare currently has more inventory in Richmond, VA (64 vs 35 on Outdoorsy). Many hosts list on both."
           }
         ]
       },
-      "magnetPath": "/magnets/jacksonville-fl-rate-card.html",
-      "marketPath": "/markets/jacksonville-fl"
+      "magnetPath": "/magnets/richmond-va-rate-card.html",
+      "marketPath": "/markets/richmond-va"
+    },
+    "detroit-mi": {
+      "slug": "detroit-mi",
+      "displayName": "Detroit, MI",
+      "region": "Midwest",
+      "radiusMiles": 35,
+      "asOf": "2026-07-23T14:51:41.089+00:00",
+      "asOfLabel": "Jul 23, 2026",
+      "monthYear": "July 2026",
+      "listingCount": 307,
+      "avgRate": 181,
+      "medianRate": 150,
+      "p25": 125,
+      "p75": 209,
+      "outdoorsyCount": 129,
+      "rvshareCount": 178,
+      "deliveryPct": 71,
+      "instantBookPct": 22,
+      "byClass": [
+        {
+          "class": "Travel Trailer",
+          "label": "Travel Trailer",
+          "count": 199,
+          "medianRate": 135
+        },
+        {
+          "class": "Class C",
+          "label": "Class C",
+          "count": 47,
+          "medianRate": 219
+        },
+        {
+          "class": "Class A",
+          "label": "Class A",
+          "count": 23,
+          "medianRate": 300
+        },
+        {
+          "class": "Class B",
+          "label": "Class B",
+          "count": 21,
+          "medianRate": 289
+        },
+        {
+          "class": "Fifth Wheel",
+          "label": "Fifth Wheel",
+          "count": 11,
+          "medianRate": 175
+        },
+        {
+          "class": "Toy Hauler",
+          "label": "Toy Hauler",
+          "count": 3,
+          "medianRate": 175
+        }
+      ],
+      "seo": {
+        "title": "Detroit, MI RV Rental Market",
+        "description": "Detroit, MI RV rental prices: median $150/night across 307 Outdoorsy & RVshare listings. Live market benchmarks for hosts.",
+        "introHtml": "<p>Detroit, MI RV rental hosts currently compete across <strong>307 active listings</strong> on Outdoorsy and RVshare within a 35-mile radius. The median asking rate is <strong>$150/night</strong> (average $181), a $31 premium of the mean over the median that signals how skewed high-end inventory is.</p>\n<p>Platform mix is roughly <strong>42% Outdoorsy / 58% RVshare</strong> (129 vs 178). By class: Travel Trailer median $135 (199 listings); Class C median $219 (47 listings); Class A median $300 (23 listings). 71% of listings offer delivery; 22% are instant book.</p>\n<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>",
+        "faq": [
+          {
+            "question": "What is the average RV rental rate in Detroit?",
+            "answer": "The average asking rate in Detroit, MI is $181 per night; the median is $150 (P25 $125 · P75 $209) across 307 active listings."
+          },
+          {
+            "question": "How many RV rentals are listed in Detroit?",
+            "answer": "RVIntel currently tracks 307 active listings in the Detroit, MI market window (35 mi): 129 on Outdoorsy and 178 on RVshare."
+          },
+          {
+            "question": "Is Outdoorsy or RVshare larger in Detroit?",
+            "answer": "RVshare currently has more inventory in Detroit, MI (178 vs 129 on Outdoorsy). Many hosts list on both."
+          }
+        ]
+      },
+      "magnetPath": "/magnets/detroit-mi-rate-card.html",
+      "marketPath": "/markets/detroit-mi"
     }
   }
 }

@@ -464,6 +464,18 @@ export const MARKETS: MarketDefinition[] = [
     isLive: true,
   },
   {
+    slug: "richmond-va",
+    displayName: "Richmond, VA",
+    centerLat: 37.5407,
+    centerLng: -77.436,
+    radiusMiles: 35,
+    outdoorsyAddress: "Richmond, VA",
+    rvshareLocation: "richmond va",
+    region: "Northeast",
+    sortOrder: 560,
+    isLive: true,
+  },
+  {
     slug: "seattle-wa",
     displayName: "Seattle, WA",
     centerLat: 47.6062,

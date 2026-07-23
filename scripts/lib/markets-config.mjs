@@ -81,6 +81,7 @@ export const EXPANSION_SLUGS = [
   "washington-dc",
   "harrisburg-pa",
   "hartford-ct",
+  "richmond-va",
   "seattle-wa",
 ];
 

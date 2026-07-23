@@ -57,6 +57,7 @@ const BATCHES = {
     "washington-dc",
     "harrisburg-pa",
     "hartford-ct",
+    "richmond-va",
   ],
   pacific: ["seattle-wa"],
 };
