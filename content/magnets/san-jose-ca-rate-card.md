@@ -1,9 +1,9 @@
 # San Jose, CA RV Rental Rate Card — July 2026
 
-**426 active listings** · Median **$200/night** · Avg **$208/night**
+**428 active listings** · Median **$200/night** · Avg **$208/night**
 
 - P25–P75: $150 – $250
-- Outdoorsy: 242 · RVshare: 184
+- Outdoorsy: 244 · RVshare: 184
 - Delivery: 61% · Instant book: 30%
 - Radius: 30 mi · Region: California
 
@@ -11,8 +11,8 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Class B | 155 | $220 |
-| Travel Trailer | 138 | $153 |
+| Class B | 156 | $222 |
+| Travel Trailer | 139 | $153 |
 | Class C | 101 | $240 |
 | Class A | 21 | $250 |
 | Fifth Wheel | 6 | $200 |
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/san-jose-ca
 Shareable rate card: https://www.rvintel.io/magnets/san-jose-ca-rate-card.html
 
-_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_

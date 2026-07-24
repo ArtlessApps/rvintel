@@ -1,9 +1,9 @@
 # San Antonio, TX RV Rental Rate Card — July 2026
 
-**357 active listings** · Median **$140/night** · Avg **$161/night**
+**358 active listings** · Median **$145/night** · Avg **$161/night**
 
 - P25–P75: $122 – $193
-- Outdoorsy: 152 · RVshare: 205
+- Outdoorsy: 153 · RVshare: 205
 - Delivery: 77% · Instant book: 29%
 - Radius: 35 mi · Region: Southwest
 
@@ -11,14 +11,14 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 236 | $125 |
+| Travel Trailer | 237 | $125 |
 | Class C | 48 | $200 |
 | Fifth Wheel | 43 | $180 |
 | Class A | 16 | $269 |
-| Class B | 8 | $237 |
+| Class B | 8 | $244 |
 | Toy Hauler | 5 | $138 |
 
 Full market page: https://www.rvintel.io/markets/san-antonio-tx
 Shareable rate card: https://www.rvintel.io/magnets/san-antonio-tx-rate-card.html
 
-_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_

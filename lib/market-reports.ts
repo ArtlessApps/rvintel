@@ -9,17 +9,9 @@ export type MarketReportRef = {
   format: "pdf" | "html";
 };
 
-const PERIOD = "Q2 2026";
-
-/** Static PDF reports under /public/reports. */
-export const MARKET_REPORTS: Partial<Record<string, MarketReportRef>> = {
-  "san-diego-ca": {
-    path: "/reports/san-diego-rv-market-report-q2-2026.pdf",
-    period: PERIOD,
-    fileName: "san-diego-rv-market-report-q2-2026.pdf",
-    format: "pdf",
-  },
-};
+/** Optional legacy quarterly PDF/HTML reports under /public/reports.
+ * Rate cards (/magnets/*) are the primary shareable market artifact. */
+export const MARKET_REPORTS: Partial<Record<string, MarketReportRef>> = {};
 
 function currentQuarterFile(slug: string, ext: "html" | "pdf") {
   const year = new Date().getFullYear();

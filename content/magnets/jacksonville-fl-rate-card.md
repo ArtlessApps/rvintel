@@ -11,7 +11,7 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 212 | $120 |
+| Travel Trailer | 212 | $121 |
 | Class C | 56 | $182 |
 | Fifth Wheel | 55 | $170 |
 | Class A | 44 | $250 |
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/jacksonville-fl
 Shareable rate card: https://www.rvintel.io/magnets/jacksonville-fl-rate-card.html
 
-_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_

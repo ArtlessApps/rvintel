@@ -11,7 +11,7 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 198 | $131 |
+| Travel Trailer | 198 | $132 |
 | Class C | 34 | $235 |
 | Fifth Wheel | 24 | $189 |
 | Class B | 13 | $226 |
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/columbus-oh
 Shareable rate card: https://www.rvintel.io/magnets/columbus-oh-rate-card.html
 
-_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_

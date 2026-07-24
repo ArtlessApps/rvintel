@@ -423,7 +423,11 @@ async function main() {
   }
 
   /** @type {Record<string, object>} */
-  const bundle = {};
+  const existingPath = path.join(outJsonDir, "market-magnets.json");
+  /** When regenerating a subset, merge into the existing bundle so other markets keep their CTAs. */
+  const bundle = argSlugs.length && fs.existsSync(existingPath)
+    ? { ...(JSON.parse(fs.readFileSync(existingPath, "utf-8")).markets ?? {}) }
+    : {};
   let generated = 0;
   let skipped = 0;
 
@@ -464,7 +468,8 @@ async function main() {
   );
 
   console.log(
-    `\nDone. ${generated} magnet(s), ${skipped} skipped → lib/generated/market-magnets.json`
+    `\nDone. ${generated} magnet(s), ${skipped} skipped → lib/generated/market-magnets.json` +
+      (argSlugs.length ? " (merged into existing bundle)" : "")
   );
 }
 

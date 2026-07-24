@@ -1,6 +1,6 @@
 # Riverside County, CA RV Rental Rate Card — July 2026
 
-**2,137 active listings** · Median **$169/night** · Avg **$205/night**
+**2,137 active listings** · Median **$169/night** · Avg **$206/night**
 
 - P25–P75: $131 – $239
 - Outdoorsy: 1,133 · RVshare: 1,004
@@ -12,13 +12,13 @@
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
 | Travel Trailer | 993 | $135 |
-| Class C | 491 | $220 |
+| Class C | 491 | $219 |
 | Class A | 253 | $289 |
-| Class B | 246 | $210 |
-| Fifth Wheel | 79 | $213 |
+| Class B | 246 | $212 |
+| Fifth Wheel | 79 | $214 |
 | Toy Hauler | 65 | $151 |
 
 Full market page: https://www.rvintel.io/markets/riverside-county-ca
 Shareable rate card: https://www.rvintel.io/magnets/riverside-county-ca-rate-card.html
 
-_Data as of Jul 22, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_

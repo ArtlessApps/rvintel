@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/richmond-va
 Shareable rate card: https://www.rvintel.io/magnets/richmond-va-rate-card.html
 
-_Data as of Jul 23, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
