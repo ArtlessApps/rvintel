@@ -6,6 +6,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { ReactElement } from "react";
+import { BUSINESS_POSTS } from "@/lib/business-posts";
 
 export interface Post {
   slug: string;
@@ -19,7 +20,7 @@ export interface Post {
   Content: () => ReactElement;
 }
 
-export const POSTS: Post[] = [
+const PRICING_POSTS: Post[] = [
 
   // ── 1. Dynamic Pricing 101 ───────────────────────────────────────────────────
   {
@@ -855,6 +856,8 @@ export const POSTS: Post[] = [
   },
 
 ];
+
+export const POSTS: Post[] = [...PRICING_POSTS, ...BUSINESS_POSTS];
 
 // Helper: find one post by slug
 export function getPost(slug: string): Post | undefined {

@@ -15,15 +15,16 @@ import { POSTS } from "@/lib/posts";
 export const metadata = {
   title: "Learn · RVIntel",
   description:
-    "Guides, strategy, and market insights to help RV rental hosts price smarter and earn more.",
+    "Guides for RV rental hosts: pricing, listings, operations, agreements, and how to start or grow a profitable rental business.",
 };
 
 const CATEGORIES = [
   "All",
+  "Getting Started",
   "Pricing Strategy",
+  "Host Growth",
   "Seasonal Trends",
   "Market Analysis",
-  "Host Growth",
 ];
 
 export default function LearnPage() {
@@ -43,8 +44,8 @@ export default function LearnPage() {
               The Learning Hub
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-lg">
-              Data-driven guides for RV rental hosts who want to price smarter,
-              understand their market, and grow their income.
+              Practical guides for RV rental hosts—from starting the business and
+              winning listings to pricing, operations, and long-term rentals.
             </p>
           </div>
         </section>

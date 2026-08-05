@@ -1,0 +1,1043 @@
+[
+  {
+    "title": "Getting Started",
+    "slug": "ec8c88ec",
+    "id": "7bc5227537aa47eeb4cd60d7d8e9a4ee",
+    "desc": "Form your LLC, choose the right RV, get the right insurance, and know exactly what to include with your rental. This module builds the foundation your entire business runs on. Get this right from the start and everything that follows becomes easier and more profitable.",
+    "privacy": 0,
+    "hasAccess": 1,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "6fd6047259ce4c5a80c4f1a1bd4f4e16",
+        "name": "8ee197de",
+        "title": "Welcome",
+        "path": [
+          "Getting Started",
+          "Welcome"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1206375329/5b5f05beeb?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 19000,
+        "resources": [],
+        "markdown": "Welcome to the community!  Really glad you're here.\n\nWhether you're just getting started or already have RVs on the road, you're in the right place. This community was built to give you everything I wish I had when I started. The course, the documents, the support, and a network of owners who get it.\n\nHere's what to do first:\n\n**1. Introduce yourself**: Drop a post in the community feed. Tell us where you're located, how many RVs you have (or if you're just getting started), and what your biggest goal is right now. This is a great group and people here love to help.\n\n**2. Head into the course**:  Start with Module 1 even if you're not a beginner. There's usually something in there worth revisiting.\n\n**3. Grab your documents**: Don't skip this. The document vault is one of the most valuable things in here. Get your agreements in place before your next booking.\n\n**4. Ask anything:** Seriously, no question is too basic. Drop it in the community or reach out to me directly. That's what I'm here for.\n\nLooking forward to building with you all!\n\n-Clark\n",
+        "desc_raw_len": 1773
+      },
+      {
+        "id": "0d7e51074c8140fcbaedfe3d8bea0467",
+        "name": "a05869f2",
+        "title": "LLC Formation",
+        "path": [
+          "Getting Started",
+          "LLC Formation"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [
+          {
+            "title": "Hold Harmless Indemnity Agreement",
+            "file_id": "3f5a9b08dcb34581bfc7211236a15537",
+            "file_name": "Hold Harmless Indemnity Agreement.docx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          }
+        ],
+        "markdown": "Forming an LLC is one of the most important steps you can take to protect yourself as an RV rental business owner. Without one, your personal assets such as your home, savings, and personal finances are exposed if something goes wrong. An LLC creates a legal separation between you and your business so that business related incidents stay a business problem, not a personal one.\n\nBeyond protection, operating under an LLC adds credibility with renters, makes it easier to open business bank accounts, and gives you more flexibility when it comes to taxes. It is a small upfront step that pays for itself many times over.\n\n**How to get set up:**\n\n**Form your LLC.** Every state has its own process and fee but it is generally straightforward and inexpensive. Search \"[your state] LLC formation\" to find your state's official website and begin the process. If you prefer to have it done for you, services like Incfile will handle the formation for a small additional fee.\n\n**Get your EIN.** Once your LLC is formed you will need an Employer Identification Number from the IRS. This is free and takes about 10 minutes. Apply directly at [irs.gov](https://sa.www4.irs.gov/applyein/legalStructure).\n\n**Get your business license.** Most cities require a local business license once your LLC is formed. Check your city or county website for requirements in your area.\n\n**Open a dedicated business bank account.** Keep your business and personal finances completely separate from day one. This protects your LLC status, simplifies bookkeeping, and makes tax time significantly easier.\n\nA template for additional indemnification is attached below and also available in the Documents module\n\n\n\n## Brand Domain Name & Custom Email Address\n\nHaving a brand domain name is extremely valuable and builds instant credibility for your business. It will be where your website is hosted and your custom email address comes from\n\nSecuring one at this stage just makes sense, a domain name from namecheap is incredibly cheap at under $20/year\n\nI also highly reccomend using google workspace for email. This gives you a custom email address of [you@yourdomain.com](mailto:you@yourdomain.com) and provides you with tons of storage for documents, photos, videos as well as electronic signing of documents all in one place. Its currently around $30/month for google workspace and very much worth it\n",
+        "desc_raw_len": 3720
+      },
+      {
+        "id": "70f5c2c8585d41f0a297e15f7870fab4",
+        "name": "72879174",
+        "title": "What type of RV should I get?",
+        "path": [
+          "Getting Started",
+          "What type of RV should I get?"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "This is one of the most common questions when owners are getting started, and if you are just starting with your first RV get one that suits your needs. If you already have an RV - list it!\n\n\n\nAs for rental specific units the best performers are\n\n- Class C motorhomes\n\n- Class B Motorhomes\n\n- Small Travel Trailers\n\nEach type of unit has it's own pros and cons\n\nDrivable units are super popular with renters but have a lot more maintenance required and up front cost whereas travel trailers require minimal maintenance but require having a sufficient tow vehicle and may sometimes require delivery and setup\n\nClass C motorhomes are the most popular\n\nSmaller trailers are generally have the best ROI\n\nBunkhouse models are particularly popular as a lot of renters are going on family trips.\n",
+        "desc_raw_len": 1547
+      },
+      {
+        "id": "833818fcc06b4231ba5494b848422835",
+        "name": "4c2233f1",
+        "title": "Insurance",
+        "path": [
+          "Getting Started",
+          "Insurance"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1169174860/78beceb4a3",
+        "videoLenMs": 278000,
+        "resources": [
+          {
+            "title": "RV Insurance Binder",
+            "file_id": "25497922c770445bb11c4afc29f51c1b",
+            "file_name": "RV Insurance Binder.docx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          }
+        ],
+        "markdown": "## Security Deposits\n\nSecurity deposits should be equal to the amount of the insurance deductible and be able to cover interor damage beyond normal wear and tear as these are often not covered with typical insurance\n\n\n\n## Platform Insurance\n\nEvery platform has their own insurance carriers and some platforms like RVShare allow you to use your own commercial insurance. But all of them require you to still have your own coverage.\n\nThings to understand\n\n- Episodic insurance for rentals is specific for the days of the rental, beginning at 12:00am the starting day and ending at 11:59pm the last day - do not allow pickup and dropoff outside of your rental dates or it will not be covered\n\n- Platform insurance is considered secondary to the renters personal insurance.\n\n- You are required to have your own coverage to be eligible for platform insurance\n\n\n\n## Commercial Insurance\n\nThe best option for your rental units is to have a commercial policy from MBA\n\nThese work the same as a personal policy would in the sense that they cover while you are using it, delivering to a renter, etc.\n\nThey also allow you to take direct bookings\n\nTheres two types of policies - the first one is similar to platform insurance where the customer pays only for the nights they are using it (episodic coverage)\n\nThe second type (Primary coverage) costs more but is covered all the time.  As of writing this MBA has moved to all primary policies  in most states\n\n\n\n## Insurance Claims\n\nInsurance claims on rental platforms usually go as follows\n\n1. Report damage immediately and deposit is held to cover deductible\n\n2. Get a quote by a repair shop to submit to insurance\n\n3. Insurance will do their own estimate\n\n4. Platform Insurance tries to get the renters insurance to cover (they almost always deny it)\n\n5. Then they will pay an amount around their estimate (which is usually not as much as the actual repair)\n\n6. Your repair shop will submit a supplemental claim to get the rest needed to cover the full repair\n\n\n\nIt is absolutely crucial to have thorough before and after pictures of every single rental or you risk an insurance claim being denied or disputed.\n\nEach rental platform also has its own requirements for example outdoorsy has the 90 day inspection you have to do along with the departure and return forms\n\n## Trip Insurance\n\nTrip insurance is not required but is something you can recommend to the renter to protect their trip costs in the event they arent able to make their trip\n",
+        "desc_raw_len": 4503
+      },
+      {
+        "id": "670c7228489f4023a87b644aa1f24c80",
+        "name": "c9eab789",
+        "title": "What to include",
+        "path": [
+          "Getting Started",
+          "What to include"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [
+          {
+            "title": "RV Rental Welcome Book Template",
+            "link": "https://canva.link/o10m61gq58w7yid"
+          }
+        ],
+        "markdown": "Basic essentials to be included with every rental\n\n### Safety\n\n- Fire extinguisher\n\n- First aid kit\n\n- Smoke alarm\n\n- Carbon monoxide / LP gas alarm\n\n### **Camping & Outdoor Essentials**\n\n- Leveling blocks\n\n- Wheel chocks\n\n- Sewer hose\n\n- Fresh water hose (with pressure regulator)\n\n- Electrical adapter if needed to connect to generator and 30 / 50 A\n\n- Jack crank or stabilizer wrench if needed\n\n\n\n\n\n# Extra comforts\n\nThese are technically optional, but offer an advantage especially for small businesses. Larger fleets likely wont provide any extras.\n\n###  **Kitchen Supplies**\n\n- Pots and pans\n\n- Cooking utensils (spatula, tongs, ladle, whisk, can opener)\n\n- Cutting board and knives\n\n- Plates, bowls, cups, mugs (No glass)\n\n- Silverware (forks, knives, spoons)\n\n- Dish soap and scrubber\n\n- Trash can & extra trash bags\n\n- Paper towels\n\n- Basic condiments (salt, pepper, cooking oil optional)\n\n###  **Bedroom & Comfort**\n\n- Fresh linens\n\n- Pillows and pillowcases\n\n- Blankets or comforters\n\n- Mattress protectors\n\n- Small fan or portable heater (seasonal)\n\n###  **Bathroom Supplies**\n\n- RV-safe toilet paper (Angel soft works great)\n\n- Hand soap\n\n- Shower curtain & bath mat\n\n- Towels (bath, hand, washcloth)\n\n- Holding tank treatment tabs\n\n### **Guest Convenience & Information**\n\nWelcome binder or QR code with:\n\n- Check-in/out procedures\n\n- How-to guides (slide-outs, hookups, thermostat, etc.)\n\n- Emergency contacts and roadside assistance info\n\n- Local campground and attraction recommendations\n\n\n\nBelow is an RV Rental Welcome Book template on canva (make a copy to be able to edit it)\n\nP.S. My real contact info is in there if you need help with anything!!\n",
+        "desc_raw_len": 5826
+      }
+    ]
+  },
+  {
+    "title": "Building a Winning Listing",
+    "slug": "97e1c1c1",
+    "id": "4a703ce0af014844a24ed8c8fdef7b62",
+    "desc": "Your listing is your storefront. We cover photos, titles, descriptions, pricing strategy, and how to stand out on any platform. This is one of the highest leverage things you can do for your business and most owners get it completely wrong.",
+    "privacy": 0,
+    "hasAccess": 1,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "75610051307741c1ad28efd86648cf49",
+        "name": "a3fab82d",
+        "title": "Setup for Success",
+        "path": [
+          "Building a Winning Listing",
+          "Setup for Success"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1205282920/b8d50095bb?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 53000,
+        "resources": [],
+        "markdown": "Your listing is one of the most important pieces of your business. A high performing listing equals a high performing business\n\n\n\nA high quality listing should do the following\n\n- Stand out visually\n\n- Be searchable\n\n- Have well lit photos showcasing the appeal of the unit\n\n- Sell the experience to the renter\n\n- Get them to take the next step and either book or send a message to you\n",
+        "desc_raw_len": 994
+      },
+      {
+        "id": "06cb9f46e9514d96915aa288e3338de3",
+        "name": "ba6757ee",
+        "title": "Listing Audit",
+        "path": [
+          "Building a Winning Listing",
+          "Listing Audit"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "One of the perks offered with RVRentalSkool is a listing audit. Send us one of your listings to [clark@rvrentalskool.com](mailto:clark@rvrentalskool.com) and we'll go over your listing and send you a report of everything we find\n",
+        "desc_raw_len": 456
+      },
+      {
+        "id": "d0bc13af725e414aae4a0420fa66c9d7",
+        "name": "66d04052",
+        "title": "Photos",
+        "path": [
+          "Building a Winning Listing",
+          "Photos"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1205308591/b16e95da37?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 71000,
+        "resources": [],
+        "markdown": "Listing photos are going to be the very first thing a renter sees. You want your cover photo to stand out among the rest of the listings in order to get them to click  your listing.\n\nIt is critical to have quality and thorough photos showing the entire unit setup and ready to be enjoyed.\n\nWe highly recommend hiring a professional photographer to come take photos of your units.\n\nProfessional photos go a long way to help your unit stand out and perform above the competition\n\n## Cover photo\n\nThis may be your single most important piece of the listing. It determines whether someone even clicks your listing on platforms like Outdoorsy and RVshare. Use a bright, landscape-oriented shot taken during golden hour if possible. Setup the unit in a nice camp site, mountain area, or lake if possible with the RV staged like someone is about to enjoy it chairs set up, door open, maybe a cozy outdoor rug.\n\nAvoid dealership-style parking lot photos at all costs. Clean the tires, remove clutter, and frame it so the RV fills most of the image while still showing an inviting background (mountains, trees, lake, campground). The goal isn\u2019t to show the whole RV. It\u2019s to make someone imagine themselves already on the trip.\n",
+        "desc_raw_len": 1641
+      },
+      {
+        "id": "a5cd5c3eed8d46dbbade59efb4da28a6",
+        "name": "1137edd5",
+        "title": "Title",
+        "path": [
+          "Building a Winning Listing",
+          "Title"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1205308593/166d098d09?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 47000,
+        "resources": [],
+        "markdown": "Your title is typically the second thing a renter will see. It is also an opportunity to make your listing more searchable by including certain keywords your renters may be looking for.\n\nIt helps to use features that set you apart in the title especially when they are things people may be searching for.\n\nFor example\n\n1. Pet friendly\n\n2. Sleeps 8\n\n3. Bunk Beds\n\n4. Solar powered\n\n5. Delivery available\n\n\n\nBuild a title that is tailored to the rental experience\n\nInstead of the default \"2025 Jayco Jayflight Trailer\"\n\nYou could use something like\n\nLuxury 2025 Jayco Jay Flight - Modern, Clean & Ready for Your Getaway\n\nor\n\n2025 Jayco Jay Flight - Pet Friendly | Fully Stocked | Delivery Available\n",
+        "desc_raw_len": 1748
+      },
+      {
+        "id": "f9495501237a4748811fa5fc65f9cce1",
+        "name": "86d3ba3f",
+        "title": "Description",
+        "path": [
+          "Building a Winning Listing",
+          "Description"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1205308592/34e4352a13?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 151000,
+        "resources": [],
+        "markdown": "Your RV listing description is your opportunity to sell the experience.\n\nDon't just rattle off specs of the unit. We want to provide the renter a glimpse of what the rental experience feels like. Use words that evoke emotion to get them wanting the experience. It's also helpful to ease common concerns such as first time renters, what supplies are included, etc.\n\nThe first few lines of your description are the most important. Use an effective hook to keep them interested\n\nWe also want to detail the features and what is included.\n\nEnd the description with a call to action. The goal is to get them to take the next step and book, or at least reach out to us with a message.\n\nOnce we have a conversation going with the renter it becomes easy to nuture them and secure the booking.\n\n(It's critical to respond to these messages quickly!!)\n\nExample description:\n\n\n\nReady to take the kids on their first adventure?\n\nThis 2025 Jayflight sleeps 6 and is fully stocked so you can show up and relax.\n\nPerfect for families, couples, first-time RVers, and national park trips.\n\nIf you\u2019ve never rented an RV before - no problem. We make it simple.\n\nFeatures\n\n\u2022 Fully stocked kitchen (cookware, utensils, coffee maker)\n\u2022 Fresh linens available\n\u2022 AC + heat\n\u2022 Large fridge/freezer\n\u2022 Indoor shower + toilet\n\u2022 Outdoor awning for shade\n\u2022 Solar\n\u2022 Pet friendly\n\nWe include the essentials so you don\u2019t have to overpack:\n\n\u2022 Cookware & dishes\n\u2022 Basic cleaning supplies\n\u2022 Leveling blocks\n\u2022 Sewer & water hookups\n\u2022 Electrical adapters\n\u2022 Walkthrough tutorial at pickup\n\nJust bring food, clothes, and adventure.\n\nDelivery & setup available to:\n\n\u2022 Campgrounds\n\u2022 Festivals\n\u2022 State parks\n\u2022 Private property (with approval)\n\nWe\u2019ll handle setup so you can show up and enjoy.\n\n(Delivery fee applies based on distance.)\n\nWe pride ourselves on making this EASY.\n\nPeak season fills fast - especially weekends and holidays.\n\nMessage us with any questions you have and we\u2019ll respond quickly to help you plan the perfect trip.\n\nOur goal is to make this the easiest, most enjoyable RV trip you\u2019ve ever taken.\n",
+        "desc_raw_len": 4250
+      },
+      {
+        "id": "c541e361895342508b8bf0b0492dae67",
+        "name": "7b5d0d2a",
+        "title": "Pricing",
+        "path": [
+          "Building a Winning Listing",
+          "Pricing"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1205311301/e04ff6bdc7?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 87000,
+        "resources": [],
+        "markdown": "The following are guidelines to help you get your nightly rates dialed in.\n\n## Base Rate Formula\n\nHere are some rough estimates for nightly rate based on the value of the unit. Every market is different so these are just rough guidelines\n\n- $20k-$30k = $110-$150$\n\n- 30k-$50k = $130-$180\n\n- $50k-$80k = $160-$250\n\n- $80k+ = $225-$400+\n\nUse local competition as the final calibration tool. We dont want to be too low or too high on our nightly rate\n\n\n\n## 3-Tier Seasonal Structure\n\nYou should never run one static price. Instead, take advantage of high demand times like summer and events while reducing rates during slower times to maintain occupancy.\n\n### Off Season (Nov-Feb)\n\n- 15-30% below peak\n\n- Offer weekly discounts aggressively\n\n### Shoulder Season (Mar-Apr / Sep-Oct)\n\n- Base rate\n\n- Mild discounts for 7+ nights\n\n### Peak Season (May-Aug + Holidays)\n\n- 20-40% above base\n\n- 3-4 night minimums\n\n- Remove big discounts\n\n## Event Surge Pricing\n\nCharge more for:\n\n- Major festivals\n\n- College game weekends\n\n- National park peak dates\n\n- NASCAR / rodeos / state fairs\n",
+        "desc_raw_len": 3323
+      }
+    ]
+  },
+  {
+    "title": "Rock Solid Rental Agreement",
+    "slug": "01ae2b8c",
+    "id": "55556e172a18424bbd6119cbbcccdcbf",
+    "desc": "A handshake is not a contract. This module walks you through everything your rental agreement needs to be legally binding and truly protective. Liability, damage, cancellation, pet policies, mileage and more. Know what to include and how to enforce it.",
+    "privacy": 0,
+    "hasAccess": 1,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "aeea16f2928b4f2bbb392126a6c445ed",
+        "name": "d155a874",
+        "title": "Rental Agreement",
+        "path": [
+          "Rock Solid Rental Agreement",
+          "Rental Agreement"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1205315787/3de3eac3f4?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 33000,
+        "resources": [
+          {
+            "title": "RV Rental Agreement",
+            "file_id": "fc8a19a242b745f4b19ac66deeb31e2c",
+            "file_name": "Complete RV Rental Agreement_4.1.doc",
+            "file_content_type": "application/msword"
+          }
+        ],
+        "markdown": "One of the most important things to have in place is a rental agreement that protects you as the business owner. Rental platforms do offer some protection for you but are geared more towards protecting themselves. Laying out your own terms and fees in your own rental agreement is a vital part for a successful rental business\n\n\n\nMake sure you state clearly\n\n- Renters responsibilities\n\n- Rules\n\n- Pickup / Return Schedules\n\n- Fees for specific violations\n\n\n\nLaws are different in every state so once you have your rental agreement completely filled out it is highly recommended to have legal personnel analyse your document. Hiring lawyers can be expensive, but you can utilize a service like legalshield to look at all your documents for a minimal fee. This way you can ensure they are legally viable in the event of any disputes\n",
+        "desc_raw_len": 1450
+      }
+    ]
+  },
+  {
+    "title": "Operations & Procedures",
+    "slug": "32863a14",
+    "id": "aa8a579fd68f4914b511f49f0337c181",
+    "desc": "Getting bookings is one skill. Running a professional operation that keeps renters happy, protects your asset, and generates five star reviews consistently is another. This module covers everything that happens from the moment a lead comes in to the moment the keys are back in your hand.",
+    "privacy": 0,
+    "hasAccess": 1,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "332e84d1a03a4272ab9ea868f23719d0",
+        "name": "a7e64093",
+        "title": "Calendar Management",
+        "path": [
+          "Operations & Procedures",
+          "Calendar Management"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1205282921/aa2b8fcfd4?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 186000,
+        "resources": [],
+        "markdown": "\n",
+        "desc_raw_len": 26
+      },
+      {
+        "id": "1388961c90cf484eb2a07042675792be",
+        "name": "1d7f5956",
+        "title": "Nurturing Leads",
+        "path": [
+          "Operations & Procedures",
+          "Nurturing Leads"
+        ],
+        "hasAccess": 1,
+        "videoLink": "https://vimeo.com/1206374485/ecc61d7155?share=copy&fl=sv&fe=ci",
+        "videoLenMs": 98000,
+        "resources": [],
+        "markdown": "Speed and personality win bookings. When someone reaches out about your RV they are almost certainly looking at multiple listings at the same time. The owner who responds first with a warm, personal message wins the booking the majority of the time.\n\nDo not send a generic copy paste reply. Use the renter's name, reference something specific about their trip, and make them feel like they are talking to a real person who is excited to host them. That personal touch is something the big platforms and corporate rental companies cannot replicate and it is one of your biggest advantages as an independent owner.\n\nA few principles for lead nurturing:\n\n**Respond within minutes, not hours.** Set notifications on your phone for every inquiry. A response time under 15 minutes signals professionalism and dramatically increases your conversion rate. Most renters book with whoever responds first. Platforms also weight your listings ranking pretty heavily on response time since those with fast responses win far more bookings.\n\nHaving multiple people who can respond will increase conversion rate\n\n**Ask questions.** A simple question like \"where are you headed?\" does two things. It gives you information to personalize the experience and it starts a conversation that builds trust before they have even committed to booking. For towables make sure they have a sufficient tow vehicle for the unit.\n\n**Answer every question thoroughly.** Renters who feel informed before they book are renters who show up prepared, have better experiences, and leave better reviews. Never make someone feel like their question was an inconvenience.\n\n**Follow up on unbooked inquiries.** If someone expressed interest but did not book, a friendly follow up message a day or two later can recover the booking. Just a simple check-in in to see if they had any questions or if dates worked out. This can also provide valuable information on why they didn't book and help you adjust. (Price too high, didn't suit their needs, and so on)\n\n**Pre-booking**: respond fast, be personal, answer thoroughly. This is one of the most important things in your operation. Fast responses win bookings. Platforms also factor response time into their algorithm so better response times means a better listing.\n\n**Post-booking confirmation**: send a confirmation message immediately with all the details they need. Pickup location, time, what to bring, and your contact number. Renters who feel prepared show up prepared.\n\n**48 hour pre-rental check in**: a short message the day before asking if they have any last minute questions builds excitement and catches any logistics issues before they become problems.\n\n**Post-rental follow up**: thank them for choosing you, invite them to reach out if they have any feedback, and ask for a review. Keep it warm and genuine, not templated.\n\nMost people will not leave a review if you do not ask.\n\nRenters who feel well taken care of become repeat customers and referral sources. The communication investment is small and the return is significant.\n",
+        "desc_raw_len": 4247
+      },
+      {
+        "id": "b9e48c0a1d184513a88ba036b28b65a5",
+        "name": "7eb2d65e",
+        "title": "Preparation",
+        "path": [
+          "Operations & Procedures",
+          "Preparation"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [
+          {
+            "title": "Preparation Checklist",
+            "file_id": "6630404c17bd42a682256165aee0ac81",
+            "file_name": "Preparation Checklist.pdf",
+            "file_content_type": "application/pdf"
+          }
+        ],
+        "markdown": "Having a smooth prep process is key to a smooth functioning business.\n\nSpending too much or too little time on preparing your unit hurts\n\nMake sure to check all fluids and tires between each rental as well as service intervals for oil, generator, tire rotations etc\n\n## Turnover\n\nQuick turnover reduces the amount of time it takes to get prep substantially. Have an extra set of clean linens ready to swap out if you provide them.\n\nOptimize your cleaning process so you dont have to do tasks twice. Swap linens>clean mirrors and surfaces>sweep>mop\n\nRVs love to get dirty easily so if there is any other work to be done on the unit I'd leave the sweeping and mopping until right before the rental\n",
+        "desc_raw_len": 1151
+      },
+      {
+        "id": "9c8e78fc12ba41e0904ea2b178768001",
+        "name": "bd6a4586",
+        "title": "Pickup Walkthrough",
+        "path": [
+          "Operations & Procedures",
+          "Pickup Walkthrough"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [
+          {
+            "title": "Prep Checklist",
+            "file_id": "4c202c87f82b40448ddfadc01b452e64",
+            "file_name": "Preparation Checklist.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "Departure and Return Form",
+            "file_id": "fe7232346ade4278baec6ee86b0cd643",
+            "file_name": "Motorhome Check In-Out Form.pdf",
+            "file_content_type": "application/pdf"
+          }
+        ],
+        "markdown": "A thorough pickup walkthrough is one of the most important things you can do to protect your business and set your renter up for a great experience. We do a full walkthrough with every renter regardless of their previous RV experience because every unit is different and what they know from another RV may not apply to yours.\n\nA consistent walkthrough process does three things. It ensures the renter knows how to operate the unit properly, it reduces the likelihood of damage from misuse, and it establishes a shared understanding of the RV's condition at the start of the rental.\n\n**What to cover in every pickup walkthrough:**\n\nSafety: Locations of smoke, carbon monoxide, propane alarms as well as fire extinguishers and emergency exits. Also show them which seats have seat belts if it is a drivable unit\n\nSystems and Operation: Water, electric, propane, generator, AC or heat. Show them how to use every feature to ensure a positive rental experience for everyone.\n\nKitchen and appliances: stove, refrigerator, microwave. Make sure they know what runs on propane versus electric. Show them where any included cookware and supplies are\n\nBathroom and waste systems: this is where most first time RVers need the most guidance. Walk through the tank system clearly and make sure they know exactly how it works. Misuse of the waste system is one of the most common and most avoidable issues in RV rentals. Make sure they know to fill the bowl every use and to use plenty of water. It is the number one thing for a positive bathroom experience, and RV experience in general. Smelly bathrooms are easily avoidable when used properly.\n\nExterior: Show them how to operate any outside features such as outside kitchens, compartments, and show them how to use water sewer and electric hookups. Go one by one to each compartment and show them everything they need to know.\n\nDriving or towing: if the renter is driving or towing do a quick driving lesson with them. cover hitching, mirrors, clearance height , turning radius, backing up and any quirks specific to your unit.\n\n\n**IMPORTANT:** Some of the most common insurance claims are due to height clearance issues and turn radius so be sure to educate them well on this specifically. It is also a good idea to have the clearance indicated somewhere near the driver for drivable units.\n\n\nInsurance and Emergency: Be sure to provide them a copy of their insurance info and contact information for both yourself and roadside assistance.\n\n**Document everything at pickup.** After showing them the all the procedures walk the entire unit together and photograph any existing marks, scratches, or wear before the renter drives away. Make sure to photograph all possible angles both interior/exterior and include roof/underbelly photos. This takes only minutes and eliminates any disputes at return.\n\nRecord vehicle mileage and generator hours, propane levels, and holding tank levels\n\nTake a look at this thorough Motorhome Walkthrough for ideas:\n[https://www.youtube.com/playlist?list=PLOqMJK1qVSaQ8sv1fP5Ure4H1nlgaECqz](https://www.youtube.com/playlist?list=PLOqMJK1qVSaQ8sv1fP5Ure4H1nlgaECqz)\n",
+        "desc_raw_len": 4276
+      },
+      {
+        "id": "0a0e8bfb32f9414e92ec2b10d6463952",
+        "name": "84a33b03",
+        "title": "Dropoff Walkthrough",
+        "path": [
+          "Operations & Procedures",
+          "Dropoff Walkthrough"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [
+          {
+            "title": "Return Inspection",
+            "file_id": "f913be88d9ba4f18ab585982d529bfdc",
+            "file_name": "Return Inspection.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "Departure and Return Form",
+            "file_id": "94c6e43a86c34bedac3d895c9238c510",
+            "file_name": "Motorhome Check In-Out Form.pdf",
+            "file_content_type": "application/pdf"
+          }
+        ],
+        "markdown": "The dropoff is just as important as the pickup. Do not skip it or rush it.\n\nWalk the exterior together with the renter present and compare what you see to your pickup photos. Address anything that needs to be addressed while the renter is still there it is far easier to handle a damage conversation in person than over text after the fact.\n\nMake sure to do return photos just as thoroghly as you do on pickup.\n\nCheck all systems tanks, appliances, generator hours, mileage. Cross reference against your pre-rental documentation and charge any applicable overage fees per your rental agreement.\n\n\nAny damage needs to be submitted to platforms as soon as you are aware of them. Do not wait or you risk your claim being disputed. This will immediately hold their security deposit and you can start the insurance claim process if needed.\n\nPlatforms let you submit return documents and report damage up to 48 hours after return, after which even if there is damage your claim and any overages will be denied.\n\nLet the renter know their security deposit is released once you have confirmed everything is in order. A fast deposit return generates goodwill and is one of the most reliable ways to earn a five star review.\n\nSend a review request within 24 hours of dropoff while the experience is still fresh. Most renters who had a great time will leave a review if asked directly and promptly.\n\nUse the return inspection document below to define your procedure.\n",
+        "desc_raw_len": 2014
+      },
+      {
+        "id": "02137f599a4b4a13a4665d74587e785f",
+        "name": "669c298a",
+        "title": "Event Rentals",
+        "path": [
+          "Operations & Procedures",
+          "Event Rentals"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "High demand events are one of the biggest profit centers in the RV rental business and owners who plan for them consistently outperform those who do not. Concerts, sporting events, festivals, racing events, and holiday weekends create concentrated demand that lets you charge premium rates while your competitors are sitting at their standard pricing.\n\nThe key is knowing what events are coming and positioning early.\n\n**Build your event calendar.** At the start of each year research major events in your area and surrounding markets. Music festivals, NASCAR and Formula 1 races, college football weekends, major sporting events, state fairs, and holiday weekends. Mark them on your calendar and set your pricing and minimum stay requirements well in advance.\n\n**Price aggressively for high demand events.** Standard pricing does not apply during peak event weekends. Research what comparable accommodations are charging and price your RV accordingly. Renters booking for major events expect to pay a premium and will.\n\n**Set minimum stay requirements.** For major events require a minimum of two to three nights. Single night event bookings are rarely worth the turnover cost and logistical effort.\n\n**Understand how event rentals work.** For most event rentals the RV is delivered to or driven to the event site and set up stationary for the duration. The renter uses it as their base camp for the event. Depending on your agreement you may handle delivery and setup yourself or the renter may drive or tow the unit. Make sure your rental agreement clearly covers who is responsible for transport, setup, and any site fees.\n\n**Charge a delivery fee for event setups.** If you are delivering and setting up the unit your time and mileage should be compensated. A delivery fee is standard and expected for this type of rental.\n\n**Scout the venue in advance if possible.** Knowing the layout, access points, and parking situation at a local event venue lets you advise renters accurately and avoid day-of surprises.\n",
+        "desc_raw_len": 2766
+      },
+      {
+        "id": "347026483fc44aa0810591df04178e5f",
+        "name": "fe2956da",
+        "title": "Administrative Operations",
+        "path": [
+          "Operations & Procedures",
+          "Administrative Operations"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Running a profitable business requires knowing your numbers. Owners who track their income and expenses consistently make better decisions, pay less in taxes, and spot problems before they become serious.\n\n**Tracking income and expenses**\n\nWe recommend either a dedicated spreadsheet or accounting software like Quickbooks \u2014 both work well depending on your preference and the size of your operation. What matters is that you are tracking consistently from day one rather than trying to reconstruct everything at tax time.\n\nTrack every booking, every expense, and every fee collected. Categories to track include rental income, delivery fees, prep fees, maintenance costs, supplies, insurance, platform fees, mileage, and any other business related expense.\n\nKeep your business finances completely separate from your personal finances. Run everything through your business bank account. This protects your LLC status, simplifies your bookkeeping, and ensures you never miss a deductible expense.\n\n**Invoicing and payment**\n\nFor direct bookings outside of platforms always collect payment in advance or at pickup. Never release the unit without payment confirmed. For long term and corporate rentals a signed agreement with a clear payment schedule is essential.\n\n**Record keeping**\n\nKeep copies of every signed rental agreement, every damage report, and every renter communication. If a dispute ever arises your records are your protection. A simple folder system organized by renter and date is sufficient.\n\n**Monthly review**\n\nSet aside time once a month to review your numbers. Look at total revenue, total expenses, net profit, and occupancy rate. Knowing these numbers lets you make informed decisions about pricing, marketing, and when it makes sense to add another unit.\n",
+        "desc_raw_len": 2499
+      }
+    ]
+  },
+  {
+    "title": "Increasing Profitability",
+    "slug": "76b358dd",
+    "id": "daab32f869034e69a0337080639b5fe5",
+    "desc": "Now that you're ready to fulfill bookings let's look at how to be more profitable. We cover prep fees, in-house maintenance, cutting unnecessary costs and advertising efficiently. Owners who master this module often make more money without adding a single booking.",
+    "privacy": 0,
+    "hasAccess": 1,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "b7193141e52f4b998de42370194e34f5",
+        "name": "e0bf177c",
+        "title": "Prep Fees",
+        "path": [
+          "Increasing Profitability",
+          "Prep Fees"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Prep fees account for a decent amount of each rental, and include quite a lot more than just cleaning. Platforms usually suggest around $100 to start but it is realistically fair to charge quite a bit more.\n\nTake a moment and make a note of everything it takes you to get your rental ready\n\n- Laundry\n\n- Making beds\n\n- Cleaning\n\n- Restocking supplies\n\n- Topping off propane/fuel\n\n- Checking fluid levels\n\n- Filling water tanks\n\n- Flushing waste tanks\n\n- Trip to storage\n\n- Exterior wash\n\nNot to mention all the little minor repairs that need to happen between rentals. Tightening screws here and there, fixing a door handle, etc\n\nI've found $200 to be a much more realistic price point for prep fees, sometimes more depending on the unit. This gives you plenty of padding to hire a cleaner and to be able to cover expenses on consumables like cleaning supplies, toiletries and so on.\n",
+        "desc_raw_len": 2023
+      },
+      {
+        "id": "7c94e8fd85104c15bb139b0fd9aa13a5",
+        "name": "a682f367",
+        "title": "Delivery Fees",
+        "path": [
+          "Increasing Profitability",
+          "Delivery Fees"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Delivery fees should be set appropriate for the cost of fuel as well as your time. Motorhome deliveries should also account for your return travel, and they may even require an additional vehicle and driver or alternate transportation to complete\n\nKeep in mind that setting a delivery fee on a platform is based on a single one way trip but it will actually take you two round trips to complete.\n\nFor example if my delivery fee is $4 per mile and the delivery location is 60 miles away, that will be a $240 delivery charge but it will actually take 240 miles of driving time to complete, plus time to setup so set your delivery fees accordingly.\n",
+        "desc_raw_len": 844
+      },
+      {
+        "id": "828f76dc91094fbaa8acd1546ef2c921",
+        "name": "fe4cf81b",
+        "title": "Event Pricing",
+        "path": [
+          "Increasing Profitability",
+          "Event Pricing"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Events are a significant portion of your revenue. Many of these events can be very high demand and as such subject to premium prices\n\nHere are some types of events that perform extremely well\n\n- Races\n\n- Rodeos\n\n- Sports games / Tournaments\n\n- Festivals\n",
+        "desc_raw_len": 756
+      },
+      {
+        "id": "c4eab6b805214e30a36d5cd85312c836",
+        "name": "1be29598",
+        "title": "Add-ons",
+        "path": [
+          "Increasing Profitability",
+          "Add-ons"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "One way to add additional income to each rental is to offer add-ons. Generally these items are inexpensive but offering them can add value and convenience for your renters\n\n\n\n- Generators\n\n- Camp chairs\n\n- Canopies\n\n- Tents\n\n- Extra bedding\n\n- Bike rack\n",
+        "desc_raw_len": 892
+      },
+      {
+        "id": "fc583b692e014c40867d9c00f0d4121a",
+        "name": "d0b17976",
+        "title": "Reducing Expenses",
+        "path": [
+          "Increasing Profitability",
+          "Reducing Expenses"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Reducing expenses goes a long way towards increasing overall profitability.\n\n#### **Turnover efficiency**\n\n- Standardized cleaning checklist so nothing gets missed and time doesn't get wasted\n\n- Extra set of bedding and towels ready to go\n\n- Bulk supplies ready to restock each rental\n\n- Hire a reliable cleaner at a flat rate vs hourly (hourly bleeds money)\n\n- Photo documentation at every departure and return to avoid dispute costs later\n\n#### **Doing maintenance and repairs in house**\n\nMost repair items will be minor issues you can easily repair yourself. If you have questions on a specific issue you are having reach out to us and we would love to help you diagnose the problem and find a solution.\n\nRemember - As a Skool member you have access to unlimited support so don't hesitate!\n\nPreventative maintenance is key to avoiding large expenses down the road. Fluids should be checked before every rental and oil changes and tire rotations need to be done as scheduled.\n\nFor more difficult repairs we recommend building a relationship with a local mobile RV repair service. They are generally much cheaper and have faster turnaround than dealerships or brick and mortar repair shops.\n\n#### **Operations**\n\nSome of these have been mentioned in previous modules but we\n\n- Mileage caps ensure renters pay for excessive wear\n\n- Security deposits** **offset damage costs significantly. Make sure they sufficient to cover insurance deductible without having to go after the renter for more or pay out of pocket to submit a claim.\n\n- Tax deductions: depreciation, mileage, maintenance, insurance, and membership costs like this one are all deductible. Most owners overpay on taxes. Ask your tax professional  about bonus depreciation on business property.\n\n- Keep detailed expense reports per unit throughout the year so you can easily provide them come tax season\n\n- Bundling insurance across multiple units if you're scaling\n\n- Generator hour limits are a commonly overlooked expense that can add up fast - most generators need regular service every 100 hours or less of use so factor this in to your costs\n",
+        "desc_raw_len": 3884
+      },
+      {
+        "id": "1a72b119ff9840dbb29c655c5bb382c3",
+        "name": "6c81b5a2",
+        "title": "Private Bookings & Advertising",
+        "path": [
+          "Increasing Profitability",
+          "Private Bookings & Advertising"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Once you have your own website and commercial insurance you are ready to start taking private bookings\n\nIf you need help with setting up your website you can buy the website module in the course and get started right away. It's one of the biggest assets you can build long term for your brand.\n\nYou'll also need a payment processor that will let you charge authorization holds for the deposit.\n\n[Stripe.com](http://stripe.com) and [Authorize.net](http://authorize.net) are two good options. They have minimal fees and integrate easily with your website.\n\nDon't forget to have your renter review and sign your rental agreement and take plenty of before and after pictures for every rental!\n\n[Google workspace](https://workspace.google.com/) gives you lots of space to store images, videos, and e-sign documents. It also gives you a professional email address with your domain name which increases brand authority significantly\n\n#### **Advertising & Lead Generation**\n\nThe major rental platforms: Outdoorsy, RVshare, and RVezy handle a lot of advertising on your behalf, which is one of their biggest benefits when you're starting out. This page is focused on what you can do on top of that to generate direct bookings, build your own audience, and reduce your dependence on platforms over time.\n\nDirect bookings mean no platform fees, no middleman, and a customer relationship you actually own.\n\n#### **Free and Low Cost**\n\n**Website** Your website is the foundation of your direct booking strategy. Every other channel on this list should point back to it. Even a simple site with your RV photos, pricing, availability, and a contact form will convert traffic into inquiries. As a member you have access to a fully built direct booking website if you haven't taken advantage of that yet reach out and we will get you set up.\n\n**Google Business Profile** A free Google Maps listing puts your business in front of people actively searching for RV rentals in your area. Set it up, add photos, collect reviews, and keep it updated. This is one of the highest intent traffic sources available to you at zero cost someone searching \"RV rental near me\" is ready to book.\n\n**Facebook Marketplace** Massively underutilized by RV rental owners. List your RV on Marketplace the same way you would on a rental platform good photos, clear description, pricing, and availability. It costs nothing and reaches a huge local audience. Many owners get consistent inquiries from Marketplace alone.\n\n**Social Media** You don't need to be on every platform. Pick one and be consistent. Short videos and photos of your RV, happy renters, and destinations perform well organically and keep your business top of mind. Behind the scenes content showing how you prep, clean, and maintain your RV builds trust and credibility with potential renters.\n\n**Local Classifieds and Community Boards** Craigslist, Nextdoor, and local Facebook community groups are free and often overlooked. Nextdoor in particular is great for delivery rentals since you're reaching people in a specific geographic area who already have local intent.\n\n**Referral Program** Your happiest renters are your best advertising. A simple incentive such as a discount on their next rental or a small gift card for a successful referral can generate a steady stream of warm leads at a fraction of what paid advertising costs. People trust recommendations from friends far more than any ad.\n\n**Partner with Local Businesses** Campgrounds, event venues, wedding planners, and outdoor recreation companies all serve customers who may need an RV. A simple referral relationship with even one or two local businesses can drive consistent bookings with zero ad spend.\n\n#### **Paid Advertising**\n\nWhen you are ready to invest in paid advertising, the two channels we have seen work best for RV rental owners are Google Ads and Facebook and Instagram Ads.\n\nGoogle Ads puts you in front of people who are actively searching for RV rentals. These people are high intent and ready to book. Facebook and Instagram Ads are better for building awareness and reaching people who may not know they want to rent an RV yet but are the right audience for it. Both can work well depending on your goals and budget.\n\nPaid advertising works best once you have your listing, website, and direct booking process dialed in. Sending paid traffic to a weak listing or a site that isn't ready to convert is money wasted.\n\nWhen you are ready to explore paid advertising reach out to us directly and we will help you find the right approach for your budget and market.\n",
+        "desc_raw_len": 6726
+      }
+    ]
+  },
+  {
+    "title": "Document Vault",
+    "slug": "e9269dfc",
+    "id": "c1483b694c084e749edcd3f038ab0df0",
+    "desc": "Every document an RV rental owner needs, ready to customize and use. Checklists, inspection forms, renter communication templates, policies and more. Stop reinventing the wheel and run a professional operation from the very first booking.",
+    "privacy": 0,
+    "hasAccess": 1,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "0c380edfc0b7493c88b8afbc76c6c49f",
+        "name": "798d3390",
+        "title": "Templates and Documents",
+        "path": [
+          "Document Vault",
+          "Templates and Documents"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [
+          {
+            "title": "Complete RV Rental Agreement",
+            "file_id": "8fa31a6ab40143fb8ef2963615e3b816",
+            "file_name": "Complete RV Rental Agreement_4.1.doc",
+            "file_content_type": "application/msword"
+          },
+          {
+            "title": "One way Rental Invoice",
+            "file_id": "abb5920f00c04ae0a43a69e66b69654b",
+            "file_name": "Delivery Invoice Template (One way rental).xlsx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          },
+          {
+            "title": "Hold Harmless Indemnity Agreement",
+            "file_id": "e31bc71855b9475695ea45c4cb38c6b4",
+            "file_name": "Hold Harmless Indemnity Agreement.docx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          },
+          {
+            "title": "Intake Supply List",
+            "file_id": "ac33bcaa0cae4d129d77208e1b62097a",
+            "file_name": "Intake Supply List.docx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          },
+          {
+            "title": "Linens Management",
+            "file_id": "642f3f8f0ddb472ab7ea0387c7379e81",
+            "file_name": "Linens Management.docx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          },
+          {
+            "title": "Long Term RV Rental Contract",
+            "file_id": "9e0c69d99e7a4e67afa25f9295224ed4",
+            "file_name": "Long Term RV Rental Contract.docx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          },
+          {
+            "title": "Pet Policy",
+            "file_id": "03a0ef2e1d954d73a3809fa7e017f37f",
+            "file_name": "Pet Policy.doc",
+            "file_content_type": "application/msword"
+          },
+          {
+            "title": "Prep Checklist",
+            "file_id": "bae4ee705a6847a88e9f15aec28d697c",
+            "file_name": "Preparation Checklist.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "Return Inspection",
+            "file_id": "6e59229ecfcd4ebe9d15264cd60202f2",
+            "file_name": "Return Inspection.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "RV Insurance Binder",
+            "file_id": "1cc790815f8042198d3f1bc1022fbfd6",
+            "file_name": "RV Insurance Binder.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "RV Maintenance Log",
+            "file_id": "76035f4ee17f4e2b8fb0b05561cdd164",
+            "file_name": "RV Maintenance Log.xlsx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          },
+          {
+            "title": "Security Damage Authorization",
+            "file_id": "3ec39d876c894a728c0a16f6cc2d6944",
+            "file_name": "Security Damage Authorization Form.doc",
+            "file_content_type": "application/msword"
+          },
+          {
+            "title": "Suggesting Take Along List",
+            "file_id": "65e652f9a9734853b3ee57166150ce38",
+            "file_name": "Suggested Take Along List.docx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          },
+          {
+            "title": "Troubleshooting Manual",
+            "file_id": "c828cd5be88a480991ba9960c34ce530",
+            "file_name": "Troubleshooting Manual.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "Vehicle Release of Liability Form",
+            "file_id": "fdd2f9b730754391b206b4c30daafe93",
+            "file_name": "Vehicle Release of Liability Form.doc",
+            "file_content_type": "application/msword"
+          },
+          {
+            "title": "Trailer Check In-Out Form",
+            "file_id": "ca5e3585abd049099efc0da9a10a981a",
+            "file_name": "Trailer Rental Check In-Out Form.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "Motorhome Check In-Out Form",
+            "file_id": "c7b2c077589c46eebb1d41767b48605c",
+            "file_name": "Motorhome Check In-Out Form.pdf",
+            "file_content_type": "application/pdf"
+          },
+          {
+            "title": "Welcome Book (Make a copy to edit)",
+            "link": "https://canva.link/o10m61gq58w7yid"
+          },
+          {
+            "title": "Invoice Template",
+            "file_id": "1972bb09b52b4954a1b003650af15d33",
+            "file_name": "Invoice Template.xlsx",
+            "file_content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          }
+        ],
+        "markdown": "Here are some of the templates and resources we include all in one place so you can find them easier\n\nIf there is a specific template you are looking for that isn't listed let us know so we can add it\n",
+        "desc_raw_len": 330
+      }
+    ]
+  },
+  {
+    "title": "Maintenance and Repairs",
+    "slug": "4da7eef5",
+    "id": "c904590bd3be46fba9cf46b2cfede1c2",
+    "desc": "Basic maintenance and in house repairs are an integral part of running a successful rental business",
+    "privacy": 1,
+    "hasAccess": null,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "2890ab6afae94d388025cd9d082d69da",
+        "name": "f3af1a9b",
+        "title": "Maintenance and Repairs",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "0bc086b98b6d4c5da04adf6fa2392d7a",
+        "name": "c904c8c8",
+        "title": "Regular Service",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Regular Service"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "d348ddf0b72d4a1590b551092f409aa8",
+        "name": "a2dd1507",
+        "title": "Freezing AC",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Freezing AC"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "c537332fbfac4b38897210b9c3dc9450",
+        "name": "6d6529fc",
+        "title": "Issues starting",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Issues starting"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "c122c271463646a6adcd8adbf033f717",
+        "name": "ca8890f3",
+        "title": "Vibrating when fan turns on",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Vibrating when fan turns on"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "600469e599ee485c8fd828f732a744e5",
+        "name": "b2d57107",
+        "title": "Corroded plug",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Corroded plug"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "3e9ba532df4142e29d03567b3cc03533",
+        "name": "a041dbb9",
+        "title": "Won't light/Stay lit",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Won't light/Stay lit"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "0b85a0a34ae445d39e27b4ea6e87dea5",
+        "name": "a9ede5a8",
+        "title": "Doesn't work on electric",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Doesn't work on electric"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "c7216a91708a436ca19598bbc7d5bbad",
+        "name": "72a53d37",
+        "title": "Doesn't work on electric",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Doesn't work on electric"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "9c5722fac33b41f1818fd1435efb6156",
+        "name": "c54a6427",
+        "title": "Temperature issues",
+        "path": [
+          "Maintenance and Repairs",
+          "Maintenance and Repairs",
+          "Temperature issues"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      }
+    ]
+  },
+  {
+    "title": "Long Term Rentals",
+    "slug": "5115b0b3",
+    "id": "a1950c5de3814a7e90338f2a27e5a071",
+    "desc": "Fewer turnovers, consistent monthly income, and a completely different business model. This module covers pricing, agreements, screening and logistics for long term renters. Less chaos, more predictability, and serious income potential for owners ready to add this strategy.",
+    "privacy": 0,
+    "hasAccess": 1,
+    "amount": null,
+    "lessons": [
+      {
+        "id": "2e836796802d402ab19e3310148de1f4",
+        "name": "187d4efd",
+        "title": "Who Is The Long Term Renter",
+        "path": [
+          "Long Term Rentals",
+          "Who Is The Long Term Renter"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Understanding who you are renting to changes how you find them, how you price, and how you structure the agreement. The two most common long term renter profiles are:\n\n**Traveling workers and contractors** Construction crews, traveling nurses, pipeline workers, and other contractors frequently need housing near a job site for weeks or months at a time. Hotels are expensive and inconvenient. An RV parked near the job site is often a much better solution. These renters tend to be practical, low maintenance, and on a company expense account which means payment reliability is high.\n\nCompanies that frequently place traveling workers include construction firms, staffing agencies, energy companies, and infrastructure contractors. Building a relationship with even one company in this space can generate repeat long term bookings on a consistent basis.\n\n**Insurance displacement renters** When a home becomes uninhabitable due to fire, flood, storm damage, or other covered events, insurance companies are responsible for housing the displaced family. RVs are an increasingly common solution especially in areas where hotels are scarce or the family needs to stay near their property during repairs.\n\nThese renters are often referred directly by insurance adjusters or restoration companies. Building relationships with local insurance agents, adjusters, and restoration contractors can generate a steady pipeline of this type of renter. This is a market most RV rental owners have never considered and that gives you a significant advantage.\n",
+        "desc_raw_len": 1932
+      },
+      {
+        "id": "42cc8f09d1894b088da77b8e6c1a19ff",
+        "name": "0c6edcd0",
+        "title": "Pricing Long Term Rentals",
+        "path": [
+          "Long Term Rentals",
+          "Pricing Long Term Rentals"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Unlike short term rentals where nightly rates and platform algorithms do a lot of the work, long term rental pricing is negotiated case by case. There is no universal formula. The right price depends on the length of the stay, the renter profile, the time of year, and what the market will bear in your area.\n\nA few principles to guide your pricing:\n\n**Discount from your nightly rate but protect your margins.** Long term renters expect a discount in exchange for the commitment and consistency they provide. A reasonable starting point is 20 to 30 percent off your standard nightly rate calculated over the rental period. Go lower than that and you may be losing money once you factor in wear and tear.\n\n**Factor in what you are not paying for.** Long term rentals mean fewer turnovers, lower cleaning costs, less time spent on logistics, and more predictable cash flow. That operational savings has real value and should be reflected in how you think about the discount you are offering.\n\n**Contract terms create certainty on both sides.** Many long term rentals are structured as fixed term contracts.  30 days, 60 days, 90 days, or longer. A signed contract with a set monthly rate or a rate for the entire term gives you income certainty and gives the renter clarity. For corporate and insurance clients this is often a requirement anyway.\n\n**Get a larger security deposit.** A long term renter has significantly more opportunity to cause wear and damage than a weekend renter. Require a security deposit that reflects the length and risk of the stay. We cover this in the agreement section below.\n",
+        "desc_raw_len": 2144
+      },
+      {
+        "id": "d4bcbdcd18084feb883009cfef8b0871",
+        "name": "615fffb4",
+        "title": "Finding Long Term Renters",
+        "path": [
+          "Long Term Rentals",
+          "Finding Long Term Renters"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Long term renters rarely find you through the same channels as short term renters. You need to fish in different ponds.\n\n**For traveling workers and contractors:**\n\n- Reach out directly to construction companies, staffing agencies, and energy companies operating in your area\n\n- Post in local Facebook groups for contractors and job site workers\n\n- List on platforms that cater specifically to traveling workers such as Furnished Finder\n\n- Network with site managers and foremen. Word of mouth travels fast on job sites\n\n- Contact local staffing agencies who place traveling workers and let them know you offer extended stay RV rentals\n\n**For insurance displacement renters:**\n\n- Introduce yourself to local insurance agents and adjusters. Leave your card and a one pager explaining your service\n\n- Connect with restoration and remediation companies in your area. They work directly with displaced families and need housing solutions fast\n\n- List on platforms that serve insurance housing needs\n\n- Make sure your listing and website clearly mention that you accommodate insurance claims and extended stays. Renters in this situation are often searching specifically for this\n",
+        "desc_raw_len": 2253
+      },
+      {
+        "id": "09cb9b8c61e94a33bf29550c50b70af7",
+        "name": "1602b273",
+        "title": "Protecting Your Asset",
+        "path": [
+          "Long Term Rentals",
+          "Protecting Your Asset"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Wear and tear is the biggest challenge unique to long term rentals and the one most owners underestimate going in. A renter living in your RV full time puts significantly more stress on every system than a weekend vacationer. The plumbing, the HVAC, the appliances, the flooring, and the exterior all take more wear over an extended stay.\n\nThis does not mean long term rentals are not worth it, they absolutely are. It means you need to go in with your eyes open and the right protections in place.\n\n**Set clear usage expectations in the agreement.** Define what is and is not allowed. Pets, smoking, guests, modifications, generator hours, and anything else that matters to you. Vague agreements create disputes. Specific agreements prevent them.\n\n**Build in a mid-stay inspection.** For rentals longer than 30 days, include a scheduled walkthrough at the midpoint of the stay. Frame it as routine maintenance rather than a check-up. You are there to service the unit and make sure everything is working properly. This lets you catch and address issues before they become expensive and gives you documentation of the unit's condition mid-rental.\n\n**Charge a monthly maintenance fee or build it into your rate.** Long term use means more frequent servicing. Factor this into your pricing or charge a flat monthly maintenance fee on top of the rental rate so you are not absorbing these costs out of your margin.\n\n**Document everything at move-in and move-out.** Photo and video documentation at the start and end of every long term rental is non-negotiable. The longer the stay the harder it becomes to prove the condition something was in at the beginning. Thorough documentation protects you in any dispute.\n",
+        "desc_raw_len": 2250
+      },
+      {
+        "id": "905ee294ac724238bdc75daa14e3c91d",
+        "name": "d6ced3a4",
+        "title": "The Long Term Rental Agreement",
+        "path": [
+          "Long Term Rentals",
+          "The Long Term Rental Agreement"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Your standard short term rental agreement is not sufficient for a long term rental. The extended duration, the different renter profile, and the increased wear risk all require additional protections.\n\nYour long term rental agreement should cover:\n\n- Fixed contract term with start and end dates\n\n- Monthly rate and payment due date\n\n- Late payment policy and fees\n\n- Security deposit amount and conditions for return\n\n- Pet, smoking, and guest policies\n\n- Generator hour limits and usage guidelines\n\n- Mid-stay inspection rights\n\n- Maintenance responsibilities\n\n- Early termination terms for both parties\n\n- What constitutes normal wear versus damage\n\nYour done-for-you long term rental agreement is included with this module. Review it carefully, customize it with your business details, and never begin a long term rental without a signed copy from the renter.\n",
+        "desc_raw_len": 1948
+      },
+      {
+        "id": "08befe04820940f9a6fb2feaed323aa9",
+        "name": "7f4c0b00",
+        "title": "Managing The Long Term Rental",
+        "path": [
+          "Long Term Rentals",
+          "Managing The Long Term Rental"
+        ],
+        "hasAccess": 1,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": [],
+        "markdown": "Once the renter is in the unit the keys to a successful long term rental are communication, documentation, and consistency.\n\nStay in light contact without being intrusive. A quick check in message every few weeks goes a long way toward catching small problems early and keeping the relationship professional. Renters who feel ignored are renters who let problems slide until they become expensive.\n\nKeep your maintenance schedule running in the background. Even with a renter in the unit your preventive maintenance obligations do not stop. Stay on top of the service intervals for your generator, water systems, and HVAC so you are not dealing with an avoidable breakdown mid-rental.\n\nWhen the rental ends do a thorough walkthrough with the renter present if possible. Review the documentation from move-in side by side with what you are seeing now. Handle any damage claims promptly and professionally using the process outlined in your agreement.\n\nDone right a long term rental is one of the smoothest income streams in this business. Predictable, low maintenance on a day to day basis, and deeply appreciated by renters who often become repeat customers or referral sources.\n",
+        "desc_raw_len": 1470
+      }
+    ]
+  },
+  {
+    "title": "Scaling Through Consignment",
+    "slug": "fa25336d",
+    "id": "6c3150e1934a4686a96e07d1d75025a1",
+    "desc": "Manage other people's RVs and grow your fleet without buying more inventory. This module shows you how to find RV owners who want passive income, structure the agreement to protect yourself, and manage their units profitably alongside your own.",
+    "privacy": 3,
+    "hasAccess": null,
+    "amount": 29700,
+    "lessons": [
+      {
+        "id": "7374d3f62fdf4b6ea3407dec5c56811f",
+        "name": "b8b35240",
+        "title": "Strategy Call",
+        "path": [
+          "Scaling Through Consignment",
+          "Strategy Call"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "8a744bde0e08421a9896c237ff87ee71",
+        "name": "135504be",
+        "title": "The Opportunity",
+        "path": [
+          "Scaling Through Consignment",
+          "The Opportunity"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "6cf3c83c901c46a1baf63f00c723e470",
+        "name": "598e1de1",
+        "title": "Overcoming Owner Objections",
+        "path": [
+          "Scaling Through Consignment",
+          "Overcoming Owner Objections"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "55265d1ae3744c43b903c395c6cc6f3c",
+        "name": "e70fadd2",
+        "title": "Finding Consignment Leads",
+        "path": [
+          "Scaling Through Consignment",
+          "Finding Consignment Leads"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "f3d6f2db837f42c6942a28e9a53cd3e1",
+        "name": "51867642",
+        "title": "Compensation Structure",
+        "path": [
+          "Scaling Through Consignment",
+          "Compensation Structure"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "03527999c5ba4aadbb439d104cb8a918",
+        "name": "6b3a203f",
+        "title": "Consignment Agreement",
+        "path": [
+          "Scaling Through Consignment",
+          "Consignment Agreement"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      },
+      {
+        "id": "51a1d6c457ba4e3aa9aaff8defa1c9ac",
+        "name": "2520e3a4",
+        "title": "Managing the Relationship",
+        "path": [
+          "Scaling Through Consignment",
+          "Managing the Relationship"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      }
+    ]
+  },
+  {
+    "title": "$247 Website - Founders Only!!!",
+    "slug": "def6ada8",
+    "id": "87e1c08cbfbf4d82b0c582333a3f432e",
+    "desc": "Buy this module to lock in your $247 custom website - Offer Expires 7/4/26",
+    "privacy": 3,
+    "hasAccess": null,
+    "amount": 24700,
+    "lessons": [
+      {
+        "id": "9e5931d09df94bcbafd8515c96d05dff",
+        "name": "896498c6",
+        "title": "Book Your Call",
+        "path": [
+          "$247 Website - Founders Only!!!",
+          "Book Your Call"
+        ],
+        "hasAccess": null,
+        "videoLink": null,
+        "videoLenMs": null,
+        "resources": null,
+        "markdown": "",
+        "desc_raw_len": 0
+      }
+    ]
+  }
+]

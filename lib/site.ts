@@ -3,6 +3,9 @@ export const SITE_URL =
 
 export const SITE_NAME = "RVIntel";
 
+/** Companion owner community + classroom (templates, support). */
+export const SKOOL_URL = "https://www.skool.com/rvrentalskool";
+
 export const SITE_DESCRIPTION =
   "RV rental market intelligence across 35 US markets. RVIntel tracks competitor rates, occupancy signals, and pricing trends so hosts know exactly what their rig should earn.";
 

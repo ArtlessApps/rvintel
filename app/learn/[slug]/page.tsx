@@ -1,6 +1,6 @@
 // app/learn/[slug]/page.tsx
 // ─────────────────────────────────────────────────────────────────────────────
-// This ONE file powers all 6 article pages.
+// This ONE file powers all /learn article pages.
 // Next.js sees the [slug] folder name and knows: "any URL that looks like
 // /learn/something should use this file." It passes the 'something' part
 // in as params.slug, and we use that to look up the right article.
@@ -24,7 +24,7 @@ import { STRIPE_TRIAL_DAYS, TRIAL_SUBTEXT } from "@/lib/stripe-subscription";
 
 type Props = { params: Promise<{ slug: string }> };
 
-// ── Pre-generate all 6 routes at build time ───────────────────────────────────
+// ── Pre-generate all article routes at build time ─────────────────────────────
 // This tells Next.js "here are all the slugs that exist" so it can build
 // static HTML pages for each one (better performance + SEO).
 export function generateStaticParams() {
