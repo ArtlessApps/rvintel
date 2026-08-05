@@ -9,7 +9,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, Clock, Tag, CalendarDays } from "lucide-react";
+import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
@@ -159,10 +159,8 @@ export default async function ArticlePage({ params }: Props) {
               {post.excerpt}
             </p>
 
-            {/* Date + author */}
             <div className="flex items-center gap-2 text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground">
-              <CalendarDays className="w-2.5 h-2.5" />
-              {post.date} &middot; {post.author}
+              {post.author}
             </div>
           </div>
         </section>

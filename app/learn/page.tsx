@@ -104,11 +104,7 @@ export default function LearnPage() {
                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">
                     {post.excerpt}
                   </p>
-                  <div className="mt-6 flex items-center justify-between">
-                    <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground font-medium">
-                      {post.date}
-                    </span>
-                    {/* "Read" arrow — visible on hover */}
+                  <div className="mt-6 flex items-center justify-end">
                     <span className="flex items-center gap-1 text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                       Read <ArrowRight className="w-3 h-3" />
                     </span>
