@@ -28,6 +28,7 @@ type NavLink = {
 
 const NAV_LINKS: NavLink[] = [
   { href: "/markets", label: "Markets" },
+  { href: "/tools/roi-calculator", label: "ROI Calculator" },
   { href: "/learn", label: "Learn" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/fleet", label: "My Fleet", icon: Truck },

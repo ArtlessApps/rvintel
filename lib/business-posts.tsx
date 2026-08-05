@@ -99,6 +99,12 @@ export const BUSINESS_POSTS: BusinessPost[] = [
           </li>
         </ul>
         <p>
+          Run the numbers for your ZIP and RV type with the free{" "}
+          <a href="/tools/roi-calculator">RV rental ROI calculator</a> before
+          you buy — it factors platform fees, insurance, maintenance, and
+          local median rates.
+        </p>
+        <p>
           Drivables book easily and need more upkeep. Towables are cheaper to
           run but may require delivery and setup. Bunkhouse floorplans punch
           above their weight because so many trips are family trips.
@@ -462,6 +468,11 @@ export const BUSINESS_POSTS: BusinessPost[] = [
           pricing, add-ons, expense control, and direct bookings can raise net
           profit on the same calendar. Many hosts undercharge for work they
           already do between every trip.
+        </p>
+        <p>
+          Not sure what your current setup earns after fees and repairs? Model
+          it with the{" "}
+          <a href="/tools/roi-calculator">RV rental ROI calculator</a>.
         </p>
 
         <h2>Prep Fees That Match Real Work</h2>

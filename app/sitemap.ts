@@ -28,6 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}/tools/roi-calculator`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
     ...markets.map((market) => ({
       url: `${baseUrl}/markets/${market.slug}`,
       lastModified: new Date(),

@@ -4,6 +4,7 @@ import { liveMarkets } from "@/lib/markets";
 
 const NAV = [
   { href: "/markets", label: "Markets" },
+  { href: "/tools/roi-calculator", label: "ROI Calculator" },
   { href: "/learn", label: "Learn" },
   { href: "/upgrade", label: "Pricing" },
 ];
