@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Orange County, CA RV Rental Rate Card · RVIntel</title>
-  <meta name="description" content="Orange County, CA RV rental prices: median $199/night across 1,364 Outdoorsy &amp; RVshare listings. Live market benchmarks for hosts." />
+  <meta name="description" content="Orange County, CA RV rental prices: median $197/night across 1,367 Outdoorsy &amp; RVshare listings. Live market benchmarks for hosts." />
   <style>
     :root {
       --teal: #2dd4bf;
@@ -85,6 +85,29 @@
       background: linear-gradient(135deg, var(--teal-deep), var(--teal));
     }
     .foot { margin-top: 1.25rem; font-size: 0.75rem; color: var(--muted); }
+    .chart { margin: 0 0 1.25rem; }
+    .row { display: flex; align-items: center; height: 34px; }
+    .row-label { width: 132px; font-size: 0.8125rem; flex-shrink: 0; }
+    .row-count { color: var(--muted); }
+    .row-track { flex: 1; position: relative; height: 100%; }
+    .band {
+      position: absolute; top: 11px; height: 12px;
+      background: #cfeee4; border-radius: 6px;
+    }
+    .tick {
+      position: absolute; top: 8px; height: 18px; width: 2px;
+      background: var(--teal-deep);
+    }
+    .median-line {
+      position: absolute; top: 0; bottom: 0; width: 1px;
+      background: rgba(25, 28, 30, 0.25);
+    }
+    .axis {
+      display: flex; font-size: 0.6875rem; color: var(--muted);
+      margin-top: 2px;
+    }
+    .axis-track { flex: 1; position: relative; height: 16px; }
+    .axis-track span { position: absolute; white-space: nowrap; }
     @media print {
       body { background: #fff; padding: 0; }
       .card { box-shadow: none; }
@@ -96,31 +119,88 @@
     <div class="accent"></div>
     <div class="inner">
       <p class="eyebrow">California · 30 mi · RVIntel</p>
-      <h1>Orange County, CA RV rental rates</h1>
-      <p class="sub">Rate card · July 2026 · Outdoorsy + RVshare</p>
+      <h1>Orange County, CA</h1>
+      <p class="sub">Where the middle 50% of each class is priced · August 2026 · Outdoorsy + RVshare</p>
       <div class="metrics">
-        <div class="metric"><div class="label">Active listings</div><div class="value">1,364</div></div>
-        <div class="metric"><div class="label">Median / night</div><div class="value">$199</div></div>
-        <div class="metric"><div class="label">Avg / night</div><div class="value">$231</div></div>
+        <div class="metric"><div class="label">Active listings</div><div class="value">1,367</div></div>
+        <div class="metric"><div class="label">Median / night</div><div class="value">$197</div></div>
+        <div class="metric"><div class="label">Avg / night</div><div class="value">$230</div></div>
       </div>
-      <ul class="bullets">
-        <li>P25–P75: $145 – $250</li>
-        <li>Outdoorsy 793 · RVshare 571</li>
-        <li>Delivery 59% · Instant book 27%</li>
-      </ul>
-      <table>
-        <thead><tr><th>Class</th><th class="num">Listings</th><th class="num">Median</th></tr></thead>
-        <tbody>
-<tr><td>Travel Trailer</td><td class="num">476</td><td class="num">$139</td></tr>
-<tr><td>Class C</td><td class="num">389</td><td class="num">$229</td></tr>
-<tr><td>Class B</td><td class="num">257</td><td class="num">$220</td></tr>
-<tr><td>Class A</td><td class="num">187</td><td class="num">$298</td></tr>
-<tr><td>Fifth Wheel</td><td class="num">25</td><td class="num">$220</td></tr>
-<tr><td>Toy Hauler</td><td class="num">21</td><td class="num">$151</td></tr>
-        </tbody>
-      </table>
-      <a class="cta" href="https://www.rvintel.io/markets/orange-county-ca">View full Orange County, CA market →</a>
-      <p class="foot">Data as of Jul 24, 2026 · Active geo-scoped listings with positive nightly rates · rvintel.io</p>
+      <div class="chart">
+        <div style="position: relative;">
+          <div style="position: absolute; left: 132px; right: 0; top: 0; bottom: 0;">
+            <div class="median-line" style="left:40.97%"></div>
+          </div>
+
+        <div class="row">
+          <div class="row-label">Travel Trailer <span class="row-count">482</span></div>
+          <div class="row-track">
+            <div class="band" style="left:15.81%; width:10.97%"></div>
+            <div class="tick" style="left:22.26%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class C <span class="row-count">392</span></div>
+          <div class="row-track">
+            <div class="band" style="left:40.32%; width:19.35%"></div>
+            <div class="tick" style="left:51.29%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class B <span class="row-count">252</span></div>
+          <div class="row-track">
+            <div class="band" style="left:35.16%; width:22.90%"></div>
+            <div class="tick" style="left:48.06%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class A <span class="row-count">186</span></div>
+          <div class="row-track">
+            <div class="band" style="left:58.06%; width:32.26%"></div>
+            <div class="tick" style="left:73.87%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Fifth Wheel <span class="row-count">25</span></div>
+          <div class="row-track">
+            <div class="band" style="left:35.48%; width:29.35%"></div>
+            <div class="tick" style="left:41.94%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Toy Hauler <span class="row-count">21</span></div>
+          <div class="row-track">
+            <div class="band" style="left:25.81%; width:16.13%"></div>
+            <div class="tick" style="left:26.13%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Pop Up <span class="row-count">8</span></div>
+          <div class="row-track">
+            <div class="band" style="left:11.29%; width:5.81%"></div>
+            <div class="tick" style="left:12.26%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Other <span class="row-count">1</span></div>
+          <div class="row-track">
+            <div class="band" style="left:41.94%; width:1.50%"></div>
+            <div class="tick" style="left:41.94%"></div>
+          </div>
+        </div>
+        </div>
+        <div class="axis">
+          <span style="width: 132px; flex-shrink: 0;"></span>
+          <div class="axis-track">
+            <span style="left: 0;">$70</span>
+            <span style="left:40.97%; transform: translateX(-50%);">$197 market median</span>
+            <span style="right: 0;">$380</span>
+          </div>
+        </div>
+      </div>
+
+      <a class="cta" href="https://www.rvintel.io/markets/orange-county-ca">Where do you sit? → Orange County, CA</a>
+      <p class="foot">Bars show the middle 50% of asking rates; tick is the median. Cross-listed rigs de-duplicated across Outdoorsy and RVshare. Data as of Aug 6, 2026 · rvintel.io</p>
     </div>
   </article>
 </body>

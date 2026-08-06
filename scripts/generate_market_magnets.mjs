@@ -129,19 +129,57 @@ function computeMagnet(market, listings) {
     ? Math.round((withInstant / listings.length) * 100)
     : null;
 
-  const classMap = new Map();
-  for (const l of listings) {
-    const key = l.rv_class || "other";
-    if (!classMap.has(key)) classMap.set(key, []);
-    classMap.get(key).push(l.nightly_rate);
-  }
-  const byClass = [...classMap.entries()]
-    .map(([cls, clsRates]) => {
+  // Build one row per RV class. rateStats() already returns p25/p75 —
+  // we were just throwing them away before.
+  const classes = [...new Set(listings.map((l) => l.rv_class).filter(Boolean))];
+
+  const byClass = classes
+    .map((cls) => {
+      const clsRates = listings
+        .filter((l) => l.rv_class === cls)
+        .map((l) => l.nightly_rate)
+        .filter((r) => r != null && r > 0);
       const s = rateStats(clsRates);
-      return { class: cls, label: classLabel(cls), count: s.count, medianRate: s.median };
+      return {
+        class: cls,
+        label: classLabel(cls),
+        count: s.count,
+        medianRate: s.median,
+        p25: s.p25,
+        p75: s.p75,
+      };
     })
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 6);
+    .filter((row) => row.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  // Every class bar is drawn on one shared axis, so the scale has to be
+  // computed once from all the bands together — not per row.
+  const allP25 = byClass.map((c) => c.p25).filter((n) => n != null);
+  const allP75 = byClass.map((c) => c.p75).filter((n) => n != null);
+
+  let chartMin = null;
+  let chartMax = null;
+
+  if (allP25.length && allP75.length) {
+    const rawMin = Math.min(...allP25, overall.median ?? Infinity);
+    const rawMax = Math.max(...allP75, overall.median ?? 0);
+    // Pad by 12% so no bar touches the edge; round to clean $10 marks.
+    const pad = Math.max(20, Math.round((rawMax - rawMin) * 0.12));
+    chartMin = Math.max(0, Math.floor((rawMin - pad) / 10) * 10);
+    chartMax = Math.ceil((rawMax + pad) / 10) * 10;
+  }
+
+  // How many rigs sit in a class whose middle 50% doesn't contain the
+  // market median. This is the headline stat for the card.
+  const outsideMedianCount = byClass
+    .filter(
+      (c) =>
+        overall.median != null &&
+        c.p25 != null &&
+        c.p75 != null &&
+        (c.p75 < overall.median || c.p25 > overall.median)
+    )
+    .reduce((sum, c) => sum + c.count, 0);
 
   let asOf = null;
   for (const l of listings) {
@@ -167,8 +205,14 @@ function computeMagnet(market, listings) {
       ? overall.avg - overall.median
       : null;
 
+  // The median alone reads as "the number"; this keeps it honest about the spread behind it.
+  const spreadSentence =
+    outsideMedianCount > 0
+      ? ` That single figure hides a wide spread: for ${fmtNum(outsideMedianCount)} of ${fmtNum(listings.length)} listings, the entire middle 50% of their class sits above or below it.`
+      : "";
+
   const introHtml = [
-    `<p>${escapeHtml(city)} RV rental hosts currently compete across <strong>${fmtNum(listingCount)} active listings</strong> on Outdoorsy and RVshare within a ${market.radiusMiles}-mile radius. The median asking rate is <strong>${fmtMoney(overall.median)}/night</strong> (average ${fmtMoney(overall.avg)})${gap != null && gap !== 0 ? `, a ${fmtMoney(Math.abs(gap))} ${gap > 0 ? "premium of the mean over the median" : "discount of the mean under the median"} that signals how skewed high-end inventory is` : ""}.</p>`,
+    `<p>${escapeHtml(city)} RV rental hosts currently compete across <strong>${fmtNum(listingCount)} active listings</strong> on Outdoorsy and RVshare within a ${market.radiusMiles}-mile radius. The median asking rate is <strong>${fmtMoney(overall.median)}/night</strong> (average ${fmtMoney(overall.avg)})${gap != null && gap !== 0 ? `, a ${fmtMoney(Math.abs(gap))} ${gap > 0 ? "premium of the mean over the median" : "discount of the mean under the median"} that signals how skewed high-end inventory is` : ""}.${spreadSentence}</p>`,
     `<p>Platform mix is roughly <strong>${odsPct}% Outdoorsy / ${rvsPct}% RVshare</strong> (${fmtNum(outdoorsyCount)} vs ${fmtNum(rvshareCount)}). ${topClassBits ? `By class: ${escapeHtml(topClassBits)}.` : ""} ${deliveryPct != null ? `${deliveryPct}% of listings offer delivery;` : ""} ${instantBookPct != null ? `${instantBookPct}% are instant book.` : ""}</p>`,
     `<p>Figures are computed from active geo-scoped listings with a positive nightly rate. Use this page as a pricing baseline, then refine against comps in your class, length, and amenity bundle.</p>`,
   ].join("\n");
@@ -193,6 +237,19 @@ function computeMagnet(market, listings) {
           : `RVshare currently has more inventory in ${city} (${fmtNum(rvshareCount)} vs ${fmtNum(outdoorsyCount)} on Outdoorsy). Many hosts list on both.`,
     },
   ];
+
+  const biggestClass = byClass[0];
+  const spreadClass = byClass.find((c) => c.p25 != null && c.p75 != null);
+
+  if (biggestClass) {
+    faq.push({
+      question: `What should my RV charge in ${shortCity}?`,
+      answer:
+        spreadClass && overall.median != null
+          ? `It depends on class more than location. In ${market.displayName}, ${biggestClass.label.toLowerCase()}s are the largest segment (${fmtNum(biggestClass.count)} listings) with a middle 50% of ${fmtMoney(biggestClass.p25)}–${fmtMoney(biggestClass.p75)}, while the all-class median is ${fmtMoney(overall.median)}. Pricing to the market median without checking your own class can put you well above or below your actual competition.`
+          : `Rates vary widely by RV class in ${market.displayName}. Check the class ranges rather than the market median.`,
+    });
+  }
 
   const asOfLabel = asOf
     ? new Date(asOf).toLocaleDateString("en-US", {
@@ -229,6 +286,9 @@ function computeMagnet(market, listings) {
     deliveryPct,
     instantBookPct,
     byClass,
+    chartMin,
+    chartMax,
+    outsideMedianCount,
     seo: {
       title: `${city} RV Rental Market`,
       description,
@@ -268,12 +328,30 @@ _Data as of ${m.asOfLabel} · Outdoorsy + RVshare · RVIntel_
 }
 
 function renderHtml(m) {
-  const classRows = m.byClass
-    .map(
-      (c) =>
-        `<tr><td>${escapeHtml(c.label)}</td><td class="num">${fmtNum(c.count)}</td><td class="num">${fmtMoney(c.medianRate)}</td></tr>`
-    )
-    .join("\n");
+  // Convert a dollar amount to a left-offset percentage on the shared axis.
+  const pct = (v) => {
+    if (v == null || m.chartMin == null || m.chartMax == null) return 0;
+    const span = m.chartMax - m.chartMin;
+    if (span <= 0) return 0;
+    return ((v - m.chartMin) / span) * 100;
+  };
+
+  const barRows = m.byClass
+    .filter((c) => c.p25 != null && c.p75 != null)
+    .map((c) => {
+      const left = pct(c.p25);
+      const width = Math.max(pct(c.p75) - left, 1.5);
+      const medianLeft = pct(c.medianRate);
+      return `
+        <div class="row">
+          <div class="row-label">${escapeHtml(c.label)} <span class="row-count">${fmtNum(c.count)}</span></div>
+          <div class="row-track">
+            <div class="band" style="left:${left.toFixed(2)}%; width:${width.toFixed(2)}%"></div>
+            <div class="tick" style="left:${medianLeft.toFixed(2)}%"></div>
+          </div>
+        </div>`;
+    })
+    .join("");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -362,6 +440,29 @@ function renderHtml(m) {
       background: linear-gradient(135deg, var(--teal-deep), var(--teal));
     }
     .foot { margin-top: 1.25rem; font-size: 0.75rem; color: var(--muted); }
+    .chart { margin: 0 0 1.25rem; }
+    .row { display: flex; align-items: center; height: 34px; }
+    .row-label { width: 132px; font-size: 0.8125rem; flex-shrink: 0; }
+    .row-count { color: var(--muted); }
+    .row-track { flex: 1; position: relative; height: 100%; }
+    .band {
+      position: absolute; top: 11px; height: 12px;
+      background: #cfeee4; border-radius: 6px;
+    }
+    .tick {
+      position: absolute; top: 8px; height: 18px; width: 2px;
+      background: var(--teal-deep);
+    }
+    .median-line {
+      position: absolute; top: 0; bottom: 0; width: 1px;
+      background: rgba(25, 28, 30, 0.25);
+    }
+    .axis {
+      display: flex; font-size: 0.6875rem; color: var(--muted);
+      margin-top: 2px;
+    }
+    .axis-track { flex: 1; position: relative; height: 16px; }
+    .axis-track span { position: absolute; white-space: nowrap; }
     @media print {
       body { background: #fff; padding: 0; }
       .card { box-shadow: none; }
@@ -373,26 +474,32 @@ function renderHtml(m) {
     <div class="accent"></div>
     <div class="inner">
       <p class="eyebrow">${escapeHtml(m.region)} · ${m.radiusMiles} mi · RVIntel</p>
-      <h1>${escapeHtml(m.displayName)} RV rental rates</h1>
-      <p class="sub">Rate card · ${escapeHtml(m.monthYear)} · Outdoorsy + RVshare</p>
+      <h1>${escapeHtml(m.displayName)}</h1>
+      <p class="sub">Where the middle 50% of each class is priced · ${escapeHtml(m.monthYear)} · Outdoorsy + RVshare</p>
       <div class="metrics">
         <div class="metric"><div class="label">Active listings</div><div class="value">${fmtNum(m.listingCount)}</div></div>
         <div class="metric"><div class="label">Median / night</div><div class="value">${fmtMoney(m.medianRate)}</div></div>
         <div class="metric"><div class="label">Avg / night</div><div class="value">${fmtMoney(m.avgRate)}</div></div>
       </div>
-      <ul class="bullets">
-        <li>P25–P75: ${fmtMoney(m.p25)} – ${fmtMoney(m.p75)}</li>
-        <li>Outdoorsy ${fmtNum(m.outdoorsyCount)} · RVshare ${fmtNum(m.rvshareCount)}</li>
-        <li>Delivery ${m.deliveryPct ?? "—"}% · Instant book ${m.instantBookPct ?? "—"}%</li>
-      </ul>
-      <table>
-        <thead><tr><th>Class</th><th class="num">Listings</th><th class="num">Median</th></tr></thead>
-        <tbody>
-${classRows}
-        </tbody>
-      </table>
-      <a class="cta" href="${SITE_URL.replace(/\/$/, "")}${m.marketPath}">View full ${escapeHtml(m.displayName)} market →</a>
-      <p class="foot">Data as of ${escapeHtml(m.asOfLabel)} · Active geo-scoped listings with positive nightly rates · rvintel.io</p>
+      <div class="chart">
+        <div style="position: relative;">
+          <div style="position: absolute; left: 132px; right: 0; top: 0; bottom: 0;">
+            <div class="median-line" style="left:${pct(m.medianRate).toFixed(2)}%"></div>
+          </div>
+${barRows}
+        </div>
+        <div class="axis">
+          <span style="width: 132px; flex-shrink: 0;"></span>
+          <div class="axis-track">
+            <span style="left: 0;">${fmtMoney(m.chartMin)}</span>
+            <span style="left:${pct(m.medianRate).toFixed(2)}%; transform: translateX(-50%);">${fmtMoney(m.medianRate)} market median</span>
+            <span style="right: 0;">${fmtMoney(m.chartMax)}</span>
+          </div>
+        </div>
+      </div>
+
+      <a class="cta" href="${SITE_URL.replace(/\/$/, "")}${m.marketPath}">Where do you sit? → ${escapeHtml(m.displayName)}</a>
+      <p class="foot">Bars show the middle 50% of asking rates; tick is the median. Cross-listed rigs de-duplicated across Outdoorsy and RVshare. Data as of ${escapeHtml(m.asOfLabel)} · rvintel.io</p>
     </div>
   </article>
 </body>

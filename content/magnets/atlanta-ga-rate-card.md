@@ -1,24 +1,25 @@
-# Atlanta, GA RV Rental Rate Card — July 2026
+# Atlanta, GA RV Rental Rate Card — August 2026
 
-**543 active listings** · Median **$169/night** · Avg **$238/night**
+**536 active listings** · Median **$165/night** · Avg **$236/night**
 
 - P25–P75: $115 – $250
-- Outdoorsy: 252 · RVshare: 291
-- Delivery: 72% · Instant book: 25%
+- Outdoorsy: 249 · RVshare: 287
+- Delivery: 71% · Instant book: 25%
 - Radius: 40 mi · Region: Southeast
 
 ## Rates by class
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 261 | $115 |
-| Class C | 101 | $249 |
-| Class A | 71 | $369 |
-| Class B | 60 | $275 |
-| Fifth Wheel | 42 | $186 |
-| Toy Hauler | 6 | $169 |
+| Travel Trailer | 260 | $115 |
+| Class C | 99 | $249 |
+| Class A | 68 | $382 |
+| Class B | 59 | $275 |
+| Fifth Wheel | 42 | $183 |
+| Toy Hauler | 5 | $171 |
+| Pop Up | 3 | $83 |
 
 Full market page: https://www.rvintel.io/markets/atlanta-ga
 Shareable rate card: https://www.rvintel.io/magnets/atlanta-ga-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

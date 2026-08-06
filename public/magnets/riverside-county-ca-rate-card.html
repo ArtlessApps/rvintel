@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Riverside County, CA RV Rental Rate Card · RVIntel</title>
-  <meta name="description" content="Riverside County, CA RV rental prices: median $169/night across 2,137 Outdoorsy &amp; RVshare listings. Live market benchmarks for hosts." />
+  <meta name="description" content="Riverside County, CA RV rental prices: median $169/night across 2,138 Outdoorsy &amp; RVshare listings. Live market benchmarks for hosts." />
   <style>
     :root {
       --teal: #2dd4bf;
@@ -85,6 +85,29 @@
       background: linear-gradient(135deg, var(--teal-deep), var(--teal));
     }
     .foot { margin-top: 1.25rem; font-size: 0.75rem; color: var(--muted); }
+    .chart { margin: 0 0 1.25rem; }
+    .row { display: flex; align-items: center; height: 34px; }
+    .row-label { width: 132px; font-size: 0.8125rem; flex-shrink: 0; }
+    .row-count { color: var(--muted); }
+    .row-track { flex: 1; position: relative; height: 100%; }
+    .band {
+      position: absolute; top: 11px; height: 12px;
+      background: #cfeee4; border-radius: 6px;
+    }
+    .tick {
+      position: absolute; top: 8px; height: 18px; width: 2px;
+      background: var(--teal-deep);
+    }
+    .median-line {
+      position: absolute; top: 0; bottom: 0; width: 1px;
+      background: rgba(25, 28, 30, 0.25);
+    }
+    .axis {
+      display: flex; font-size: 0.6875rem; color: var(--muted);
+      margin-top: 2px;
+    }
+    .axis-track { flex: 1; position: relative; height: 16px; }
+    .axis-track span { position: absolute; white-space: nowrap; }
     @media print {
       body { background: #fff; padding: 0; }
       .card { box-shadow: none; }
@@ -96,31 +119,88 @@
     <div class="accent"></div>
     <div class="inner">
       <p class="eyebrow">California · 45 mi · RVIntel</p>
-      <h1>Riverside County, CA RV rental rates</h1>
-      <p class="sub">Rate card · July 2026 · Outdoorsy + RVshare</p>
+      <h1>Riverside County, CA</h1>
+      <p class="sub">Where the middle 50% of each class is priced · August 2026 · Outdoorsy + RVshare</p>
       <div class="metrics">
-        <div class="metric"><div class="label">Active listings</div><div class="value">2,137</div></div>
+        <div class="metric"><div class="label">Active listings</div><div class="value">2,138</div></div>
         <div class="metric"><div class="label">Median / night</div><div class="value">$169</div></div>
-        <div class="metric"><div class="label">Avg / night</div><div class="value">$206</div></div>
+        <div class="metric"><div class="label">Avg / night</div><div class="value">$205</div></div>
       </div>
-      <ul class="bullets">
-        <li>P25–P75: $131 – $239</li>
-        <li>Outdoorsy 1,133 · RVshare 1,004</li>
-        <li>Delivery 66% · Instant book 28%</li>
-      </ul>
-      <table>
-        <thead><tr><th>Class</th><th class="num">Listings</th><th class="num">Median</th></tr></thead>
-        <tbody>
-<tr><td>Travel Trailer</td><td class="num">993</td><td class="num">$135</td></tr>
-<tr><td>Class C</td><td class="num">491</td><td class="num">$219</td></tr>
-<tr><td>Class A</td><td class="num">253</td><td class="num">$289</td></tr>
-<tr><td>Class B</td><td class="num">246</td><td class="num">$212</td></tr>
-<tr><td>Fifth Wheel</td><td class="num">79</td><td class="num">$214</td></tr>
-<tr><td>Toy Hauler</td><td class="num">65</td><td class="num">$151</td></tr>
-        </tbody>
-      </table>
-      <a class="cta" href="https://www.rvintel.io/markets/riverside-county-ca">View full Riverside County, CA market →</a>
-      <p class="foot">Data as of Jul 24, 2026 · Active geo-scoped listings with positive nightly rates · rvintel.io</p>
+      <div class="chart">
+        <div style="position: relative;">
+          <div style="position: absolute; left: 132px; right: 0; top: 0; bottom: 0;">
+            <div class="median-line" style="left:34.06%"></div>
+          </div>
+
+        <div class="row">
+          <div class="row-label">Travel Trailer <span class="row-count">997</span></div>
+          <div class="row-track">
+            <div class="band" style="left:17.19%; width:10.94%"></div>
+            <div class="tick" style="left:23.13%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class C <span class="row-count">495</span></div>
+          <div class="row-track">
+            <div class="band" style="left:40.00%; width:19.38%"></div>
+            <div class="tick" style="left:49.69%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class A <span class="row-count">252</span></div>
+          <div class="row-track">
+            <div class="band" style="left:59.06%; width:29.06%"></div>
+            <div class="tick" style="left:71.56%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class B <span class="row-count">241</span></div>
+          <div class="row-track">
+            <div class="band" style="left:37.19%; width:22.19%"></div>
+            <div class="tick" style="left:46.88%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Fifth Wheel <span class="row-count">78</span></div>
+          <div class="row-track">
+            <div class="band" style="left:36.56%; width:28.75%"></div>
+            <div class="tick" style="left:47.81%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Toy Hauler <span class="row-count">65</span></div>
+          <div class="row-track">
+            <div class="band" style="left:23.44%; width:14.38%"></div>
+            <div class="tick" style="left:28.44%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Pop Up <span class="row-count">8</span></div>
+          <div class="row-track">
+            <div class="band" style="left:11.88%; width:4.38%"></div>
+            <div class="tick" style="left:14.69%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Other <span class="row-count">2</span></div>
+          <div class="row-track">
+            <div class="band" style="left:43.13%; width:9.69%"></div>
+            <div class="tick" style="left:48.13%"></div>
+          </div>
+        </div>
+        </div>
+        <div class="axis">
+          <span style="width: 132px; flex-shrink: 0;"></span>
+          <div class="axis-track">
+            <span style="left: 0;">$60</span>
+            <span style="left:34.06%; transform: translateX(-50%);">$169 market median</span>
+            <span style="right: 0;">$380</span>
+          </div>
+        </div>
+      </div>
+
+      <a class="cta" href="https://www.rvintel.io/markets/riverside-county-ca">Where do you sit? → Riverside County, CA</a>
+      <p class="foot">Bars show the middle 50% of asking rates; tick is the median. Cross-listed rigs de-duplicated across Outdoorsy and RVshare. Data as of Aug 6, 2026 · rvintel.io</p>
     </div>
   </article>
 </body>

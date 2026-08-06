@@ -1,9 +1,9 @@
-# Orange County, CA RV Rental Rate Card — July 2026
+# Orange County, CA RV Rental Rate Card — August 2026
 
-**1,364 active listings** · Median **$199/night** · Avg **$231/night**
+**1,367 active listings** · Median **$197/night** · Avg **$230/night**
 
-- P25–P75: $145 – $250
-- Outdoorsy: 793 · RVshare: 571
+- P25–P75: $142 – $250
+- Outdoorsy: 791 · RVshare: 576
 - Delivery: 59% · Instant book: 27%
 - Radius: 30 mi · Region: California
 
@@ -11,14 +11,16 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 476 | $139 |
-| Class C | 389 | $229 |
-| Class B | 257 | $220 |
-| Class A | 187 | $298 |
-| Fifth Wheel | 25 | $220 |
+| Travel Trailer | 482 | $139 |
+| Class C | 392 | $229 |
+| Class B | 252 | $219 |
+| Class A | 186 | $299 |
+| Fifth Wheel | 25 | $200 |
 | Toy Hauler | 21 | $151 |
+| Pop Up | 8 | $108 |
+| Other | 1 | $200 |
 
 Full market page: https://www.rvintel.io/markets/orange-county-ca
 Shareable rate card: https://www.rvintel.io/magnets/orange-county-ca-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

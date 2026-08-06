@@ -1,9 +1,9 @@
-# Baltimore, MD RV Rental Rate Card — July 2026
+# Baltimore, MD RV Rental Rate Card — August 2026
 
-**114 active listings** · Median **$170/night** · Avg **$184/night**
+**115 active listings** · Median **$165/night** · Avg **$184/night**
 
-- P25–P75: $126 – $228
-- Outdoorsy: 51 · RVshare: 63
+- P25–P75: $125 – $227
+- Outdoorsy: 51 · RVshare: 64
 - Delivery: 75% · Instant book: 27%
 - Radius: 30 mi · Region: Northeast
 
@@ -11,7 +11,7 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 56 | $125 |
+| Travel Trailer | 57 | $125 |
 | Class C | 21 | $218 |
 | Class A | 15 | $285 |
 | Class B | 15 | $210 |
@@ -21,4 +21,4 @@
 Full market page: https://www.rvintel.io/markets/baltimore-md
 Shareable rate card: https://www.rvintel.io/magnets/baltimore-md-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

@@ -1,24 +1,25 @@
-# Madison, WI RV Rental Rate Card — July 2026
+# Madison, WI RV Rental Rate Card — August 2026
 
-**95 active listings** · Median **$150/night** · Avg **$182/night**
+**96 active listings** · Median **$150/night** · Avg **$177/night**
 
-- P25–P75: $135 – $224
-- Outdoorsy: 53 · RVshare: 42
-- Delivery: 79% · Instant book: 23%
+- P25–P75: $135 – $187
+- Outdoorsy: 53 · RVshare: 43
+- Delivery: 79% · Instant book: 24%
 - Radius: 30 mi · Region: Midwest
 
 ## Rates by class
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 65 | $145 |
+| Travel Trailer | 67 | $145 |
 | Class C | 16 | $225 |
-| Class A | 6 | $314 |
-| Class B | 5 | $275 |
+| Class A | 6 | $309 |
+| Class B | 4 | $278 |
 | Fifth Wheel | 1 | $365 |
 | Pop Up | 1 | $122 |
+| Toy Hauler | 1 | $105 |
 
 Full market page: https://www.rvintel.io/markets/madison-wi
 Shareable rate card: https://www.rvintel.io/magnets/madison-wi-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

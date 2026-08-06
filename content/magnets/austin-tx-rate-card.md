@@ -1,24 +1,26 @@
-# Austin, TX RV Rental Rate Card — July 2026
+# Austin, TX RV Rental Rate Card — August 2026
 
-**432 active listings** · Median **$133/night** · Avg **$207/night**
+**420 active listings** · Median **$132/night** · Avg **$185/night**
 
 - P25–P75: $115 – $215
-- Outdoorsy: 214 · RVshare: 218
-- Delivery: 77% · Instant book: 29%
+- Outdoorsy: 209 · RVshare: 211
+- Delivery: 76% · Instant book: 29%
 - Radius: 35 mi · Region: Southwest
 
 ## Rates by class
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 270 | $122 |
-| Class C | 55 | $229 |
-| Class B | 53 | $250 |
-| Class A | 25 | $301 |
+| Travel Trailer | 258 | $122 |
+| Class C | 56 | $227 |
+| Class B | 51 | $250 |
+| Class A | 26 | $321 |
 | Fifth Wheel | 21 | $176 |
 | Toy Hauler | 3 | $151 |
+| Other | 3 | $139 |
+| Pop Up | 2 | $94 |
 
 Full market page: https://www.rvintel.io/markets/austin-tx
 Shareable rate card: https://www.rvintel.io/magnets/austin-tx-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

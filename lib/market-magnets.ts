@@ -5,6 +5,8 @@ export type MarketMagnetClassRow = {
   label: string;
   count: number;
   medianRate: number | null;
+  p25: number | null;
+  p75: number | null;
 };
 
 export type MarketMagnetFaq = {
@@ -37,6 +39,9 @@ export type MarketMagnet = {
   deliveryPct: number | null;
   instantBookPct: number | null;
   byClass: MarketMagnetClassRow[];
+  chartMin: number | null;
+  chartMax: number | null;
+  outsideMedianCount: number;
   seo: MarketMagnetSeo;
   magnetPath: string;
   marketPath: string;

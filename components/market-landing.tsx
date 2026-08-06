@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   MapPin,
-  ArrowRight,
   BarChart3,
   BookOpen,
   Download,
@@ -11,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StartTrialCta } from "@/components/start-trial-cta";
+import { ClassRangeChart } from "@/components/class-range-chart";
+import { DashboardCtaButton } from "@/components/dashboard-cta-button";
 import { JsonLd } from "@/lib/json-ld";
 import type { MarketStats } from "@/lib/market-stats";
 import type { MarketMagnet } from "@/lib/market-magnets";
@@ -132,6 +133,15 @@ export function MarketLanding({
           />
         )}
 
+        {magnet && (
+          <ClassRangeChart
+            byClass={byClass}
+            medianRate={medianRate}
+            chartMin={magnet.chartMin}
+            chartMax={magnet.chartMax}
+          />
+        )}
+
         <div className="grid sm:grid-cols-3 gap-4 mb-8">
           {[
             {
@@ -168,7 +178,7 @@ export function MarketLanding({
         {byClass.length > 0 && (
           <section className="mb-10">
             <h2 className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-muted-foreground mb-4">
-              Median rates by class
+              Class detail
             </h2>
             <div className="overflow-x-auto rounded-sm bg-muted/20">
               <table className="w-full text-sm">
@@ -177,6 +187,7 @@ export function MarketLanding({
                     <th className="px-4 py-3 font-medium">Class</th>
                     <th className="px-4 py-3 font-medium text-right">Listings</th>
                     <th className="px-4 py-3 font-medium text-right">Median / night</th>
+                    <th className="px-4 py-3 font-medium text-right">Middle 50%</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -189,6 +200,11 @@ export function MarketLanding({
                       <td className="px-4 py-3 text-right font-semibold">
                         {fmtMoney(row.medianRate)}
                       </td>
+                      <td className="px-4 py-3 text-right text-muted-foreground">
+                        {row.p25 !== null && row.p75 !== null
+                          ? `${fmtMoney(row.p25)} – ${fmtMoney(row.p75)}`
+                          : "—"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -198,21 +214,12 @@ export function MarketLanding({
         )}
 
         <div className="flex flex-wrap gap-3 mb-4">
-          <Button
-            asChild
-            className="rounded-sm"
-            style={{ background: "linear-gradient(135deg, #006b5f, #2dd4bf)" }}
-            disabled={!hasData}
-          >
-            <Link href={`/dashboard?market=${slug}`}>
-              Open dashboard <ArrowRight className="w-4 h-4 ml-1" />
-            </Link>
-          </Button>
+          <DashboardCtaButton slug={slug} />
           {magnet?.magnetPath && (
             <Button asChild variant="outline" className="rounded-sm">
               <Link href={magnet.magnetPath} target="_blank" rel="noopener noreferrer">
                 <FileText className="w-4 h-4 mr-1.5" />
-                Rate card
+                Download the {displayName} rate card
               </Link>
             </Button>
           )}

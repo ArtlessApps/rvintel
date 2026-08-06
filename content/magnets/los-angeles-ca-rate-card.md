@@ -1,9 +1,9 @@
-# Los Angeles, CA RV Rental Rate Card — July 2026
+# Los Angeles, CA RV Rental Rate Card — August 2026
 
-**1,684 active listings** · Median **$199/night** · Avg **$227/night**
+**1,696 active listings** · Median **$199/night** · Avg **$227/night**
 
 - P25–P75: $145 – $250
-- Outdoorsy: 997 · RVshare: 687
+- Outdoorsy: 997 · RVshare: 699
 - Delivery: 59% · Instant book: 28%
 - Radius: 40 mi · Region: California
 
@@ -11,14 +11,16 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Class C | 542 | $229 |
-| Travel Trailer | 517 | $136 |
-| Class B | 353 | $229 |
-| Class A | 203 | $299 |
-| Fifth Wheel | 32 | $220 |
+| Class C | 556 | $226 |
+| Travel Trailer | 518 | $135 |
+| Class B | 350 | $225 |
+| Class A | 202 | $299 |
+| Fifth Wheel | 33 | $213 |
 | Toy Hauler | 27 | $150 |
+| Pop Up | 9 | $107 |
+| Other | 1 | $200 |
 
 Full market page: https://www.rvintel.io/markets/los-angeles-ca
 Shareable rate card: https://www.rvintel.io/magnets/los-angeles-ca-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

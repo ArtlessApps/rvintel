@@ -85,6 +85,29 @@
       background: linear-gradient(135deg, var(--teal-deep), var(--teal));
     }
     .foot { margin-top: 1.25rem; font-size: 0.75rem; color: var(--muted); }
+    .chart { margin: 0 0 1.25rem; }
+    .row { display: flex; align-items: center; height: 34px; }
+    .row-label { width: 132px; font-size: 0.8125rem; flex-shrink: 0; }
+    .row-count { color: var(--muted); }
+    .row-track { flex: 1; position: relative; height: 100%; }
+    .band {
+      position: absolute; top: 11px; height: 12px;
+      background: #cfeee4; border-radius: 6px;
+    }
+    .tick {
+      position: absolute; top: 8px; height: 18px; width: 2px;
+      background: var(--teal-deep);
+    }
+    .median-line {
+      position: absolute; top: 0; bottom: 0; width: 1px;
+      background: rgba(25, 28, 30, 0.25);
+    }
+    .axis {
+      display: flex; font-size: 0.6875rem; color: var(--muted);
+      margin-top: 2px;
+    }
+    .axis-track { flex: 1; position: relative; height: 16px; }
+    .axis-track span { position: absolute; white-space: nowrap; }
     @media print {
       body { background: #fff; padding: 0; }
       .card { box-shadow: none; }
@@ -96,31 +119,81 @@
     <div class="accent"></div>
     <div class="inner">
       <p class="eyebrow">Mountain West · 35 mi · RVIntel</p>
-      <h1>Salt Lake City, UT RV rental rates</h1>
-      <p class="sub">Rate card · July 2026 · Outdoorsy + RVshare</p>
+      <h1>Salt Lake City, UT</h1>
+      <p class="sub">Where the middle 50% of each class is priced · August 2026 · Outdoorsy + RVshare</p>
       <div class="metrics">
         <div class="metric"><div class="label">Active listings</div><div class="value">967</div></div>
         <div class="metric"><div class="label">Median / night</div><div class="value">$165</div></div>
         <div class="metric"><div class="label">Avg / night</div><div class="value">$192</div></div>
       </div>
-      <ul class="bullets">
-        <li>P25–P75: $120 – $229</li>
-        <li>Outdoorsy 555 · RVshare 412</li>
-        <li>Delivery 66% · Instant book 36%</li>
-      </ul>
-      <table>
-        <thead><tr><th>Class</th><th class="num">Listings</th><th class="num">Median</th></tr></thead>
-        <tbody>
-<tr><td>Travel Trailer</td><td class="num">407</td><td class="num">$120</td></tr>
-<tr><td>Class C</td><td class="num">271</td><td class="num">$210</td></tr>
-<tr><td>Class B</td><td class="num">183</td><td class="num">$220</td></tr>
-<tr><td>Class A</td><td class="num">53</td><td class="num">$297</td></tr>
-<tr><td>Toy Hauler</td><td class="num">27</td><td class="num">$134</td></tr>
-<tr><td>Fifth Wheel</td><td class="num">20</td><td class="num">$162</td></tr>
-        </tbody>
-      </table>
-      <a class="cta" href="https://www.rvintel.io/markets/salt-lake-city-ut">View full Salt Lake City, UT market →</a>
-      <p class="foot">Data as of Jul 24, 2026 · Active geo-scoped listings with positive nightly rates · rvintel.io</p>
+      <div class="chart">
+        <div style="position: relative;">
+          <div style="position: absolute; left: 132px; right: 0; top: 0; bottom: 0;">
+            <div class="median-line" style="left:34.85%"></div>
+          </div>
+
+        <div class="row">
+          <div class="row-label">Travel Trailer <span class="row-count">409</span></div>
+          <div class="row-track">
+            <div class="band" style="left:15.15%; width:9.39%"></div>
+            <div class="tick" style="left:21.21%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class C <span class="row-count">272</span></div>
+          <div class="row-track">
+            <div class="band" style="left:42.12%; width:17.58%"></div>
+            <div class="tick" style="left:48.48%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class B <span class="row-count">181</span></div>
+          <div class="row-track">
+            <div class="band" style="left:39.39%; width:21.21%"></div>
+            <div class="tick" style="left:51.52%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Class A <span class="row-count">50</span></div>
+          <div class="row-track">
+            <div class="band" style="left:59.39%; width:29.39%"></div>
+            <div class="tick" style="left:73.64%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Toy Hauler <span class="row-count">27</span></div>
+          <div class="row-track">
+            <div class="band" style="left:21.52%; width:14.24%"></div>
+            <div class="tick" style="left:25.45%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Fifth Wheel <span class="row-count">22</span></div>
+          <div class="row-track">
+            <div class="band" style="left:26.06%; width:16.06%"></div>
+            <div class="tick" style="left:35.15%"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">Pop Up <span class="row-count">6</span></div>
+          <div class="row-track">
+            <div class="band" style="left:10.00%; width:5.76%"></div>
+            <div class="tick" style="left:12.42%"></div>
+          </div>
+        </div>
+        </div>
+        <div class="axis">
+          <span style="width: 132px; flex-shrink: 0;"></span>
+          <div class="axis-track">
+            <span style="left: 0;">$50</span>
+            <span style="left:34.85%; transform: translateX(-50%);">$165 market median</span>
+            <span style="right: 0;">$380</span>
+          </div>
+        </div>
+      </div>
+
+      <a class="cta" href="https://www.rvintel.io/markets/salt-lake-city-ut">Where do you sit? → Salt Lake City, UT</a>
+      <p class="foot">Bars show the middle 50% of asking rates; tick is the median. Cross-listed rigs de-duplicated across Outdoorsy and RVshare. Data as of Aug 6, 2026 · rvintel.io</p>
     </div>
   </article>
 </body>

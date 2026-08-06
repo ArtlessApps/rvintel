@@ -1,21 +1,21 @@
-# Cheyenne, WY RV Rental Rate Card — July 2026
+# Cheyenne, WY RV Rental Rate Card — August 2026
 
-**32 active listings** · Median **$134/night** · Avg **$155/night**
+**34 active listings** · Median **$134/night** · Avg **$153/night**
 
-- P25–P75: $118 – $200
-- Outdoorsy: 16 · RVshare: 16
-- Delivery: 81% · Instant book: 16%
+- P25–P75: $120 – $200
+- Outdoorsy: 16 · RVshare: 18
+- Delivery: 79% · Instant book: 15%
 - Radius: 40 mi · Region: Mountain West
 
 ## Rates by class
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 25 | $125 |
+| Travel Trailer | 27 | $125 |
 | Class C | 4 | $245 |
 | Fifth Wheel | 3 | $200 |
 
 Full market page: https://www.rvintel.io/markets/cheyenne-wy
 Shareable rate card: https://www.rvintel.io/magnets/cheyenne-wy-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

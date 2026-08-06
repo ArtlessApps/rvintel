@@ -1,9 +1,9 @@
-# Minneapolis, MN RV Rental Rate Card — July 2026
+# Minneapolis, MN RV Rental Rate Card — August 2026
 
-**510 active listings** · Median **$149/night** · Avg **$224/night**
+**515 active listings** · Median **$149/night** · Avg **$223/night**
 
 - P25–P75: $130 – $215
-- Outdoorsy: 260 · RVshare: 250
+- Outdoorsy: 261 · RVshare: 254
 - Delivery: 70% · Instant book: 26%
 - Radius: 40 mi · Region: Midwest
 
@@ -11,14 +11,15 @@
 
 | Class | Listings | Median / night |
 | --- | ---: | ---: |
-| Travel Trailer | 331 | $135 |
-| Class C | 88 | $250 |
+| Travel Trailer | 333 | $135 |
+| Class C | 90 | $250 |
 | Class B | 33 | $215 |
 | Class A | 29 | $265 |
 | Toy Hauler | 11 | $150 |
-| Fifth Wheel | 9 | $183 |
+| Fifth Wheel | 10 | $182 |
+| Pop Up | 9 | $99 |
 
 Full market page: https://www.rvintel.io/markets/minneapolis-mn
 Shareable rate card: https://www.rvintel.io/magnets/minneapolis-mn-rate-card.html
 
-_Data as of Jul 24, 2026 · Outdoorsy + RVshare · RVIntel_
+_Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_
