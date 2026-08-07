@@ -505,3 +505,54 @@ export function marketDisplayName(slug: string): string {
 export function liveMarkets(): MarketDefinition[] {
   return MARKETS.filter((m) => m.isLive).sort((a, b) => a.sortOrder - b.sortOrder);
 }
+
+function toRad(deg: number): number {
+  return (deg * Math.PI) / 180;
+}
+
+/** Great-circle distance in miles between two market centers. */
+export function marketDistanceMiles(a: MarketDefinition, b: MarketDefinition): number {
+  const R = 3958.8;
+  const dLat = toRad(b.centerLat - a.centerLat);
+  const dLng = toRad(b.centerLng - a.centerLng);
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.centerLat)) * Math.cos(toRad(b.centerLat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
+export type NearbyMarket = {
+  market: MarketDefinition;
+  distanceMiles: number;
+};
+
+/**
+ * Closest live markets for internal cross-linking.
+ * Returns neighbors within `maxMiles`. If none exist (isolated markets),
+ * falls back to same-region then absolute nearest so every page still
+ * cross-links.
+ */
+export function nearbyMarkets(
+  slug: string,
+  options: { limit?: number; maxMiles?: number } = {},
+): NearbyMarket[] {
+  const { limit = 3, maxMiles = 175 } = options;
+  const origin = MARKET_BY_SLUG[slug];
+  if (!origin?.isLive) return [];
+
+  const ranked = liveMarkets()
+    .filter((m) => m.slug !== slug)
+    .map((market) => ({
+      market,
+      distanceMiles: marketDistanceMiles(origin, market),
+    }))
+    .sort((a, b) => a.distanceMiles - b.distanceMiles);
+
+  const withinRadius = ranked.filter((n) => n.distanceMiles <= maxMiles);
+  if (withinRadius.length > 0) return withinRadius.slice(0, limit);
+
+  const sameRegion = ranked.filter((n) => n.market.region === origin.region);
+  if (sameRegion.length > 0) return sameRegion.slice(0, limit);
+
+  return ranked.slice(0, limit);
+}

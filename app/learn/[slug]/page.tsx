@@ -14,6 +14,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { POSTS, getPost, type Post } from "@/lib/posts";
+import { relatedMarketsForPost } from "@/lib/post-related-markets";
+import { MARKET_BY_SLUG } from "@/lib/markets";
 import { JsonLd } from "@/lib/json-ld";
 import {
   SITE_URL,
@@ -117,6 +119,9 @@ export default async function ArticlePage({ params }: Props) {
 
   // Pick 3 other articles to show as "Related Reading" at the bottom
   const related = POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const relatedMarkets = relatedMarketsForPost(post.slug)
+    .map((marketSlug) => MARKET_BY_SLUG[marketSlug])
+    .filter((m): m is NonNullable<typeof m> => Boolean(m?.isLive));
 
   return (
     <div className="min-h-screen bg-background">
@@ -204,6 +209,10 @@ export default async function ArticlePage({ params }: Props) {
               [&_strong]:text-foreground
               [&_strong]:font-medium
               [&_em]:italic
+              [&_a]:text-primary
+              [&_a]:underline
+              [&_a]:underline-offset-2
+              [&_a]:hover:opacity-80
             "
           >
             <Content />
@@ -267,6 +276,37 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           </div>
         </section>
+
+        {/* ── Related Markets ────────────────────────────────────────────── */}
+        {relatedMarkets.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+            <p className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-muted-foreground mb-6">
+              Explore market data
+            </p>
+            <div className="grid sm:grid-cols-3 gap-4 max-w-2xl">
+              {relatedMarkets.map((market) => (
+                <Link
+                  key={market.slug}
+                  href={`/markets/${market.slug}`}
+                  className="group block bg-muted/30 hover:bg-muted/50 rounded-sm p-5 transition-colors"
+                >
+                  <div
+                    className="h-0.5 w-full mb-4"
+                    style={{
+                      background: "linear-gradient(90deg, #006b5f, #2dd4bf)",
+                    }}
+                  />
+                  <span className="text-[0.625rem] uppercase tracking-[0.05em] text-primary font-medium block mb-2">
+                    {market.region}
+                  </span>
+                  <p className="text-sm font-semibold leading-snug text-foreground group-hover:text-primary transition-colors">
+                    {market.displayName} RV rental rates
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Related Reading ────────────────────────────────────────────── */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">

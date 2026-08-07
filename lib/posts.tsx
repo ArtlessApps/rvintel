@@ -6,6 +6,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { ReactElement } from "react";
+import Link from "next/link";
 import { BUSINESS_POSTS } from "@/lib/business-posts";
 
 export interface Post {
@@ -135,12 +136,13 @@ const PRICING_POSTS: Post[] = [
 
         <h2>What Market Data Shows</h2>
         <p>
-          Across the San Diego RV rental market, Class B campervans sit at a
-          median nightly rate of $189. But the spread between the 25th and 75th
-          percentile is nearly $90. That gap isn&apos;t entirely explained by vehicle
-          quality or listing completeness. A meaningful portion is simply pricing
-          behavior&mdash;hosts who treat their rate as a live variable versus those
-          who don&apos;t.
+          Across the{" "}
+          <Link href="/markets/san-diego-ca">San Diego RV rental market</Link>,
+          Class B campervans sit at a median nightly rate of $189. But the
+          spread between the 25th and 75th percentile is nearly $90. That gap
+          isn&apos;t entirely explained by vehicle quality or listing completeness. A
+          meaningful portion is simply pricing behavior&mdash;hosts who treat
+          their rate as a live variable versus those who don&apos;t.
         </p>
         <p>
           For Class A coaches, the spread is even wider. The same vehicle class,
@@ -369,8 +371,10 @@ const PRICING_POSTS: Post[] = [
           </li>
           <li>
             <strong>Geographic proximity</strong> &mdash; Rates vary meaningfully
-            within a metro area. A San Diego listing based in Mission Valley
-            competes differently than one in Chula Vista or Escondido.
+            within a metro area. A{" "}
+            <Link href="/markets/san-diego-ca">San Diego</Link> listing based in
+            Mission Valley competes differently than one in Chula Vista or
+            Escondido.
           </li>
           <li>
             <strong>Similar availability</strong> &mdash; A host with high

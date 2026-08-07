@@ -13,6 +13,7 @@ import { StartTrialCta } from "@/components/start-trial-cta";
 import { ClassRangeChart } from "@/components/class-range-chart";
 import { DashboardCtaButton } from "@/components/dashboard-cta-button";
 import { JsonLd } from "@/lib/json-ld";
+import { nearbyMarkets } from "@/lib/markets";
 import type { MarketStats } from "@/lib/market-stats";
 import type { MarketMagnet } from "@/lib/market-magnets";
 import type { MarketReportRef } from "@/lib/market-reports";
@@ -69,6 +70,7 @@ export function MarketLanding({
   const introHtml = magnet?.seo.introHtml;
   const faq = magnet?.seo.faq ?? [];
   const byClass = magnet?.byClass ?? [];
+  const nearby = nearbyMarkets(slug);
 
   const faqLd =
     faq.length > 0
@@ -264,6 +266,35 @@ export function MarketLanding({
               ))}
             </div>
           </section>
+        )}
+
+        {nearby.length > 0 && (
+          <div className="pt-12 border-t border-border">
+            <p className="text-[0.6875rem] uppercase tracking-[0.05em] font-medium text-muted-foreground mb-6 flex items-center gap-2">
+              <MapPin className="w-3 h-3" />
+              Nearby markets
+            </p>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {nearby.map(({ market, distanceMiles }) => (
+                <Link
+                  key={market.slug}
+                  href={`/markets/${market.slug}`}
+                  className="group block bg-muted/30 hover:bg-muted/50 rounded-sm p-5 transition-colors"
+                >
+                  <div
+                    className="h-0.5 w-full mb-4"
+                    style={{ background: "linear-gradient(90deg, #006b5f, #2dd4bf)" }}
+                  />
+                  <span className="text-[0.625rem] uppercase tracking-[0.05em] text-primary font-medium block mb-2">
+                    {market.region} · {Math.round(distanceMiles)} mi
+                  </span>
+                  <p className="text-sm font-semibold leading-snug text-foreground group-hover:text-primary transition-colors">
+                    {market.displayName} RV rental market
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
 
         <div className="pt-12 border-t border-border">
