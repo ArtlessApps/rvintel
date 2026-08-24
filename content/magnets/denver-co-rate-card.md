@@ -20,6 +20,7 @@
 | Pop Up | 10 | $132 |
 
 Full market page: https://www.rvintel.io/markets/denver-co
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=denver-co
 Shareable rate card: https://www.rvintel.io/magnets/denver-co-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

@@ -20,6 +20,7 @@
 | Pop Up | 4 | $105 |
 
 Full market page: https://www.rvintel.io/markets/seattle-wa
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=seattle-wa
 Shareable rate card: https://www.rvintel.io/magnets/seattle-wa-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

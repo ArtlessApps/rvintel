@@ -45,7 +45,15 @@ export default function LearnPage() {
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-lg">
               Practical guides for RV rental hosts—from starting the business and
-              winning listings to pricing, operations, and long-term rentals.
+              winning listings to pricing, operations, and long-term rentals. Or
+              skip the reading and run numbers in the{" "}
+              <Link
+                href="/tools/roi-calculator"
+                className="text-primary hover:underline"
+              >
+                RV rental ROI calculator
+              </Link>
+              .
             </p>
           </div>
         </section>

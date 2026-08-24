@@ -120,6 +120,13 @@ export function WaitlistPage() {
                   >
                     <Link href="/markets">Browse {LIVE_MARKET_COUNT} live markets</Link>
                   </Button>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    className="h-10 text-muted-foreground"
+                  >
+                    <Link href="/tools/roi-calculator">Free RV rental ROI calculator</Link>
+                  </Button>
                 </div>
               </div>
 
@@ -169,6 +176,9 @@ export function WaitlistPage() {
             <div className="flex flex-wrap justify-center gap-3">
               <Button asChild variant="outline" className="rounded-sm">
                 <Link href="/markets">Browse all markets</Link>
+              </Button>
+              <Button asChild variant="outline" className="rounded-sm">
+                <Link href="/tools/roi-calculator">RV rental ROI calculator</Link>
               </Button>
               <StartTrialCta />
             </div>

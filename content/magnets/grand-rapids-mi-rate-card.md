@@ -20,6 +20,7 @@
 | Toy Hauler | 1 | $145 |
 
 Full market page: https://www.rvintel.io/markets/grand-rapids-mi
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=grand-rapids-mi
 Shareable rate card: https://www.rvintel.io/magnets/grand-rapids-mi-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

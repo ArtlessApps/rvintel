@@ -20,6 +20,7 @@
 | Toy Hauler | 2 | $155 |
 
 Full market page: https://www.rvintel.io/markets/columbus-oh
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=columbus-oh
 Shareable rate card: https://www.rvintel.io/magnets/columbus-oh-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

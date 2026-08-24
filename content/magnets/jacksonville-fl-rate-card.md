@@ -20,6 +20,7 @@
 | Pop Up | 1 | $40 |
 
 Full market page: https://www.rvintel.io/markets/jacksonville-fl
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=jacksonville-fl
 Shareable rate card: https://www.rvintel.io/magnets/jacksonville-fl-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

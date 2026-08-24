@@ -134,6 +134,24 @@ export function isRoiRvClass(value: string): value is RoiRvClass {
   return (ROI_RV_CLASSES as readonly string[]).includes(value);
 }
 
+/** Seeded market rates when arriving from a market page (`?market=`). */
+export type RoiMarketSeed = {
+  marketSlug: string;
+  marketName: string;
+  distanceMiles: number;
+  medianRate: number | null;
+  rateSource: "class" | "market" | null;
+  listingCount: number;
+  classCount: number;
+  city: string | null;
+  state: string | null;
+};
+
+export function roiCalculatorHref(marketSlug?: string | null): string {
+  if (!marketSlug) return "/tools/roi-calculator";
+  return `/tools/roi-calculator?market=${encodeURIComponent(marketSlug)}`;
+}
+
 export function getClassAssumptions(rvClass: RoiRvClass): ClassAssumptions {
   return CLASS_ASSUMPTIONS[rvClass];
 }

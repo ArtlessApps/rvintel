@@ -20,6 +20,7 @@
 | Pop Up | 3 | $79 |
 
 Full market page: https://www.rvintel.io/markets/detroit-mi
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=detroit-mi
 Shareable rate card: https://www.rvintel.io/magnets/detroit-mi-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

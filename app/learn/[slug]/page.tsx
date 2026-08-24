@@ -264,6 +264,14 @@ export default async function ArticlePage({ params }: Props) {
                   </Button>
                   <Button
                     asChild
+                    variant="outline"
+                    size="sm"
+                    className="rounded-sm"
+                  >
+                    <Link href="/tools/roi-calculator">RV rental ROI calculator</Link>
+                  </Button>
+                  <Button
+                    asChild
                     variant="ghost"
                     size="sm"
                     className="rounded-sm text-muted-foreground"

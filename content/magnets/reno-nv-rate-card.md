@@ -19,6 +19,7 @@
 | Toy Hauler | 6 | $167 |
 
 Full market page: https://www.rvintel.io/markets/reno-nv
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=reno-nv
 Shareable rate card: https://www.rvintel.io/magnets/reno-nv-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

@@ -19,6 +19,7 @@
 | Toy Hauler | 3 | $189 |
 
 Full market page: https://www.rvintel.io/markets/san-jose-ca
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=san-jose-ca
 Shareable rate card: https://www.rvintel.io/magnets/san-jose-ca-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

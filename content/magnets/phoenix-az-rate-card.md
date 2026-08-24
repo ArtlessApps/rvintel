@@ -20,6 +20,7 @@
 | Pop Up | 8 | $85 |
 
 Full market page: https://www.rvintel.io/markets/phoenix-az
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=phoenix-az
 Shareable rate card: https://www.rvintel.io/magnets/phoenix-az-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

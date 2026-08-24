@@ -20,6 +20,7 @@
 | Pop Up | 4 | $81 |
 
 Full market page: https://www.rvintel.io/markets/dallas-fort-worth-tx
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=dallas-fort-worth-tx
 Shareable rate card: https://www.rvintel.io/magnets/dallas-fort-worth-tx-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

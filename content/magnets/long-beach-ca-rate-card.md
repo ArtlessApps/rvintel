@@ -21,6 +21,7 @@
 | Other | 1 | $200 |
 
 Full market page: https://www.rvintel.io/markets/long-beach-ca
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=long-beach-ca
 Shareable rate card: https://www.rvintel.io/magnets/long-beach-ca-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

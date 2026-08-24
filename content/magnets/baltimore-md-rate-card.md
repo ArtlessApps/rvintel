@@ -19,6 +19,7 @@
 | Toy Hauler | 1 | $137 |
 
 Full market page: https://www.rvintel.io/markets/baltimore-md
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=baltimore-md
 Shareable rate card: https://www.rvintel.io/magnets/baltimore-md-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

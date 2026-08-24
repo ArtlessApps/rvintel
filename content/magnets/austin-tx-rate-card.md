@@ -21,6 +21,7 @@
 | Pop Up | 2 | $94 |
 
 Full market page: https://www.rvintel.io/markets/austin-tx
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=austin-tx
 Shareable rate card: https://www.rvintel.io/magnets/austin-tx-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

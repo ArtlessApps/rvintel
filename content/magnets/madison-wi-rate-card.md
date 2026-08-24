@@ -20,6 +20,7 @@
 | Toy Hauler | 1 | $105 |
 
 Full market page: https://www.rvintel.io/markets/madison-wi
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=madison-wi
 Shareable rate card: https://www.rvintel.io/magnets/madison-wi-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

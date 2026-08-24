@@ -20,6 +20,7 @@
 | Pop Up | 1 | $85 |
 
 Full market page: https://www.rvintel.io/markets/chattanooga-tn
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=chattanooga-tn
 Shareable rate card: https://www.rvintel.io/magnets/chattanooga-tn-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

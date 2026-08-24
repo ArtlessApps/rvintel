@@ -20,6 +20,7 @@
 | Pop Up | 1 | $120 |
 
 Full market page: https://www.rvintel.io/markets/hartford-ct
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=hartford-ct
 Shareable rate card: https://www.rvintel.io/magnets/hartford-ct-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

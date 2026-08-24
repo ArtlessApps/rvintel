@@ -20,6 +20,7 @@
 | Pop Up | 4 | $73 |
 
 Full market page: https://www.rvintel.io/markets/tampa-fl
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=tampa-fl
 Shareable rate card: https://www.rvintel.io/magnets/tampa-fl-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

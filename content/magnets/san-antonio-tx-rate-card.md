@@ -20,6 +20,7 @@
 | Pop Up | 1 | $68 |
 
 Full market page: https://www.rvintel.io/markets/san-antonio-tx
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=san-antonio-tx
 Shareable rate card: https://www.rvintel.io/magnets/san-antonio-tx-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

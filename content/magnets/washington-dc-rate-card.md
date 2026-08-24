@@ -20,6 +20,7 @@
 | Pop Up | 2 | $103 |
 
 Full market page: https://www.rvintel.io/markets/washington-dc
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=washington-dc
 Shareable rate card: https://www.rvintel.io/magnets/washington-dc-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

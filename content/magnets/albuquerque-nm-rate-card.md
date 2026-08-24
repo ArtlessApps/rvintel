@@ -19,6 +19,7 @@
 | Pop Up | 3 | $90 |
 
 Full market page: https://www.rvintel.io/markets/albuquerque-nm
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=albuquerque-nm
 Shareable rate card: https://www.rvintel.io/magnets/albuquerque-nm-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

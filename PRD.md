@@ -340,14 +340,14 @@ Top-of-funnel content surfaces that support the waitlist funnel without dependin
 - [x] **San Diego market report** — live PDF at `/markets/san-diego-ca`; legacy `/markets/san-diego` 301 → canonical slug. **(2026-04-23; redirect 2026-06-07)**
 - [x] **Dashboard market selector** — region-grouped dropdown over all 33 live markets; `?market=<slug>` deep link supported. **(2026-06-06)**
 - [x] **Landing page coverage section** — hero + stats bar reflecting 33 markets, 7 regions, 26k+ listing pool. **(2026-06-06)**
-- [x] **Sitemap** — `app/sitemap.ts` emits home, `/learn`, `/markets`, all 33 market slugs, and 6 learn articles via `liveMarkets()` + `lib/post-slugs.ts` (avoids importing React article content). **(2026-06-07)**
+- [x] **Sitemap** — `app/sitemap.ts` emits home, **`/tools/roi-calculator` (priority 0.9 — primary link magnet)**, `/learn`, `/markets`, all live market slugs, and learn articles via `liveMarkets()` + `lib/post-slugs.ts` (avoids importing React article content). **(2026-06-07; ROI calculator added 2026-08-24)**
 - [x] **robots.txt** — `app/robots.ts` allows public pages; disallows `/dashboard`, `/login`, `/early-access`, `/api/`; references sitemap. **(2026-06-07)**
 - [x] **Learn page** (`/learn`) — host education hub with 6 published articles at `/learn/[slug]`; Open Graph + Article JSON-LD per post. **(2026-04-23 content; SEO wiring 2026-06-07)**
 - [x] **SEO P0 — crawlability & indexation** — see §12.1. Shipped 2026-06-07 (commit `d49e0308`).
 - [x] **SEO P1 — on-page & structured data** — see §12.2. Shipped 2026-06-07.
 - [x] **State-dependent marketing CTAs** — `lib/product-cta.ts` + `StartTrialCta` / `SiteHeader` switch trial vs dashboard vs resubscribe based on SSR-hydrated subscription profile. **(2026-06-08)**
 - [ ] **Wire `/learn` article CTAs to `StartTrialCta`** — bottom-of-article trial buttons still hardcode `/login?next=/upgrade`.
-- [ ] **SEO P2 — content & programmatic growth** — market-page SEO copy, quarterly reports for top 10 metros, learn cross-links, income calculator. See §12.3.
+- [x] **SEO P2 — RV rental ROI calculator** — `/tools/roi-calculator` shipped as the primary linkable tool (high-intent query, in-content links from every market page, sitemap priority 0.9). Rate cards remain shareable 1-pagers; they are not the SEO magnet. Remaining P2: market-page SEO copy refresh, quarterly reports for top 10 metros, learn cross-links. See §12.3.
 - [ ] **SEO P3 — measurement** — Google Search Console submission, GA4 organic segmentation, weekly rank tracking. See §12.4.
 - [ ] Generate and publish quarterly HTML/PDF reports for expansion markets (`scripts/generate_all_market_reports.mjs`)
 
@@ -643,7 +643,7 @@ Global active pool: **26,178** listings (single registry; geo windows overlap by
 **Audit date:** 2026-06-07 · **Specialist workflow:** `marketing-seo-specialist.md`
 **Baseline:** Near-zero organic presence (`site:rvintel.io` returned no results pre-fix; production `/sitemap.xml` was returning 500).
 
-RVIntel's organic moat is **geo-specific host intelligence** — quarterly market reports, live Outdoorsy/RVshare comp data, and the `/learn` hub. altCamp owns national camper-van research; no one owns `[city] RV rental market report for hosts` at scale across 33 metros. SEO compounds on top of that content layer once crawl/indexation is healthy.
+RVIntel's organic moat is **geo-specific host intelligence** plus one national link magnet: the **RV rental ROI calculator**. Market pages and quarterly reports own `[city] RV rental market` queries; `/tools/roi-calculator` owns the high-intent tool query and is the page other sites will actually link to — far more than a rate card. altCamp owns national camper-van research; no one owns `[city] RV rental market report for hosts` at scale. SEO compounds on top of that content layer once crawl/indexation is healthy.
 
 ### 12.1 Phase P0 — Crawlability & indexation (COMPLETE 2026-06-07)
 
@@ -658,7 +658,7 @@ RVIntel's organic moat is **geo-specific host intelligence** — quarterly marke
 | 7 | Document `NEXT_PUBLIC_SITE_URL=https://rvintel.io` in `.env.local.example` | [x] |
 | 8 | Submit sitemap in Google Search Console | [ ] post-deploy manual step |
 
-**Indexable surface after P0:** ~42 URLs (home + `/learn` + `/markets` + 33 market pages + 6 articles). Private app routes excluded from sitemap and robots-allowed paths.
+**Indexable surface:** home + `/tools/roi-calculator` + `/learn` + `/markets` + live market pages + learn articles. Private app routes excluded from sitemap and robots-allowed paths. The ROI calculator is the highest-priority tool URL (0.9) — more linkable than per-market rate cards.
 
 ### 12.2 Phase P1 — On-page & structured data (COMPLETE 2026-06-07)
 
@@ -673,17 +673,17 @@ RVIntel's organic moat is **geo-specific host intelligence** — quarterly marke
 
 **Also shipped:** canonical URLs on home, markets hub, market slug pages, and learn articles; title template `%s · RVIntel`; improved `/markets` hub title.
 
-### 12.3 Phase P2 — Content & growth (NOT STARTED)
+### 12.3 Phase P2 — Content & growth (IN PROGRESS — ROI calculator shipped 2026-08-24)
 
 Target: 3–6 months to meaningful non-branded long-tail rankings.
 
 | # | Item | Priority | Notes |
 |---|---|---|---|
-| 15 | Quarterly HTML/PDF reports for top 10 expansion markets | High | `scripts/generate_all_market_reports.mjs` ready; linkable assets for digital PR |
+| 15 | Quarterly HTML/PDF reports for top 10 expansion markets | Medium | Useful locally; the ROI calculator is the national link magnet. `scripts/generate_all_market_reports.mjs` ready. |
 | 16 | 150-word SEO intro on each market landing page | High | Programmatic template across 33 `/markets/[slug]` pages |
 | 17 | Cross-link learn articles ↔ relevant market pages | Medium | Internal link equity between hub and geo pages |
 | 18 | 2 new `/learn` articles/month; seasonal push Feb–May (pre-summer search spike) | High | Existing cluster: dynamic pricing, peak season, platform comparison |
-| 19 | "RV Rental Income Calculator" linkable tool | High | Competitor gap; earns resource links |
+| 19 | **RV rental ROI calculator** (`/tools/roi-calculator`) | High — **shipped** | Primary link magnet and high-intent query ("RV rental ROI calculator"). In global nav, sitemap (0.9), and in-content links from every market page. Far more linkable than a rate card. |
 | 20 | Digital PR for San Diego Q2 2026 report | Medium | Pitch data stories to RV/travel press |
 
 ### 12.4 Phase P3 — Measurement (NOT STARTED)
@@ -692,7 +692,7 @@ Target: 3–6 months to meaningful non-branded long-tail rankings.
 |---|---|---|
 | — | Google Search Console property + sitemap submission | [ ] |
 | — | GA4 organic channel segmentation (non-branded vs branded) | [ ] |
-| — | Weekly rank tracking for 20 target keywords (5 pillar + 15 geo-long-tail) | [ ] |
+| — | Weekly rank tracking for 20 target keywords (5 pillar including **rv rental roi calculator** + 15 geo-long-tail) | [ ] |
 | — | Re-crawl verification after each deploy; target 90%+ index coverage within 60 days of P0 | [ ] |
 
 ### 12.5 Keyword strategy (reference)
@@ -701,6 +701,7 @@ Target: 3–6 months to meaningful non-branded long-tail rankings.
 
 | Keyword | Intent | Target URL | Content status |
 |---|---|---|---|
+| **rv rental roi calculator** | Transactional / tool | `/tools/roi-calculator` | **Live — primary link magnet** |
 | dynamic pricing rv rental | Informational | `/learn/dynamic-pricing-101` | Live |
 | rv rental peak season pricing | Informational | `/learn/peak-season-playbook` | Live |
 | outdoorsy vs rvshare | Commercial | `/learn/platform-comparison` | Live |
@@ -730,7 +731,7 @@ Target: 3–6 months to meaningful non-branded long-tail rankings.
 |---|---|---|
 | Crawlability | ✅ robots + sitemap | Confirm prod sitemap returns 200 after deploy |
 | Indexation | ⚠️ pending | Submit GSC; monitor coverage ratio |
-| Structured data | ✅ Org, WebSite, Article | FAQ schema on learn Q&A sections (P2) |
+| Structured data | ✅ Org, WebSite, Article, calculator WebApplication + FAQ | FAQ schema on remaining learn Q&A sections |
 | Core Web Vitals | ⚠️ improved | Validate LCP with PageSpeed after `next/image` deploy |
 | Mobile | ✅ responsive layout | — |
 | E-E-A-T signals | ⚠️ partial | Author bios, methodology drawer on reports (P2) |
@@ -743,4 +744,4 @@ Target: 3–6 months to meaningful non-branded long-tail rankings.
 | Non-branded organic sessions | Baseline + 50% YoY (long-term) | ~0 |
 | Top-3 rankings (target keyword portfolio) | 30%+ of tracked terms | Not ranking |
 | Featured snippet capture | 20%+ of target PAA opportunities | 0% |
-| Referring domains (market reports + learn) | 10+ DR 40+ links | Minimal |
+| Referring domains (ROI calculator first, then market reports + learn) | 10+ DR 40+ links | Minimal |

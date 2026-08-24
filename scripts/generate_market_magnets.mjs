@@ -321,6 +321,7 @@ function renderMarkdown(m) {
 ${classRows}
 
 Full market page: ${SITE_URL.replace(/\/$/, "")}${m.marketPath}
+RV rental ROI calculator: ${SITE_URL.replace(/\/$/, "")}/tools/roi-calculator?market=${m.slug}
 Shareable rate card: ${SITE_URL.replace(/\/$/, "")}${m.magnetPath}
 
 _Data as of ${m.asOfLabel} · Outdoorsy + RVshare · RVIntel_
@@ -440,6 +441,7 @@ function renderHtml(m) {
       background: linear-gradient(135deg, var(--teal-deep), var(--teal));
     }
     .foot { margin-top: 1.25rem; font-size: 0.75rem; color: var(--muted); }
+    .foot a { color: var(--teal-deep); }
     .chart { margin: 0 0 1.25rem; }
     .row { display: flex; align-items: center; height: 34px; }
     .row-label { width: 132px; font-size: 0.8125rem; flex-shrink: 0; }
@@ -499,7 +501,7 @@ ${barRows}
       </div>
 
       <a class="cta" href="${SITE_URL.replace(/\/$/, "")}${m.marketPath}">Where do you sit? → ${escapeHtml(m.displayName)}</a>
-      <p class="foot">Bars show the middle 50% of asking rates; tick is the median. Cross-listed rigs de-duplicated across Outdoorsy and RVshare. Data as of ${escapeHtml(m.asOfLabel)} · rvintel.io</p>
+      <p class="foot"><a href="${SITE_URL.replace(/\/$/, "")}/tools/roi-calculator?market=${encodeURIComponent(m.slug)}">Free RV rental ROI calculator</a> using these rates. Bars show the middle 50% of asking rates; tick is the median. Cross-listed rigs de-duplicated across Outdoorsy and RVshare. Data as of ${escapeHtml(m.asOfLabel)} · rvintel.io</p>
     </div>
   </article>
 </body>

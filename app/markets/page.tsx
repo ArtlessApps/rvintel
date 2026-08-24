@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, BarChart3, ArrowRight, BookOpen } from "lucide-react";
+import { MapPin, BarChart3, ArrowRight, BookOpen, Calculator } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StartTrialCta } from "@/components/start-trial-cta";
@@ -119,6 +119,13 @@ export default function MarketsPage() {
               >
                 <BookOpen className="w-3 h-3" aria-hidden />
                 Pricing guides for RV hosts
+              </Link>
+              <Link
+                href="/tools/roi-calculator"
+                className="ml-4 inline-flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-medium hover:underline"
+              >
+                <Calculator className="w-3 h-3" aria-hidden />
+                RV rental ROI calculator
               </Link>
             </div>
             <StartTrialCta />

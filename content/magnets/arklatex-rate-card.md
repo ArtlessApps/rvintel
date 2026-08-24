@@ -17,6 +17,7 @@
 | Fifth Wheel | 2 | $173 |
 
 Full market page: https://www.rvintel.io/markets/arklatex
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=arklatex
 Shareable rate card: https://www.rvintel.io/magnets/arklatex-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

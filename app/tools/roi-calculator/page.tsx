@@ -6,21 +6,53 @@ import { SiteFooter } from "@/components/site-footer";
 import { RoiCalculator } from "@/components/roi-calculator";
 import { JsonLd } from "@/lib/json-ld";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { resolveRoiMarketDefaultsBySlug } from "@/lib/zip-to-market";
+import type { RoiMarketSeed } from "@/lib/roi-defaults";
+
+const TITLE = "RV Rental ROI Calculator";
+const DESCRIPTION =
+  "Free RV rental ROI calculator — estimate cash-on-cash return from renting out your RV. Uses live market rates plus platform fees, insurance, maintenance, and taxes.";
 
 export const metadata = {
-  title: "RV Rental ROI Calculator",
-  description:
-    "Estimate cash-on-cash ROI for renting out your RV. Factor in platform fees, insurance, maintenance, taxes, and local median rates from RVIntel market data.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: {
     canonical: "/tools/roi-calculator",
   },
   openGraph: {
-    title: "RV Rental ROI Calculator · RVIntel",
-    description:
-      "Calculate whether renting out your RV is worth it — with market-backed nightly rates and a full expense model.",
+    title: `${TITLE} · RVIntel`,
+    description: DESCRIPTION,
     url: `${SITE_URL}/tools/roi-calculator`,
   },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: `${TITLE} · RVIntel`,
+    description: DESCRIPTION,
+  },
 };
+
+type Props = { searchParams: Promise<{ market?: string | string[] }> };
+
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function seedFromMarket(slug: string | undefined): RoiMarketSeed | null {
+  if (!slug) return null;
+  const result = resolveRoiMarketDefaultsBySlug(slug, "Class C");
+  if ("error" in result) return null;
+  return {
+    marketSlug: result.marketSlug,
+    marketName: result.marketName,
+    distanceMiles: result.distanceMiles,
+    medianRate: result.medianRate,
+    rateSource: result.rateSource,
+    listingCount: result.listingCount,
+    classCount: result.classCount,
+    city: result.city,
+    state: result.state,
+  };
+}
 
 const FAQS = [
   {
@@ -31,7 +63,7 @@ const FAQS = [
   {
     question: "Where do the nightly rate defaults come from?",
     answer:
-      "When you enter a US ZIP code, RVIntel finds the nearest tracked market and autofills the median asking rate for your RV class from live Outdoorsy and RVshare listing data. You can override the rate at any time.",
+      "When you enter a US ZIP code — or follow a market page into this tool — RVIntel finds the matching tracked market and autofills the median asking rate for your RV class from live Outdoorsy and RVshare listing data. You can override the rate at any time.",
   },
   {
     question: "What costs should I include when renting out an RV?",
@@ -50,17 +82,20 @@ const FAQS = [
   },
 ];
 
-export default function RoiCalculatorPage() {
+export default async function RoiCalculatorPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const initialDefaults = seedFromMarket(firstParam(params.market));
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      name: "RV Rental ROI Calculator",
+      name: TITLE,
       applicationCategory: "FinanceApplication",
       operatingSystem: "Web",
       url: `${SITE_URL}/tools/roi-calculator`,
       description:
-        "Estimate RV rental cash-on-cash ROI using market-backed nightly rates and a full operating expense model.",
+        "Free RV rental ROI calculator using market-backed nightly rates and a full operating expense model.",
       provider: {
         "@type": "Organization",
         name: SITE_NAME,
@@ -71,6 +106,24 @@ export default function RoiCalculatorPage() {
         price: "0",
         priceCurrency: "USD",
       },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: SITE_URL,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: TITLE,
+          item: `${SITE_URL}/tools/roi-calculator`,
+        },
+      ],
     },
     {
       "@context": "https://schema.org",
@@ -102,15 +155,19 @@ export default function RoiCalculatorPage() {
               RV Rental ROI Calculator
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-lg">
-              Enter your cost, RV type, and ZIP to estimate cash-on-cash return —
-              including platform fees, repairs, insurance, and taxes — with
-              nightly rates backed by RVIntel market data.
+              Free RV rental ROI calculator for owners and hosts. Enter cost, RV
+              type, and ZIP to estimate cash-on-cash return — including platform
+              fees, repairs, insurance, and taxes — with nightly rates backed by
+              RVIntel market data.
+              {initialDefaults
+                ? ` Rates below are pre-filled from the ${initialDefaults.marketName} market.`
+                : ""}
             </p>
           </div>
         </section>
 
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-          <RoiCalculator />
+          <RoiCalculator initialDefaults={initialDefaults} />
         </section>
 
         <section className="bg-muted/30 border-y border-border">

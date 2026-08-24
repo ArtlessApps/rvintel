@@ -76,6 +76,11 @@ const websiteJsonLd = {
   url: SITE_URL,
   description: SITE_DESCRIPTION,
   publisher: { "@type": "Organization", name: SITE_NAME },
+  hasPart: {
+    "@type": "WebApplication",
+    name: "RV Rental ROI Calculator",
+    url: `${SITE_URL}/tools/roi-calculator`,
+  },
 };
 
 export default async function RootLayout({

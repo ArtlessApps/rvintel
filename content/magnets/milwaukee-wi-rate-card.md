@@ -20,6 +20,7 @@
 | Pop Up | 2 | $114 |
 
 Full market page: https://www.rvintel.io/markets/milwaukee-wi
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=milwaukee-wi
 Shareable rate card: https://www.rvintel.io/magnets/milwaukee-wi-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

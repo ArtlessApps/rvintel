@@ -1,5 +1,5 @@
-import { liveMarkets, type MarketDefinition } from "@/lib/markets";
-import { getMarketMagnet } from "@/lib/market-magnets";
+import { liveMarkets, MARKET_BY_SLUG, type MarketDefinition } from "@/lib/markets";
+import { getMarketMagnet, type MarketMagnet } from "@/lib/market-magnets";
 import { isRoiRvClass, type RoiRvClass } from "@/lib/roi-defaults";
 
 const MIN_CLASS_SAMPLE = 5;
@@ -117,24 +117,13 @@ export function findNearestMarket(
   return best;
 }
 
-export async function resolveRoiMarketDefaults(
-  zip: string,
-  rvClassRaw: string | null,
-): Promise<RoiMarketDefaults | { error: string; status: number }> {
-  const coords = await geocodeUsZip(zip);
-  if (!coords) {
-    return { error: "Enter a valid 5-digit US ZIP code.", status: 400 };
-  }
-
-  const nearest = findNearestMarket(coords.lat, coords.lng);
-  if (!nearest) {
-    return { error: "No RVIntel markets available.", status: 503 };
-  }
-
-  const rvClass =
-    rvClassRaw && isRoiRvClass(rvClassRaw) ? rvClassRaw : null;
-  const magnet = getMarketMagnet(nearest.market.slug);
-
+function ratesFromMagnet(
+  magnet: MarketMagnet | null,
+  rvClass: RoiRvClass | null,
+): Pick<
+  RoiMarketDefaults,
+  "medianRate" | "rateSource" | "listingCount" | "classCount" | "asOf"
+> {
   let medianRate: number | null = null;
   let rateSource: "class" | "market" | null = null;
   let classCount = 0;
@@ -156,17 +145,68 @@ export async function resolveRoiMarketDefaults(
   }
 
   return {
+    medianRate,
+    rateSource,
+    listingCount: magnet?.listingCount ?? 0,
+    classCount,
+    asOf: magnet?.asOf ?? null,
+  };
+}
+
+/** Direct market-page seed — no ZIP geocode. */
+export function resolveRoiMarketDefaultsBySlug(
+  slug: string,
+  rvClassRaw: string | null,
+): RoiMarketDefaults | { error: string; status: number } {
+  const market = MARKET_BY_SLUG[slug];
+  if (!market?.isLive) {
+    return { error: "Unknown market.", status: 404 };
+  }
+
+  const rvClass =
+    rvClassRaw && isRoiRvClass(rvClassRaw) ? rvClassRaw : null;
+  const magnet = getMarketMagnet(market.slug);
+  const rates = ratesFromMagnet(magnet, rvClass);
+
+  return {
+    zip: "",
+    city: null,
+    state: null,
+    marketSlug: market.slug,
+    marketName: market.displayName,
+    distanceMiles: 0,
+    ...rates,
+    rvClass,
+  };
+}
+
+export async function resolveRoiMarketDefaults(
+  zip: string,
+  rvClassRaw: string | null,
+): Promise<RoiMarketDefaults | { error: string; status: number }> {
+  const coords = await geocodeUsZip(zip);
+  if (!coords) {
+    return { error: "Enter a valid 5-digit US ZIP code.", status: 400 };
+  }
+
+  const nearest = findNearestMarket(coords.lat, coords.lng);
+  if (!nearest) {
+    return { error: "No RVIntel markets available.", status: 503 };
+  }
+
+  const rvClass =
+    rvClassRaw && isRoiRvClass(rvClassRaw) ? rvClassRaw : null;
+  const magnet = getMarketMagnet(nearest.market.slug);
+  const rates = ratesFromMagnet(magnet, rvClass);
+
+  return {
     zip: coords.zip,
     city: coords.city,
     state: coords.state,
     marketSlug: nearest.market.slug,
     marketName: nearest.market.displayName,
     distanceMiles: Math.round(nearest.distanceMiles * 10) / 10,
-    medianRate,
-    rateSource,
-    listingCount: magnet?.listingCount ?? 0,
-    classCount,
-    asOf: magnet?.asOf ?? null,
+    ...rates,
     rvClass,
   };
 }

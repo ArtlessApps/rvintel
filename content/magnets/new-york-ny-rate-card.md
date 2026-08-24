@@ -20,6 +20,7 @@
 | Pop Up | 1 | $91 |
 
 Full market page: https://www.rvintel.io/markets/new-york-ny
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=new-york-ny
 Shareable rate card: https://www.rvintel.io/magnets/new-york-ny-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

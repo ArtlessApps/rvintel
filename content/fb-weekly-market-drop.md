@@ -12,9 +12,10 @@ Goal: give hosts a useful number → send them to a self-serve page.
 2. Refresh numbers if stale: `pnpm magnets <slug>` (optional; monthly is fine).
 3. Open the Markdown rate card: `content/magnets/<slug>-rate-card.md`
 4. Copy the post from [templates](#post-templates) and fill blanks from that file.
-5. Links to use:
-   - Rate card: `https://www.rvintel.io/magnets/<slug>-rate-card.html`
+5. Links to use (prefer the calculator — it's the linkable asset):
+   - **RV rental ROI calculator (primary):** `https://www.rvintel.io/tools/roi-calculator?market=<slug>`
    - Market page: `https://www.rvintel.io/markets/<slug>`
+   - Rate card (optional screenshot / first-comment extra): `https://www.rvintel.io/magnets/<slug>-rate-card.html`
    - All markets: `https://www.rvintel.io/markets`
 6. Post in the group (text + link; screenshot of the rate card HTML is optional eye candy).
 7. Log the date + market in the [log](#post-log) at the bottom.
@@ -27,7 +28,7 @@ Goal: give hosts a useful number → send them to a self-serve page.
 - Lead with **one concrete number** (median, or a class median). Tool name is secondary.
 - Soft brand only: “pulled from Outdoorsy + RVshare” / “RVIntel tracks this” is enough.
 - CTA is always a **link**, never “message me.”
-- Don’t argue pricing advice in comments. Point back to the card / market page.
+- Don’t argue pricing advice in comments. Point back to the calculator / market page.
 - If admins hate links: put the numbers in the post body and drop the link in the **first comment**.
 
 ---
@@ -48,7 +49,7 @@ By class (median):
 • [Class 2]: $[m2]
 • [Class 3]: $[m3]
 
-Full rate card (1-pager): [rate-card URL]
+Plug those rates into the free RV rental ROI calculator: [roi-calculator URL]
 Other cities: https://www.rvintel.io/markets
 
 Curious which market I should drop next week? Comment the city.
@@ -66,6 +67,7 @@ Travel trailers ~$[tt] · Class C ~$[cc] · Class B ~$[cb]
 
 *First comment:*
 ```
+Run the numbers: [City] RV rental ROI calculator → [roi-calculator URL]
 [City] rate card → [rate-card URL]
 All markets → https://www.rvintel.io/markets
 ```
@@ -77,7 +79,7 @@ For [City] [Class] hosts —
 
 Median ask is $[class median]/night ([class count] [Class] listings in-market). Overall market median is $[median] across [N] listings.
 
-Full class + platform split: [rate-card URL]
+ROI calculator with these rates: [roi-calculator URL]
 Browse other metros: https://www.rvintel.io/markets
 ```
 
@@ -90,7 +92,7 @@ Browse other metros: https://www.rvintel.io/markets
 | “Do you have [other city]?” | “Yep — [city] is here: https://www.rvintel.io/markets/[slug] (or browse all: /markets). I rotate one city a week in here.” |
 | “How do you get this?” | “Public Outdoorsy + RVshare listing data, geo-scoped. Card shows median / avg / class mix.” |
 | “Can you look at *my* listing?” | “Not in DMs — start free trial on the market page and use the dashboard for comps.” |
-| “Is this a sales pitch?” | “Nope — sharing the [City] snapshot. Link is the free 1-pager; product is optional.” |
+| “Is this a sales pitch?” | “Nope — sharing the [City] snapshot. Link is the free ROI calculator; product is optional.” |
 | Price debate / “my market is different” | “Totals are asking rates across active listings in a [radius] mi window — your comps may differ by class/length. Card has the class split.” |
 
 ---

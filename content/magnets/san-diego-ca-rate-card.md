@@ -19,6 +19,7 @@
 | Fifth Wheel | 19 | $205 |
 
 Full market page: https://www.rvintel.io/markets/san-diego-ca
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=san-diego-ca
 Shareable rate card: https://www.rvintel.io/magnets/san-diego-ca-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

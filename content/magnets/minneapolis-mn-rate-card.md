@@ -20,6 +20,7 @@
 | Pop Up | 9 | $99 |
 
 Full market page: https://www.rvintel.io/markets/minneapolis-mn
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=minneapolis-mn
 Shareable rate card: https://www.rvintel.io/magnets/minneapolis-mn-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

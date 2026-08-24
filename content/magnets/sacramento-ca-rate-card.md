@@ -20,6 +20,7 @@
 | Pop Up | 2 | $120 |
 
 Full market page: https://www.rvintel.io/markets/sacramento-ca
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=sacramento-ca
 Shareable rate card: https://www.rvintel.io/magnets/sacramento-ca-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

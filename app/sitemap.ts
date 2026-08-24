@@ -17,10 +17,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${baseUrl}/learn`,
+      url: `${baseUrl}/tools/roi-calculator`,
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/markets`,
@@ -29,10 +29,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/tools/roi-calculator`,
+      url: `${baseUrl}/learn`,
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.85,
+      priority: 0.8,
     },
     ...markets.map((market) => ({
       url: `${baseUrl}/markets/${market.slug}`,

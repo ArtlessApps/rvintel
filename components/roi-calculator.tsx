@@ -41,20 +41,9 @@ import {
   getClassAssumptions,
   ROI_RV_CLASSES,
   type RoiFormInputs,
+  type RoiMarketSeed,
   type RoiRvClass,
 } from "@/lib/roi-defaults";
-
-type MarketMeta = {
-  marketSlug: string;
-  marketName: string;
-  distanceMiles: number;
-  medianRate: number | null;
-  rateSource: "class" | "market" | null;
-  listingCount: number;
-  classCount: number;
-  city: string | null;
-  state: string | null;
-};
 
 type FormState = RoiFormInputs;
 
@@ -150,15 +139,29 @@ function toRoiInputs(form: FormState): RoiInputs {
   };
 }
 
-export function RoiCalculator() {
+export function RoiCalculator({
+  initialDefaults = null,
+}: {
+  initialDefaults?: RoiMarketSeed | null;
+}) {
   const cta = useProductCta();
-  const [form, setForm] = useState<FormState>(() => buildInitialInputs("Class C"));
-  const [market, setMarket] = useState<MarketMeta | null>(null);
+  const seededSlug = initialDefaults?.marketSlug ?? null;
+  const [form, setForm] = useState<FormState>(() => {
+    const base = buildInitialInputs("Class C");
+    if (typeof initialDefaults?.medianRate === "number") {
+      return { ...base, nightlyRate: initialDefaults.medianRate };
+    }
+    return base;
+  });
+  const [market, setMarket] = useState<RoiMarketSeed | null>(
+    initialDefaults ?? null,
+  );
   const [rateLocked, setRateLocked] = useState(false);
   const rateLockedRef = useRef(false);
   rateLockedRef.current = rateLocked;
+  const skippedSeedFetch = useRef(Boolean(initialDefaults));
   const [lookupStatus, setLookupStatus] = useState<"idle" | "loading" | "error" | "ok">(
-    "idle",
+    initialDefaults ? "ok" : "idle",
   );
   const [lookupError, setLookupError] = useState<string | null>(null);
 
@@ -186,66 +189,71 @@ export function RoiCalculator() {
     setRateLocked(false);
   };
 
-  const lookupMarket = useEffectEvent(async (zip: string, rvClass: RoiRvClass) => {
-    const digits = zip.replace(/\D/g, "").slice(0, 5);
-    if (digits.length !== 5) {
-      setLookupStatus("idle");
+  const lookupMarket = useEffectEvent(
+    async (opts: { zip?: string; market?: string; rvClass: RoiRvClass }) => {
+      const params = new URLSearchParams({ rvClass: opts.rvClass });
+      if (opts.zip) params.set("zip", opts.zip);
+      else if (opts.market) params.set("market", opts.market);
+      else return;
+
+      setLookupStatus("loading");
       setLookupError(null);
-      setMarket(null);
-      return;
-    }
 
-    setLookupStatus("loading");
-    setLookupError(null);
-
-    try {
-      const res = await fetch(
-        `/api/roi-defaults?zip=${encodeURIComponent(digits)}&rvClass=${encodeURIComponent(rvClass)}`,
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        setLookupStatus("error");
-        setLookupError(data.error ?? "Could not look up that ZIP.");
-        setMarket(null);
-        return;
-      }
-
-      startTransition(() => {
-        setMarket({
-          marketSlug: data.marketSlug,
-          marketName: data.marketName,
-          distanceMiles: data.distanceMiles,
-          medianRate: data.medianRate,
-          rateSource: data.rateSource,
-          listingCount: data.listingCount,
-          classCount: data.classCount,
-          city: data.city,
-          state: data.state,
-        });
-        if (typeof data.medianRate === "number" && !rateLockedRef.current) {
-          setForm((prev) => ({ ...prev, nightlyRate: data.medianRate }));
+      try {
+        const res = await fetch(`/api/roi-defaults?${params.toString()}`);
+        const data = await res.json();
+        if (!res.ok) {
+          setLookupStatus("error");
+          setLookupError(data.error ?? "Could not look up that ZIP.");
+          setMarket(null);
+          return;
         }
-        setLookupStatus("ok");
-      });
-    } catch {
-      setLookupStatus("error");
-      setLookupError("Market lookup failed. You can still enter a nightly rate.");
-      setMarket(null);
-    }
-  });
+
+        startTransition(() => {
+          setMarket({
+            marketSlug: data.marketSlug,
+            marketName: data.marketName,
+            distanceMiles: data.distanceMiles ?? 0,
+            medianRate: data.medianRate,
+            rateSource: data.rateSource,
+            listingCount: data.listingCount,
+            classCount: data.classCount,
+            city: data.city,
+            state: data.state,
+          });
+          if (typeof data.medianRate === "number" && !rateLockedRef.current) {
+            setForm((prev) => ({ ...prev, nightlyRate: data.medianRate }));
+          }
+          setLookupStatus("ok");
+        });
+      } catch {
+        setLookupStatus("error");
+        setLookupError("Market lookup failed. You can still enter a nightly rate.");
+        setMarket(null);
+      }
+    },
+  );
 
   useEffect(() => {
     const digits = form.zip.replace(/\D/g, "").slice(0, 5);
-    if (digits.length !== 5) {
-      setLookupStatus("idle");
-      setMarket(null);
+    if (digits.length === 5) {
+      skippedSeedFetch.current = false;
+      const t = setTimeout(() => {
+        void lookupMarket({ zip: digits, rvClass: form.rvClass });
+      }, 400);
+      return () => clearTimeout(t);
+    }
+    if (seededSlug) {
+      if (skippedSeedFetch.current) {
+        skippedSeedFetch.current = false;
+        return;
+      }
+      void lookupMarket({ market: seededSlug, rvClass: form.rvClass });
       return;
     }
-    const t = setTimeout(() => {
-      void lookupMarket(digits, form.rvClass);
-    }, 400);
-    return () => clearTimeout(t);
-  }, [form.zip, form.rvClass]);
+    setLookupStatus("idle");
+    setMarket(null);
+  }, [form.zip, form.rvClass, seededSlug]);
 
   const rateHint = (() => {
     if (!market?.medianRate || !market.rateSource) return null;
@@ -339,7 +347,7 @@ export function RoiCalculator() {
                 <p className="text-xs text-destructive">{lookupError}</p>
               ) : market ? (
                 <p className="text-xs text-muted-foreground">
-                  Nearest market:{" "}
+                  {market.distanceMiles > 0 ? "Nearest market: " : "Market rates: "}
                   <Link
                     href={`/markets/${market.marketSlug}`}
                     className="text-primary hover:underline"
@@ -348,8 +356,10 @@ export function RoiCalculator() {
                   </Link>
                   {market.city
                     ? ` · ${market.city}${market.state ? `, ${market.state}` : ""}`
-                    : ""}{" "}
-                  ({market.distanceMiles} mi)
+                    : ""}
+                  {market.distanceMiles > 0
+                    ? ` (${market.distanceMiles} mi)`
+                    : ""}
                 </p>
               ) : (
                 <p className="text-xs text-muted-foreground">

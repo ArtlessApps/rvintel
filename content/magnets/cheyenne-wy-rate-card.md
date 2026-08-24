@@ -16,6 +16,7 @@
 | Fifth Wheel | 3 | $200 |
 
 Full market page: https://www.rvintel.io/markets/cheyenne-wy
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=cheyenne-wy
 Shareable rate card: https://www.rvintel.io/magnets/cheyenne-wy-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

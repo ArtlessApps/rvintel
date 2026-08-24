@@ -20,6 +20,7 @@
 | Toy Hauler | 2 | $118 |
 
 Full market page: https://www.rvintel.io/markets/portland-or
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=portland-or
 Shareable rate card: https://www.rvintel.io/magnets/portland-or-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

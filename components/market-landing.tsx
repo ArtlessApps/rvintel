@@ -3,6 +3,7 @@ import {
   MapPin,
   BarChart3,
   BookOpen,
+  Calculator,
   Download,
   FileText,
 } from "lucide-react";
@@ -14,6 +15,7 @@ import { ClassRangeChart } from "@/components/class-range-chart";
 import { DashboardCtaButton } from "@/components/dashboard-cta-button";
 import { JsonLd } from "@/lib/json-ld";
 import { nearbyMarkets } from "@/lib/markets";
+import { roiCalculatorHref } from "@/lib/roi-defaults";
 import type { MarketStats } from "@/lib/market-stats";
 import type { MarketMagnet } from "@/lib/market-magnets";
 import type { MarketReportRef } from "@/lib/market-reports";
@@ -93,12 +95,21 @@ export function MarketLanding({
       {faqLd ? <JsonLd data={faqLd} /> : null}
       <SiteHeader />
       <main className="pt-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <Link
-          href="/markets"
-          className="inline-flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground font-medium transition-colors mb-8"
-        >
-          ← All markets
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+          <Link
+            href="/markets"
+            className="inline-flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground font-medium transition-colors"
+          >
+            ← All markets
+          </Link>
+          <Link
+            href={roiCalculatorHref(slug)}
+            className="inline-flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.05em] text-primary hover:text-primary/80 font-medium transition-colors"
+          >
+            <Calculator className="w-3 h-3" aria-hidden />
+            RV rental ROI calculator
+          </Link>
+        </div>
 
         <div className="relative rounded-sm overflow-hidden bg-muted/30 p-8 sm:p-10 mb-8">
           <div
@@ -130,10 +141,24 @@ export function MarketLanding({
 
         {introHtml && (
           <div
-            className="prose prose-sm max-w-none text-muted-foreground mb-10 [&_strong]:text-foreground [&_p]:leading-relaxed [&_p+p]:mt-4"
+            className="prose prose-sm max-w-none text-muted-foreground mb-4 [&_strong]:text-foreground [&_p]:leading-relaxed [&_p+p]:mt-4"
             dangerouslySetInnerHTML={{ __html: introHtml }}
           />
         )}
+
+        {hasData ? (
+          <p className="text-sm text-muted-foreground leading-relaxed mb-10">
+            Plug these {displayName} rates into the free{" "}
+            <Link
+              href={roiCalculatorHref(slug)}
+              className="text-primary hover:underline"
+            >
+              RV rental ROI calculator
+            </Link>{" "}
+            to estimate cash-on-cash return after platform fees, insurance, and
+            maintenance.
+          </p>
+        ) : null}
 
         {magnet && (
           <ClassRangeChart
@@ -217,6 +242,12 @@ export function MarketLanding({
 
         <div className="flex flex-wrap gap-3 mb-4">
           <DashboardCtaButton slug={slug} />
+          <Button asChild variant="outline" className="rounded-sm">
+            <Link href={roiCalculatorHref(slug)}>
+              <Calculator className="w-4 h-4 mr-1.5" />
+              Calculate ROI with {displayName} rates
+            </Link>
+          </Button>
           {magnet?.magnetPath && (
             <Button asChild variant="outline" className="rounded-sm">
               <Link href={magnet.magnetPath} target="_blank" rel="noopener noreferrer">

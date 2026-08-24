@@ -20,6 +20,7 @@
 | Pop Up | 3 | $83 |
 
 Full market page: https://www.rvintel.io/markets/atlanta-ga
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=atlanta-ga
 Shareable rate card: https://www.rvintel.io/magnets/atlanta-ga-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

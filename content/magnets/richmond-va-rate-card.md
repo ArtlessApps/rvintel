@@ -20,6 +20,7 @@
 | Pop Up | 1 | $140 |
 
 Full market page: https://www.rvintel.io/markets/richmond-va
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=richmond-va
 Shareable rate card: https://www.rvintel.io/magnets/richmond-va-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

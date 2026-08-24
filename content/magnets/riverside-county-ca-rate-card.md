@@ -21,6 +21,7 @@
 | Other | 2 | $214 |
 
 Full market page: https://www.rvintel.io/markets/riverside-county-ca
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=riverside-county-ca
 Shareable rate card: https://www.rvintel.io/magnets/riverside-county-ca-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

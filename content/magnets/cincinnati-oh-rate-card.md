@@ -20,6 +20,7 @@
 | Pop Up | 2 | $113 |
 
 Full market page: https://www.rvintel.io/markets/cincinnati-oh
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=cincinnati-oh
 Shareable rate card: https://www.rvintel.io/magnets/cincinnati-oh-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

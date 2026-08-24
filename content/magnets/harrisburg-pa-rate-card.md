@@ -20,6 +20,7 @@
 | Pop Up | 1 | $125 |
 
 Full market page: https://www.rvintel.io/markets/harrisburg-pa
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=harrisburg-pa
 Shareable rate card: https://www.rvintel.io/magnets/harrisburg-pa-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_

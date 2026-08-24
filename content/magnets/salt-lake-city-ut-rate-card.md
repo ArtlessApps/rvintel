@@ -20,6 +20,7 @@
 | Pop Up | 6 | $91 |
 
 Full market page: https://www.rvintel.io/markets/salt-lake-city-ut
+RV rental ROI calculator: https://www.rvintel.io/tools/roi-calculator?market=salt-lake-city-ut
 Shareable rate card: https://www.rvintel.io/magnets/salt-lake-city-ut-rate-card.html
 
 _Data as of Aug 6, 2026 · Outdoorsy + RVshare · RVIntel_
